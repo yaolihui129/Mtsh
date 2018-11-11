@@ -9,6 +9,8 @@ return array(
     ),
     'DEFAULT_THEME' => 'Amaze',
     'PRODUCT' => 'Jinruihs',
+    'appID'=>'wx3090bf31097834ac',
+    'appsecret'=>'0f05798e9e7f2740706846aeba86308d',
     'TMPL_ACTION_ERROR' => 'Public:error',
     'TMPL_ACTION_SUCCESS' => 'Public:success',
 );

@@ -1,9 +1,5 @@
 <?php    
-    function getState($key){// 根据id获取状态
-        $where=array('type'=>'state','k'=>$key);
-        $data=M('tp_dict')->where($where)->find();
-        return $data['v'];
-    }
+
 
     //根据pid获取分类数
     function countCate($pidCateId){
