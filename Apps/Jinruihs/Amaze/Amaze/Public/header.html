@@ -1,91 +1,14 @@
 <!doctype html>
-<html class="no-js">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>金瑞恒升</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <meta name="renderer" content="webkit">
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
-    <link rel="shortcut icon" href="/favicon.ico" mce_href="/favicon.ico" type="image/x-icon">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="__CSS__/Amaze/flat.css">
-    <link rel="stylesheet" href="__CSS__/Amaze/amazeui.css"/>
-    <link rel="stylesheet" href="__CSS__/Amaze/admin.css">
+<html lang="zh-cmn-Hans">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+        <title>麦田双辉</title>
+        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+        <link rel="stylesheet" href="https://weui.io/weui.css"/>
+        <link rel="stylesheet" href="https://weui.io/example.css"/>
+    </head>
+    <body >
+    <div class="container" id="container">
 
 
-</head>
-<body>
-<!--[if lte IE 9]>
-<p class="browsehappy">你正在使用<strong>过时</strong>的浏览器，Amaze UI 暂不支持。 请 <a href="http://browsehappy.com/" target="_blank">升级浏览器</a>
-    以获得更好的体验！</p>
-<![endif]-->
-
-<header class="am-topbar admin-header navbar-static-top">
-    <div class="am-topbar-brand">
-        <img src="/favicon.ico" width="30px">
-        <strong>金瑞恒升</strong>
-    </div>
-    <button class="am-topbar-btn am-topbar-toggle am-btn am-btn-sm am-btn-success am-show-sm-only"
-            data-am-collapse="{target: '#topbar-collapse'}">
-        <span class="am-sr-only">导航切换</span> <span class="am-icon-bars"></span>
-    </button>
-    <div class="am-collapse am-topbar-collapse" id="topbar-collapse">
-        <ul class="nav navbar-nav">
-            <li class="active hide" id="hide" onclick="hide()"><a href="#">隐藏菜单 <span
-                    class="sr-only">(current)</span></a></li>
-            <li class="active" id="show" onclick="show()"><a href="#">显示菜单 <span class="sr-only">(current)</span></a>
-            </li>
-        </ul>
-        <ul class="am-nav am-nav-pills am-topbar-nav am-topbar-right admin-header-list">
-
-
-            <empty name="_SESSION['user']">
-                <li>
-                    <a href="__APP__/<{$Think.config.PRODUCT}>/Login"><i class="glyphicon glyphicon-log-in"> 登录</i></a>
-                </li>
-                <else/>
-                <li class="am-dropdown" data-am-dropdown>
-                    <a class="am-dropdown-toggle" data-am-dropdown-toggle href="javascript:">
-                        <i class="glyphicon glyphicon-user"> <{$_SESSION['user']|getJiraName=###}>  </i>
-                        <i class="am-icon-caret-down"></i>
-                    </a>
-                    <ul class="am-dropdown-content">
-                        <li>
-                            <a href="#">
-                                <i class="glyphicon glyphicon-credit-card"> 积分</i>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <li><a href="__APP__/<{$Think.config.PRODUCT}>/Set"><i class="am-icon-cog"> 设置 </i></a></li>
-                <li><a href="__APP__/<{$Think.config.PRODUCT}>/Login/logout"><i class="am-icon-power-off"> 退出 </i></a></li>
-            </empty>
-            <li>
-                <a href="javascript:" id="admin-fullscreen">
-                    <span class="am-icon-arrows-alt"></span>
-                    <span class="admin-fullText">开启全屏</span>
-                </a>
-            </li>
-        </ul>
-    </div>
-</header>
-<div class="am-cf admin-main">
-    <div class="admin-sidebar hide">
-        <ul class="am-list admin-sidebar-list">
-            <li>
-                <a href="__APP__/<{$Think.config.PRODUCT}>/Index/index/project/<{$Think.session.project}>">
-                    <span class="glyphicon glyphicon-home"> 迭代&任务</span>
-                </a>
-            </li>
-        </ul>
-        <div class="am-panel am-panel-default admin-sidebar-panel">
-            <div class="am-panel-bd">
-                <p><span class="am-icon-bookmark"></span> 习惯</p>
-                <p>
-                    好的习惯也不是一蹴而就的，需要的是反复的积累。<br>
-                    --果农
-                </p>
-            </div>
-        </div>
-    </div>

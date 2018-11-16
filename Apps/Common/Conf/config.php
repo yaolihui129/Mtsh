@@ -3,9 +3,10 @@ return array(
 	//'配置项'=>'配置值'
 	'SHOW_PAGE_TRACE'       =>true,//显示页面Trace信息false
     'SESSION_AUTO_START'    => true,//开启SESSION
-    'URL_MODEL'             => '1',//URL模式
+    'URL_MODEL'             => '2',//URL模式
     'MODULE_ALLOW_LIST'     => array(
-        'Jrback',       //金瑞恒生后台
+        'Admin',        //管理后台
+        'Back',       //金瑞恒生后台
         'Jinruihs',     //金瑞恒生
         'Business',     //商户中心
         'Coupon',       //优惠券
@@ -17,7 +18,7 @@ return array(
         'Market',       //营销中心
         'Payment '      //结算中心
     ),//设置允许模块
-    'DEFAULT_MODULE'        => 'Business',//设置默认模块设置
+    'DEFAULT_MODULE'        => 'Jinruihs',//设置默认模块设置
     'MODULE_DENY_LIST'      => array('Common','Runtime'), // 禁止访问的模块列表
     'URL_CASE_INSENSITIVE'  =>true, //不区分大小写
     'ONLINE'                =>0,  //是否为线上环境，0：测试环境；1：生产环境

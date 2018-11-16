@@ -1,7 +1,6 @@
 <?php
 namespace Jinruihs\Controller;
-use Think\Controller;
-class BaseController extends Controller
+class BaseController extends WechatController
 {
     public function _initialize()
     {
@@ -21,19 +20,10 @@ class BaseController extends Controller
             $this->redirect('User/Login/index');
         }
     }
-    
-    function select($data, $name, $value)
-    {
-        $html = '<select name="' . $name . '" class="form-control">';
-        foreach ($data as $v) {
-            $selected = ($v['key'] == $value) ? "selected" : "";
-            $html .= '<option ' . $selected . ' value="' . $v['key'] . '">' . $v['value'] . '</option>';
-        }
-        $html .= '<select>';
-        return $html;
-    }
 
-    public function order()
+
+
+    function order()
     {
         $num = 0;
         foreach ($_POST['sn'] as $id => $sn) {
@@ -46,7 +36,7 @@ class BaseController extends Controller
         }
     }
 
-    public function insert()
+    function insert()
     {
         $m = D(I('table'));
         if (IS_GET) {
@@ -84,8 +74,10 @@ class BaseController extends Controller
         }
     }
 
+
+
     //修改
-    public function update()
+    function update()
     {
         if (IS_GET) {
             $_GET['moder'] = $_SESSION['user'];
@@ -112,16 +104,18 @@ class BaseController extends Controller
         }
     }
 
+
+
     //逻辑删除
-    public function del()
+    function del($msg='成功')
     {
         $_POST[id] = I('id');
         $_POST['moder'] = $_SESSION['user'];
         $_POST['deleted'] = 1;
         if (D(I('table'))->save($_POST)) {
-            $this->success("删除成功！");
+            $this->success($msg);
         } else {
-            $this->error("删除失败！");
+            $this->error("失败！");
         }
     }
 

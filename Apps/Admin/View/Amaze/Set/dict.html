@@ -1,0 +1,254 @@
+<layout name="layout"/>
+<div class="admin-content container-fluid" style="min-height: 500px">
+    <br />
+    <nav class="navbar navbar-inverse">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="__URL__/index">数据字典（Dict）</a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                       aria-haspopup="true" aria-expanded="false">
+                        分类：<{$type}> <i class="am-badge"> <{$count}></i>
+                        <span class="am-icon-caret-down"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <volist name='typeList' id='vo'>
+                            <li><a href="__URL__/dict/type/<{$vo}>"><{$vo}></a></li>
+                        </volist>
+                    </ul>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <form action="__URL__/dict " method="post" class="navbar-form navbar-left" role="search">
+                    <div class="form-group input-group">
+                        <input type="text" class="form-control" name="search" value="<{$search}>"
+                               placeholder="名称、关键字">
+                        <span class="input-group-btn">
+                             <button type="submit" class="btn btn-default">
+                                 <span class="glyphicon glyphicon-search"></span>
+                             </button>
+                            <a type="button" data-toggle="modal" href="#add" class="btn btn-success"> 添加 </a>
+                        </span>
+                    </div>
+                </form>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-9">
+            <table class="am-table am-table-striped am-table-hover table-main table-bordered">
+                <thead>
+                <tr>
+                    <th class="table-title" bgcolor="#ccc">顺序</th>
+                    <th class="table-type" bgcolor="#ccc">类型</th>
+                    <th class="table-title" bgcolor="#ccc">Key</th>
+                    <th class="table-title" bgcolor="#ccc">Value</th>
+                    <th class="table-title" bgcolor="#ccc">拓展</th>
+                    <th class="table-title" bgcolor="#ccc">备注</th>
+                    <th class="table-title" bgcolor="#ccc">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <volist name='data' id='vo' empty="没有数据">
+                    <tr>
+                        <td><{$vo.sn}></td>
+                        <td><{$vo.type}></td>
+                        <td><{$vo.key}></td>
+                        <td><{$vo.value}></td>
+                        <td><{$vo.json}></td>
+                        <td><{$vo.remark}></td>
+                        <td>
+                            <a data-toggle="modal" href="#mod" id="<{$vo.id}>" onclick="mod(this.id)">修改</a>
+                            <a href="__URL__/shan_chu_dict/id/<{$vo.id}>" onclick="return confirm('你确定要废弃：<{$vo.value}>吗？')">废弃</a>
+                        </td>
+                    </tr>
+                </volist>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-3">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">选择分类</h3>
+                </div>
+                <div class="list-group">
+                    <volist name='typeList' id='vo'>
+                        <eq name="type" value="$vo">
+                            <a href="__URL__/dict/type/<{$vo}>" class="list-group-item list-group-item-warning"><{$vo}></a>
+                            <else/>
+                            <a href="__URL__/dict/type/<{$vo}>" class="list-group-item"><{$vo}></a>
+                        </eq>
+                    </volist>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+<script>
+    //修改项目JS
+    function mod(id) {
+        // alert(id)
+        $.ajax({
+            type: "GET",
+            url: "__URL__/dict_info",
+            data: {id: id},
+            dataType: "json",
+            success: function (ss) {
+                $("#mod_id").val(ss.result.id);
+                $("#mod_sn").val(ss.result.sn);
+                $("#mod_key").val(ss.result.key);
+                $("#mod_value").val(ss.result.value);
+                $("#mod_json").val(ss.result.json);
+                $("#mod_remark").val(ss.result.remark);
+            }
+        })
+    }
+</script>
+
+
+<!-- 添加-->
+<div class="modal fade" id="add" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form action="__URL__/dict_update" method="post" enctype='multipart/form-data' class="form-horizontal" role="form"   >
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <!-- 待修改-->
+                    <h4 class="modal-title">添加-数据字典</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">顺序</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" name="sn" value="<{$count+1}>" placeholder="顺序">
+                        </div>
+                        <div class="col-sm-2 control-label"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Key</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" name="key" value="" placeholder="Key">
+                        </div>
+                        <div class="col-sm-2 control-label"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Value</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" name="value" value="" placeholder="value">
+                        </div>
+                        <div class="col-sm-2 control-label"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Type</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" name="type" value="<{$type}>" placeholder="Type">
+                        </div>
+                        <div class="col-sm-2 control-label"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">拓展</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" name="json" value="" placeholder="拓展">
+                        </div>
+                        <div class="col-sm-2 control-label"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">备注</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" name="remark" value="" placeholder="备注">
+                        </div>
+                        <div class="col-sm-2 control-label"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="submit" class="btn btn-primary">提交</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 修改-->
+<div class="modal fade" id="mod" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form action="__URL__/dict_update" method="post" enctype='multipart/form-data' class="form-horizontal" role="form"   >
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title" id="title1">修改-数据字典</h4>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="mod_id" value="" />
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">顺序</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="mod_sn" name="sn" value="" placeholder="顺序">
+                        </div>
+                        <div class="col-sm-2 control-label"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Key</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="mod_key" name="key" value="" placeholder="Key">
+                        </div>
+                        <div class="col-sm-2 control-label"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Value</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="mod_value" name="value" value="" placeholder="value">
+                        </div>
+                        <div class="col-sm-2 control-label"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Type</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="mod_type" name="type" value="<{$type}>" placeholder="Type">
+                        </div>
+                        <div class="col-sm-2 control-label"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">拓展</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="mod_json" name="json" value="" placeholder="拓展">
+                        </div>
+                        <div class="col-sm-2 control-label"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">备注</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="mod_remark" name="remark" value="" placeholder="备注">
+                        </div>
+                        <div class="col-sm-2 control-label"></div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="submit" class="btn btn-primary">提交</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

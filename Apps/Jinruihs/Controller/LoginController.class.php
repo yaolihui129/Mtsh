@@ -3,6 +3,13 @@ namespace Jinruihs\Controller;
 use Think\Controller;
 class LoginController extends Controller
 {
+    public function _initialize()
+    {
+        if (ismobile()) {//设置默认默认主题为 Amaze
+            C('DEFAULT_V_LAYER', 'Amaze');
+        }
+    }
+
     public function index()
     {
         layout(false); // 临时关闭当前模板的布局功能
