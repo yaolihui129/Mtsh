@@ -8,7 +8,7 @@ return array(
         '__UPLOAD__' => 'https://xiuliguanggao.com/Upload'
     ),
     'DEFAULT_THEME' => 'Amaze',
-    'PRODUCT' => 'Jinruihs',
+    'PRODUCT'       => 'Back',
     'TMPL_ACTION_ERROR' => 'Public:error',
     'TMPL_ACTION_SUCCESS' => 'Public:success',
 );
