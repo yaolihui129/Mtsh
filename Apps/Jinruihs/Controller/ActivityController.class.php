@@ -56,15 +56,15 @@ class ActivityController extends BaseController
     function countUV($id,$user){
         //初始化
         $info = $this->init();
-        $var['activity_id']=$id;
-        $var['customer_third_id']=$user;
-        $var['access_date']=date('Y-m-d',time());
-        $data=M($info['table_activity_uv'])->where($var)->find();
-        if (!$data){
-            insert($info['table_activity_uv'],$var);
+        if($user){
+            $var['activity_id']=$id;
+            $var['customer_third_id']=$user;
+            $var['access_date']=date('Y-m-d',time());
+            $data=M($info['table_activity_uv'])->where($var)->find();
+            if (!$data){
+                insert($info['table_activity_uv'],$var);
+            }
         }
-
-
     }
 
 
