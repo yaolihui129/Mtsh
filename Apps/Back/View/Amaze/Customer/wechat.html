@@ -9,34 +9,34 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">活动管理（Activity）</a>
+            <a class="navbar-brand" href="#">微信公众号客户（Customer）</a>
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                        aria-haspopup="true" aria-expanded="false">
-                        分类：<{$type|get_dict_info='activity_type',###}>
+                        当前公众号：<{$Think.cookie.Back_publicNumber|getName='admin_app',###}>
                         <span class="am-icon-caret-down"></span>
                     </a>
                     <ul class="dropdown-menu">
-                        <volist name='typeList' id='vo'>
-                            <li><a href="__URL__/index/type/<{$vo.key}>"><{$vo.value}></a></li>
+                        <volist name='publicNumberList' id='vo'>
+                            <li><a href="__URL__/wechat/publicNumber/<{$vo.key}>"><{$vo.value}></a></li>
                         </volist>
                     </ul>
                 </li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-                <form action="__URL__/index " method="post" class="navbar-form navbar-left" role="search">
+                <form action="__URL__/wechat" method="post" class="navbar-form navbar-left" role="search">
                     <div class="form-group input-group">
-                        <input type="hidden" name="type" value="<{$type}>" />
-                        <input type="hidden" name="type" value="<{$Think.cookie.Back_app}>" />
-                        <input type="text" class="form-control" name="search" value="<{$search}>" placeholder="名称、关键字">
+                        <input type="hidden" name="merchant_id" value="<{$Think.cookie.Back_merchant}>" />
+                        <input type="hidden" name="app_id" value="<{$Think.cookie.Back_publicNumber|getName='admin_app',###,'appid'}>" />
+                        <input type="text" class="form-control" name="search" value="<{$search}>" placeholder="昵称、openid">
                         <span class="input-group-btn">
                              <button type="submit" class="btn btn-default">
                                  <span class="glyphicon glyphicon-search"></span>
                              </button>
-                            <a data-toggle="modal" href="#add" type="button" class="btn btn-success" > 添加</a>
+                            <!--<a data-toggle="modal" href="#add" type="button" class="btn btn-success" > 添加</a>-->
                         </span>
                     </div>
                 </form>
@@ -48,34 +48,48 @@
     <table class="am-table am-table-striped am-table-hover table-main table-bordered">
         <thead>
         <tr>
-            <th class="table-type" bgcolor="#ccc">顺序</th>
-            <th class="table-title" bgcolor="#ccc">标题</th>
-            <th class="table-type" bgcolor="#ccc">图片</th>
-            <th class="table-type" bgcolor="#ccc">状态</th>
-            <th class="table-type" bgcolor="#ccc">开始</th>
-            <th class="table-title" bgcolor="#ccc">结束</th>
-            <th class="table-title" bgcolor="#ccc">点击次数</th>
+            <th class="table-type" bgcolor="#ccc">客户ID</th>
+            <th class="table-type" bgcolor="#ccc">平台标识</th>
+            <th class="table-type" bgcolor="#ccc">头像URL</th>
+            <th class="table-type" bgcolor="#ccc">openid</th>
+            <th class="table-title" bgcolor="#ccc">微信昵称</th>
+            <th class="table-type" bgcolor="#ccc">性别</th>
+            <th class="table-type" bgcolor="#ccc">unionid</th>
+            <th class="table-type" bgcolor="#ccc">国家</th>
+            <th class="table-type" bgcolor="#ccc">省份</th>
+            <th class="table-type" bgcolor="#ccc">城市</th>
+            <th class="table-title" bgcolor="#ccc">来源</th>
             <th class="table-type" bgcolor="#ccc">操作</th>
         </tr>
         </thead>
         <tbody>
         <volist name='data' id='vo' empty="没有数据">
             <tr>
-                <td><{$vo.sn}></td>
-                <td title="<{$vo.desc}>"><{$vo.title}></td>
-                <td><{$vo.img}></td>
+                <td><{$vo.customer_id}></td>
                 <td>
-                    <a href="__URL__/activity_status/id/<{$vo.id}>/status/<{$vo.status}>" >
-                        <{$vo.status|get_dict_info='activity_status',###}>
-                    </a>
+                    <switch name="vo.flag">
+                        <case value="0">公众号</case>
+                        <case value="1">小程序</case>
+                        <case value="2">其他</case>
+                    </switch>
                 </td>
-                <td><{$vo.begin}></td>
-                <td><{$vo.end}></td>
-                <td><{$vo.clicknum}></td>
+                <td><img src="<{$vo.headimgurl}>" width="30px" height="30px"></td>
+                <td><{$vo.openid}></td>
+                <td><{$vo.nickname}></td>
+                <td>
+                    <switch name="vo.sex">
+                        <case value="0">女</case>
+                        <case value="1">男</case>
+                        <case value="2">女</case>
+                    </switch>
+                </td>
+                <td><{$vo.unionid}></td>
+                <td><{$vo.country}></td>
+                <td><{$vo.province}></td>
+                <td><{$vo.city}></td>
+                <td><{$vo.source}></td>
                 <td>
                     <a data-toggle="modal" href="#mod" id="<{$vo.id}>" onclick="mod(this.id)">修改信息</a>
-                    <a href="__URL__/activity_del/id/<{$vo.id}>" onclick="return confirm('你确定要下线：<{$vo.title}>吗？')">下线</a>
-                    <a href="__URL__/activity_content/id/<{$vo.id}>" >内容</a>
                 </td>
             </tr>
         </volist>

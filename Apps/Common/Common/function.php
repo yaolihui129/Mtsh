@@ -1,13 +1,24 @@
 <?php
-
-
     //根据pid获取分类数
     function countCate($pidCateId){
         $where=array('pidCateId'=>$pidCateId);
         $data=M('tp_cate')->where($where)->count();
         return $data;
     }
-    //获取分类名字
+
+    //封装下啦菜单
+    function select($data, $name, $value)
+    {
+        $html = '<select name="' . $name . '" class="form-control">';
+        foreach ($data as $v) {
+            $selected = ($v['key'] == $value) ? "selected" : "";
+            $html .= '<option ' . $selected . ' value="' . $v['key'] . '">' . $v['value'] . '</option>';
+        }
+        $html .= '<select>';
+        return $html;
+    }
+
+//获取分类名字
     function getCatname($cateid){
         if ($cateid){
             $data=M('tp_cate')->find($cateid);
@@ -37,7 +48,6 @@
         $str = substr_replace($data['phone'],'****',3,4);
         return $str;
     }
-
 
     //登录
     function login($phone,$password){
@@ -554,11 +564,6 @@
         return $str;
     }
 
-
-
-
-
-
     function countId($table,$name,$value){
         $where=array($name=>$value,"deleted"=>'0');
         $count=M($table)->where($where)->count();
@@ -572,6 +577,7 @@
     //获取某一字段值
     function getName($table,$id,$name='name'){
         $data=M($table)->find($id);
+//        dump($data['real_name']);
         if($data[$name]){
             return $data[$name];
         }else{
@@ -589,6 +595,7 @@
             return $key;
         }
     }
+
 
 
     //状态选择控件,@param $name 控件name;@param $value 选中值
@@ -885,7 +892,7 @@
     }
     function passport_key($txt, $encrypt_key)
     {
-        $encrypt_key = md5($encrypt_key);
+//        $encrypt_key = md5($encrypt_key);
         $ctr = 0;
         $tmp = '';
         for($i = 0; $i < strlen($txt); $i++) {
@@ -893,6 +900,24 @@
             $tmp .= $txt[$i] ^ $encrypt_key[$ctr++];
         }
         return $tmp;
+    }
+
+    //获取列表
+    function get_list($table,$where,$name='name',$order='id'){
+        $data=M($table)->where($where)->order($order)->select();
+        $list=array();
+        foreach ($data as $k=>$da){
+            $list[$k]['key']=$da['id'];
+            $list[$k]['value']=$da[$name];
+        }
+        return $list;
+    }
+
+    //封装字典为下拉菜单
+    function dict_list($type,$field,$default='0',$lim=''){
+        $data=$this->get_dict_list($type,$lim);
+        $var=$this->select($data,$field,$default);
+        return $var;
     }
 
 

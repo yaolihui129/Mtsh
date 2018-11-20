@@ -14,34 +14,15 @@ class BaseController extends WechatController
         $this->display('index');
     }
 
-    function isLogin()
-    {
-        if (!isset($_SESSION['isLogin']) || $_SESSION['user'] == '') {
-            $this->redirect('User/Login/index');
-        }
-    }
 
 
-
-    function order()
-    {
-        $num = 0;
-        foreach ($_POST['sn'] as $id => $sn) {
-            $num += D(I('table'))->save(array("id" => $id, "sn" => $sn));
-        }
-        if ($num) {
-            $this->success("排序成功!");
-        } else {
-            $this->error("排序失败...");
-        }
-    }
 
     function insert()
     {
         $m = D(I('table'));
         if (IS_GET) {
-            $_GET['adder'] = $_SESSION['user'];
-            $_GET['moder'] = $_SESSION['user'];
+            $_GET['adder'] = cookie(C(appID).'_isLogin');
+            $_GET['moder'] = cookie(C(appID).'_isLogin');
             $_GET['ctime'] = time();
             if (!$m->create($_GET)) {
                 $this->error($m->getError());
@@ -56,8 +37,8 @@ class BaseController extends WechatController
                 $this->error("失败");
             }
         } else {
-            $_POST['adder'] = $_SESSION['user'];
-            $_POST['moder'] = $_SESSION['user'];
+            $_POST['adder'] = cookie(C(appID).'_isLogin');
+            $_POST['moder'] = cookie(C(appID).'_isLogin');
             $_POST['ctime'] = time();
             if (!$m->create()) {
                 $this->error($m->getError());
@@ -80,7 +61,7 @@ class BaseController extends WechatController
     function update()
     {
         if (IS_GET) {
-            $_GET['moder'] = $_SESSION['user'];
+            $_GET['moder'] = cookie(C(appID).'_isLogin');
             if (D(I('table'))->save($_GET)) {
                 if ($_GET['url']) {
                     $this->success("成功", U($_GET['url']));
@@ -91,7 +72,7 @@ class BaseController extends WechatController
                 $this->error("失败！");
             }
         } else {
-            $_POST['moder'] = $_SESSION['user'];
+            $_POST['moder'] = cookie(C(appID).'_isLogin');
             if (D(I('table'))->save($_POST)) {
                 if ($_POST['url']) {
                     $this->success("成功", U($_POST['url']));
@@ -104,13 +85,11 @@ class BaseController extends WechatController
         }
     }
 
-
-
     //逻辑删除
     function del($msg='成功')
     {
-        $_POST[id] = I('id');
-        $_POST['moder'] = $_SESSION['user'];
+        $_POST['id'] = I('id');
+        $_POST['moder'] = cookie(C(appID).'_isLogin');
         $_POST['deleted'] = 1;
         if (D(I('table'))->save($_POST)) {
             $this->success($msg);
@@ -118,6 +97,8 @@ class BaseController extends WechatController
             $this->error("失败！");
         }
     }
+
+
 
 
 

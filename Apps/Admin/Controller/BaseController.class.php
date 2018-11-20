@@ -5,6 +5,12 @@ class BaseController extends Controller
 {
     public function _initialize()
     {
+        //判定登录态
+        $isLogin=cookie(C(PRODUCT).'_isLogin');
+        $user=cookie(C(PRODUCT).'_user');
+        if($isLogin==''||$user==''){
+            $this->redirect(C(PRODUCT).'/Login/index');
+        }
         if (ismobile()) {//设置默认默认主题为 Amaze
             C('DEFAULT_V_LAYER', 'Amaze');
         }
@@ -14,15 +20,6 @@ class BaseController extends Controller
     {
         $this->display('index');
     }
-
-    function isLogin()
-    {
-        if (!isset($_SESSION['isLogin']) || $_SESSION['user'] == '') {
-            $this->redirect('User/Login/index');
-        }
-    }
-    
-
 
     public function order()
     {
@@ -41,8 +38,8 @@ class BaseController extends Controller
     {
         $m = D(I('table'));
         if (IS_GET) {
-            $_GET['adder'] = $_SESSION['user'];
-            $_GET['moder'] = $_SESSION['user'];
+            $_GET['adder'] = cookie(C(PRODUCT).'_user');
+            $_GET['moder'] = cookie(C(PRODUCT).'_user');
             $_GET['ctime'] = time();
             if (!$m->create($_GET)) {
                 $this->error($m->getError());
@@ -57,8 +54,8 @@ class BaseController extends Controller
                 $this->error("失败");
             }
         } else {
-            $_POST['adder'] = $_SESSION['user'];
-            $_POST['moder'] = $_SESSION['user'];
+            $_POST['adder'] = cookie(C(PRODUCT).'_user');
+            $_POST['moder'] = cookie(C(PRODUCT).'_user');
             $_POST['ctime'] = time();
             if (!$m->create()) {
                 $this->error($m->getError());
@@ -79,7 +76,7 @@ class BaseController extends Controller
     public function update()
     {
         if (IS_GET) {
-            $_GET['moder'] = $_SESSION['user'];
+            $_GET['moder'] = cookie(C(PRODUCT).'_user');
             if (D(I('table'))->save($_GET)) {
                 if ($_GET['url']) {
                     $this->success("成功", U($_GET['url']));
@@ -90,7 +87,7 @@ class BaseController extends Controller
                 $this->error("失败！");
             }
         } else {
-            $_POST['moder'] = $_SESSION['user'];
+            $_POST['moder'] = cookie(C(PRODUCT).'_user');
             if (D(I('table'))->save($_POST)) {
                 if ($_POST['url']) {
                     $this->success("成功", U($_POST['url']));
@@ -106,8 +103,8 @@ class BaseController extends Controller
     //逻辑删除
     public function del()
     {
-        $_POST[id] = I('id');
-        $_POST['moder'] = $_SESSION['user'];
+        $_POST['id'] = I('id');
+        $_POST['moder'] =cookie(C(PRODUCT).'_user');
         $_POST['deleted'] = 1;
         if (D(I('table'))->save($_POST)) {
             $this->success("删除成功！");

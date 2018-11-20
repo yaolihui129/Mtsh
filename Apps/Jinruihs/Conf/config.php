@@ -8,7 +8,6 @@ return array(
         '__IMG__' => 'https://xiuliguanggao.com/Public/images',
         '__UPLOAD__' => 'https://xiuliguanggao.com/Upload'
     ),
-    'DB_PREFIX' => '',
     'DEFAULT_THEME' => 'Amaze',
     'TMPL_ACTION_ERROR' => 'Public:error',
     'TMPL_ACTION_SUCCESS' => 'Public:success',
@@ -17,5 +16,15 @@ return array(
     //公众号配置
     'appID'=>'wx3090bf31097834ac',
     'appsecret'=>'0f05798e9e7f2740706846aeba86308d',
+    'DB_PREFIX'             => 'tp_',
+
+    'DB_HOST'               => '127.0.0.1',
+    'DB_NAME'               => 'xiuli',
+    'DB_USER'               => 'root',
+    'DB_PWD'                => 'root',
+    'DB_PORT'               => '3306',
+
+
+
 
 );

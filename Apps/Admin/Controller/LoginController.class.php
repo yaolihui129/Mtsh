@@ -20,18 +20,15 @@ class LoginController extends Controller
     {
         $user = I('username');
         $password = I('password');
-        S($user, $password);
-        $url = C(JIRAURL) . '/rest/auth/1/session';
-        $json = json_encode(array('username' => $user, 'password' => $password));
-        $json = httpJsonPost($url, $json);
-        $arr = json_decode($json, true);
-        if ($arr['session']) {
-            $_SESSION['user'] = $user;
-            $_SESSION['isLogin'] = C(PRODUCT);
-            if ($_SESSION['url']) {
-                $url = $_SESSION['url'];
-            } else {
-                $url = '/' . C(PRODUCT) . '/Index/index/project/' . $_SESSION['project'];;
+        $time=2*7*24*3600;
+        $where=array('username'=>$user,'password'=>md5($password),'status'=>'1','deleted'=>'0');
+        $data=M('user')->where($where)->find();
+        if ($data) {
+            cookie('user',$data['id'],array('expire'=>$time,'prefix'=>C(PRODUCT).'_'));
+            cookie('isLogin',1,array('expire'=>$time,'prefix'=>C(PRODUCT).'_'));
+            $url=cookie(C(PRODUCT).'_url');
+            if(!$url){
+                $url = '/' . C(PRODUCT) . '/Index/index';
             }
             $this->redirect($url);
         } else {
@@ -43,10 +40,11 @@ class LoginController extends Controller
 
     public function logout()
     {
-        $username = $_SESSION['user'];
-        $_SESSION = array();
+        $username = cookie(C(PRODUCT).'_user');
+        $username = getName('user',$username,'real_name');
+        $_COOKIE[C(PRODUCT)] = array();
         session_destroy();
-        $this->success($username . ",再见!", U(C(PRODUCT) . '/Index/index'));
+        $this->success($username . ",再见!", U(C(PRODUCT) . '/Login/index'));
 
     }
 

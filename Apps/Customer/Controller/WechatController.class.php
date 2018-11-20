@@ -1,7 +1,7 @@
 <?php
-namespace Jinruihs\Controller;
-use Think\Controller;
-class WechatController extends Controller{
+namespace Customer\Controller;
+class WechatController extends BaseController{
+
 
   function getBaseInfo($scope='snsapi_userinfo',$state='123'){
         //1.获取code $scope='snsapi_base';snsapi_userinfo
@@ -21,46 +21,53 @@ class WechatController extends Controller{
       $res = httpGet($url);
       $arr = json_decode($res,true);
       $access_token=$arr['access_token'];
-
+      cookie(C(PRODUCT).'_openid',$arr['openid']);
       //用openID登陆
       $this->openidLogin($appid,$arr['openid']);
-      cookie($appid.'_refresh_token',$arr['refresh_token']);
+      cookie(C(PRODUCT).'_refresh_token',$arr['refresh_token']);
+      cookie(C(PRODUCT).'_userToken='.$arr['openid'],$access_token,7200);
       $scope=$arr['scope'];
       if($scope=='snsapi_userinfo'){
           $url = 'https://api.weixin.qq.com/sns/userinfo?access_token='.$access_token.'&openid='.$arr['openid'].'&lang=zh_CN';
           $userinfo=httpGet($url);
-          cookie($appid.'_userinfo', $userinfo);
+          cookie(C(PRODUCT).'_userinfo', $userinfo);
           //更新用户信息
           $this->updateCustomerThirdParty($userinfo,$state);
       }
+
       redirect($_SESSION['uri'].'/openid/'.$arr['openid']);
+
   }
 
   function openidLogin($appid,$openid){
       $where=array('app_id'=>$appid,'openid'=>$openid,'deleted'=>'0');
-      $data=M('customer_third_party')->where($where)->find();
+      $data=M('tp_customer_third_party')->where($where)->find();
       if(!$data){
           //插入数据
-          if($openid){
-              $data['app_id']=$appid;
-              $data['merchant_id']='6';
-              $data['openid']=$openid;
-              $data['id']=insert('customer_third_party',$data);
-          }
+          $data['app_id']=$appid;
+          $data['openid']=$openid;
+          $data['id']=insert('tp_customer_third_party',$data);
       }
       //设置登录态
-      cookie($appid.'_isLogin',$data['id']);
-      cookie($appid.'_openid',$openid);
+      cookie(C(PRODUCT).'_isLogin',$data['id']);
+//      cookie(C(PRODUCT).'_token',$openid);
       return true;
 
   }
   //更新用户信息
   function updateCustomerThirdParty($userinfo,$state){
       $userinfo=json_decode($userinfo,true);
-      $userinfo['id']= cookie(C(appID).'_isLogin');
+      $userinfo['id']= cookie(C(PRODUCT).'_isLogin');
       $userinfo['source']= $state;
       $userinfo['flag']= '0';
-      update('customer_third_party',$userinfo);
+      update('tp_customer_third_party',$userinfo);
   }
+
+  //拉取公众号用户信息
+    function getWechatUsersList($token,$next_openid=''){
+      $url='https://api.weixin.qq.com/cgi-bin/user/get?access_token='.$token.'&next_openid='.$next_openid;
+      $res=httpGet($url);
+      $this->ajaxReturn($res);
+    }
 
 }

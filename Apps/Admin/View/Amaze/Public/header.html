@@ -37,14 +37,14 @@
             </li>
         </ul>
         <ul class="am-nav am-nav-pills am-topbar-nav am-topbar-right admin-header-list">
-            <empty name="_SESSION['user']">
+            <empty name="Think.cookie.Admin_user">
                 <li>
                     <a href="__APP__/<{$Think.config.PRODUCT}>/Login"><i class="glyphicon glyphicon-log-in"> 登录</i></a>
                 </li>
                 <else/>
                 <li class="am-dropdown" data-am-dropdown>
                     <a class="am-dropdown-toggle" data-am-dropdown-toggle href="javascript:">
-                        <i class="glyphicon glyphicon-user"> <{$_SESSION['user']}>  </i>
+                        <i class="glyphicon glyphicon-user"> <{$Think.cookie.Admin_user|getName='user',###,'real_name'}>  </i>
                         <i class="am-icon-caret-down"></i>
                     </a>
                     <ul class="am-dropdown-content">

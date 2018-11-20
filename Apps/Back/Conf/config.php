@@ -9,6 +9,14 @@ return array(
     ),
     'DEFAULT_THEME' => 'Amaze',
     'PRODUCT'       => 'Back',
+
     'TMPL_ACTION_ERROR' => 'Public:error',
     'TMPL_ACTION_SUCCESS' => 'Public:success',
+
+    'DB_HOST'               => '127.0.0.1',
+    'DB_NAME'               => 'xiuli',
+    'DB_USER'               => 'root',
+    'DB_PWD'                => 'root',
+    'DB_PORT'               => '3306',
+    'DB_PREFIX'             => 'tp_',
 );

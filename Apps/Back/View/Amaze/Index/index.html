@@ -1,5 +1,80 @@
 <layout name="layout"/>
 <div class="admin-content container" style="min-height: 500px">
+    <nav class="navbar navbar-inverse">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#"><{$Think.cookie.Back_merchant|getName='admin_merchant',###}></a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                       aria-haspopup="true" aria-expanded="false">
+                        商户
+                        <span class="am-icon-caret-down"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <volist name='merchantList' id='vo'>
+                            <li><a href="__URL__/index/merchant/<{$vo.key}>"><{$vo.value}></a></li>
+                        </volist>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                       aria-haspopup="true" aria-expanded="false">
+                        网站
+                        <span class="am-icon-caret-down"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <volist name='appList' id='vo'>
+                            <li>
+                                <a href="__URL__/index/app/<{$vo.key}>/merchant/<{$Think.cookie.Back_merchant}>">
+                                    <{$vo.value}>
+                                </a>
+                            </li>
+                        </volist>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                       aria-haspopup="true" aria-expanded="false">
+                        公众号
+                        <span class="am-icon-caret-down"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <volist name='publicNumberList' id='vo'>
+                            <li>
+                                <a href="__URL__/index/publicNumber/<{$vo.key}>/merchant/<{$Think.cookie.Back_merchant}>/app/<{$Think.cookie.Back_app}>">
+                                    <{$vo.value}>
+                                </a>
+                            </li>
+                        </volist>
+                    </ul>
+                </li>
+                <!--<form action="__URL__/merchant_app " method="post" class="navbar-form navbar-left" role="search">
+                    <div class="form-group input-group">
+                        <input type="hidden" name="id" value="<{$merchant}>" />
+                        <input type="text" class="form-control" name="search" value="<{$search}>" placeholder="名称、关键字">
+                        <span class="input-group-btn">
+                             <button type="submit" class="btn btn-default">
+                                 <span class="glyphicon glyphicon-search"></span>
+                             </button>
+                        </span>
+                    </div>
+                </form>-->
+            </ul>
+        </div>
+    </nav>
+<h1>站点信息</h1>
+    <h2>当前商家：<{$Think.cookie.Back_merchant|getName='admin_merchant',###}></h2>
+    <h2>当前站点：<{$Think.cookie.Back_app|getName='admin_app',###}></h2>
+    <h2>当前公众号：<{$Think.cookie.Back_publicNumber|getName='admin_app',###}></h2>
 
 </div>
