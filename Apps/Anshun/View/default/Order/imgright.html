@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><{$_SESSION['Anshun']['web']}></title>
+    <meta name="keywords" content="<{$_SESSION['keywords']}>" />
+	<meta name="description" content="" />
+    <link href="http://cdn.bootcss.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="http://cdn.bootcss.com/bootstrap-fileinput/4.3.8/css/fileinput.css" rel="stylesheet">
+         
+    <!--[if lt IE 9]>
+      <script src="http://cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="http://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+<div class="container"> 
+
+
+<div class="row">
+	<div class="col-md-7">			
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<form action="__URL__/pic" method="post" enctype='multipart/form-data'  role="form">
+				     <input type="hidden" name="id" value="<{$arr.id}>" />
+				     <input type="hidden" name="place" value="right" />		         						
+					 <div class="panel panel-primary"> 
+						<div class="panel-heading">
+							<h3 class="panel-title">右侧照片
+								<div class="btn-group pull-right">
+							    	<a href="__URL__/servicelist" class="btn btn-warning btn-xs">返回</a>
+							    </div>
+							</h3>
+						</div>
+						<div class="panel-body">
+					 		<img  src="__UPLOAD__<{$arr.pathright}><{$arr.imgright}>" alt="<{$arr.imgright}>"  width="100%">					 		
+							<input  name="textright" class="form-control" value="<{$arr.textright}>" />
+							<input id="input-1" type="file" class="file form-control" name="img"><br>  
+							<div class="form-group ">
+							 	<button type="submit" class="btn btn-info btn-lg btn-block" >提 交</button>
+							</div>
+					 	</div>
+					 </div>
+					 
+				</form>	
+			</div>
+		</div>
+	</div>
+					
+		<div class="col-md-5">
+			<div class="panel panel-primary"> 
+				<div class="panel-heading">
+					<h3 class="panel-title">切换方位照片</h3>
+				</div>            		                     
+			    <ul class="list-group">
+			 		<li class="list-group-item">
+			 			<a href="__URL__/imgfront/id/<{$arr.id}>" title="#">
+			 				<img  src="__UPLOAD__<{$arr.pathfront}><{$arr.imgfront}>" alt="<{$arr.imgfront}>"  height="80px">
+			 				<h3 class="pull-right">车前&nbsp;&nbsp;&nbsp;</h3>
+			 			</a>
+			 		</li>
+			 		<li class="list-group-item">
+			 			<a href="__URL__/imgback/id/<{$arr.id}>" title="#">
+			 				<img  src="__UPLOAD__<{$arr.pathback}><{$arr.imgback}>" alt="<{$arr.imgback}>"  height="80px">
+			 				<h3 class="pull-right">车后&nbsp;&nbsp;&nbsp;</h3>
+			 			</a>
+			 		</li>
+			 		<li class="list-group-item">
+			 			<a href="__URL__/imgleft/id/<{$arr.id}>" title="#">
+			 				<img  src="__UPLOAD__<{$arr.pathleft}><{$arr.imgleft}>" alt="<{$arr.imgleft}>"  height="80px">
+			 				<h3 class="pull-right">左侧&nbsp;&nbsp;&nbsp;</h3>
+			 			</a>
+			 		</li>
+			 		<li class="list-group-item">
+			 			<img  src="__UPLOAD__<{$arr.pathright}><{$arr.imgright}>" alt="<{$arr.imgright}>"  height="80px">
+			 			<h3 class="pull-right">右侧&nbsp;&nbsp;&nbsp;</h3>			 			
+			 		</li>
+			 		<li class="list-group-item">
+			 			<a href="__URL__/imgservice/id/<{$arr.id}>" title="#">
+			 				<img  src="__UPLOAD__<{$arr.pathservice}><{$arr.imgservice}>" alt="<{$arr.imgservice}>"  height="80px">
+			 				<h3 class="pull-right">维修&nbsp;&nbsp;&nbsp;</h3>
+			 			</a>
+			 		</li>
+			 		<li class="list-group-item">
+			 			<a href="__URL__/imgoil/id/<{$arr.id}>" title="#">
+			 				<img  src="__UPLOAD__<{$arr.pathoil}><{$arr.imgoil}>" alt="<{$arr.imgoil}>"  height="80px">
+			 				<h3 class="pull-right">里程&nbsp;&nbsp;&nbsp;</h3>
+			 			</a>
+			 		</li>					 
+				</ul>                        
+			 </div>		
+		</div>
+</div>
+
+
+
+
+     	<div class="foot navbar-bottom list-inline text-center">
+         	Copyright <span class="num">&copy;</span> 2016-2017
+     		<a target="_blank" href="http://www.xiuliguanggao.com"><b>临城-秀丽广告</b></a> 版权所有<br>
+     		IP:<{$_SESSION['ip']}>;浏览器：<{$_SESSION['os']}>-<{$_SESSION['browser']}></span>
+     		<p>咨询热线：<a href="tel:<{$_SESSION['Anshun']['phone']}>"><{$_SESSION['Anshun']['phone']}></a></p>    	
+    	</div>
+     </div>
+
+	
+    <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.min.js"></script>    
+    <script src="http://cdn.bootcss.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+    <script src="http://cdn.bootcss.com/bootstrap-fileinput/4.3.8/js/fileinput.min.js"></script>
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script src="http://v2.jiathis.com/code/jia.js" charset="utf-8"></script>      
+    
+     </body>
+</html>

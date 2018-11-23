@@ -1,0 +1,227 @@
+<layout name="layout" />
+<div class="row">
+	<div class="col-md-3 ">
+	  	<div class="thumbnail" ><br>
+			<img src="__IMAGES__/WechatIMG1.jpeg" alt="__IMAGES__/WechatIMG1.jpeg" width="100%">
+			<div class="caption">
+				<h4>扫描二维码关注微信公众号</h4><br>
+				<h3><{$_SESSION['Tuocai']['web']}></h3>
+				<h4>热线:<{$_SESSION['Tuocai']['tel']}></h4>
+				<h4>Q Q:<a href="http://wpa.qq.com/msgrd?v=3&amp;uin=<{$_SESSION['Tuocai']['qq']}>&amp;site=qq&amp;menu=yes" target="_blank">
+					<{$_SESSION['Tuocai']['qq']}></a>
+				</h4>				       			         
+			</div>
+		</div>
+	</div>
+	<div class="col-md-9">	
+	  	<div id="carousel-example-generic" class="carousel slide" data-ride="carousel" >
+		  <ol class="carousel-indicators">	    
+			    <volist name='pic' id='st' empty="暂无分类">
+			    	<switch name="key">
+					    <case value="0"><li data-target="#carousel-example-generic" data-slide-to="<{$key}>" class="active"></li></case>				    
+					    <default /><li data-target="#carousel-example-generic" data-slide-to="<{$key}>"></li> 
+					</switch>
+			    </volist>		    
+		  </ol>		
+		  <div class="carousel-inner" role="listbox">
+		    <volist name='pic' id='st' empty="暂无分类">
+		    	<switch name="key">
+					<case value="0">
+						<div class="item active" >
+					      <a href="<{$st['url']}>">
+					      	<img src="__UPLOAD__/<{$st['img']}>" alt="__UPLOAD__/<{$st['img']}>" width="100%">
+					      </a>
+					      <div class="carousel-caption"><{$st[title]}></div>
+					    </div>
+					</case>				    
+					<default />
+						<div class="item" >
+					      <a href="<{$st['url']}>">
+					      	<img src="__UPLOAD__/<{$st['img']}>" alt="__UPLOAD__/<{$st['img']}>" width="100%">
+					      </a>
+					      <div class="carousel-caption"><{$st[title]}></div>
+					    </div>
+				</switch>			    		
+		    </volist>
+		  </div>				  
+		</div>   
+	</div>
+	
+</div>
+
+<br>
+<notempty name="_SESSION['Tuocai']['desc']">
+	<div class="row">
+		<div class="panel panel-danger">
+	         <div class="panel-heading"><h1 class="panel-title">主营业务</h1></div>
+	         <div class="panel-body"><p><{$_SESSION['Tuocai']['desc']}></p></div>
+	    </div>  
+	</div>
+</notempty>
+	
+<notempty name="data">	
+ <div class="row">
+    <div class="panel panel-info">
+		<div class="panel-heading"><h3 class="panel-title">推荐课程
+			<span class="pull-right">
+			<a href="__APP__/<{$JC}>/Servicelist">更多</a></span></h3>
+		</div>
+		<div class="panel-body">
+		<volist name='data' id='ar' empty="没有数据">
+	      	<div class="col-xs-12 col-md-3">
+				<div class="thumbnail" >
+					<a href="__APP__/<{$JC}>/Service/index/id/<{$ar.id}>" >
+					     <img data-src="holder.js/100%x180" src="__UPLOAD__/<{$ar.img}>" alt="<{$ar.img}>"  height="180px">
+					</a>
+					<div class="caption"><h5><{$ar.name}></h5></div>
+				</div>
+			</div>
+		</volist>
+		</div>			       		
+	</div>					  		 
+</div>
+</notempty>
+
+<notempty name="data1">	
+ <div class="row">
+    <div class="panel panel-info">
+		<div class="panel-heading"><h3 class="panel-title">学前少儿
+			<span class="pull-right">
+			<a href="__APP__/<{$JC}>/Servicelist/index/cate/xQ0yS0">更多</a></span></h3>
+		</div>
+		<div class="panel-body">
+		<volist name='data1' id='ar' empty="没有数据">
+	      	<div class="col-xs-12 col-md-3">
+				<div class="thumbnail" >
+					<a href="__APP__/<{$JC}>/Service/index/id/<{$ar.id}>" >
+					     <img data-src="holder.js/100%x180" src="__UPLOAD__/<{$ar.img}>" alt="<{$ar.img}>"  height="180px">
+					</a>
+					<div class="caption"><h5><{$ar.name}></h5></div>
+				</div>
+			</div>
+		</volist>
+		</div>			       		
+	</div>					  		 
+</div>
+</notempty>
+
+<notempty name="data2">	
+ <div class="row">
+    <div class="panel panel-info">
+		<div class="panel-heading"><h3 class="panel-title">小学课程
+			<span class="pull-right">
+			<a href="__APP__/<{$JC}>/Servicelist/index/cate/Gz4i45">更多</a></span></h3>
+		</div>
+		<div class="panel-body">
+		<volist name='data2' id='ar' empty="没有数据">
+	      	<div class="col-xs-12 col-md-3">
+				<div class="thumbnail" >
+					<a href="__APP__/<{$JC}>/Service/index/id/<{$ar.id}>" >
+					     <img data-src="holder.js/100%x180" src="__UPLOAD__/<{$ar.img}>" alt="<{$ar.img}>"  height="180px">
+					</a>
+					<div class="caption"><h5><{$ar.name}></h5></div>
+				</div>
+			</div>
+		</volist>
+		</div>			       		
+	</div>					  		 
+</div>
+</notempty>
+
+<notempty name="data3">	
+ <div class="row">
+    <div class="panel panel-info">
+		<div class="panel-heading"><h3 class="panel-title">中学课程
+			<span class="pull-right">
+			<a href="__APP__/<{$JC}>/Servicelist/index/cate/ZsuP8M">更多</a></span></h3>
+		</div>
+		<div class="panel-body">
+		<volist name='data3' id='ar' empty="没有数据">
+	      	<div class="col-xs-12 col-md-3">
+				<div class="thumbnail" >
+					<a href="__APP__/<{$JC}>/Service/index/id/<{$ar.id}>" >
+					     <img data-src="holder.js/100%x180" src="__UPLOAD__/<{$ar.img}>" alt="<{$ar.img}>"  height="180px">
+					</a>
+					<div class="caption"><h5><{$ar.name}></h5></div>
+				</div>
+			</div>
+		</volist>
+		</div>			       		
+	</div>					  		 
+</div>
+</notempty>
+
+
+<notempty name="data4">	
+ <div class="row">
+    <div class="panel panel-info">
+		<div class="panel-heading"><h3 class="panel-title">作业托管
+			<span class="pull-right">
+			<a href="__APP__/<{$JC}>/Servicelist/index/cate/UgTQqC">更多</a></span></h3>
+		</div>
+		<div class="panel-body">
+		<volist name='data4' id='ar' empty="没有数据">
+	      	<div class="col-xs-12 col-md-3">
+				<div class="thumbnail" >
+					<a href="__APP__/<{$JC}>/Service/index/id/<{$ar.id}>" >
+					     <img data-src="holder.js/100%x180" src="__UPLOAD__/<{$ar.img}>" alt="<{$ar.img}>"  height="180px">
+					</a>
+					<div class="caption"><h5><{$ar.name}></h5></div>
+				</div>
+			</div>
+		</volist>
+		</div>			       		
+	</div>					  		 
+</div>
+</notempty>
+
+
+<notempty name="data5">	
+ <div class="row">
+    <div class="panel panel-info">
+		<div class="panel-heading"><h3 class="panel-title">兴趣拓展
+			<span class="pull-right">
+			<a href="__APP__/<{$JC}>/Servicelist/index/cate/BDSkvu">更多</a></span></h3>
+		</div>
+		<div class="panel-body">
+		<volist name='data5' id='ar' empty="没有数据">
+	      	<div class="col-xs-12 col-md-3">
+				<div class="thumbnail" >
+					<a href="__APP__/<{$JC}>/Service/index/id/<{$ar.id}>" >
+					     <img data-src="holder.js/100%x180" src="__UPLOAD__/<{$ar.img}>" alt="<{$ar.img}>"  height="180px">
+					</a>
+					<div class="caption"><h5><{$ar.name}></h5></div>
+				</div>
+			</div>
+		</volist>
+		</div>			       		
+	</div>					  		 
+</div>
+</notempty>
+
+<notempty name="arr">
+<div class="row">
+    <div class="panel panel-success">
+		<div class="panel-heading"><h3 class="panel-title">师资力量
+			<span class="pull-right">
+			<a href="__APP__/<{$JC}>/Customer/index/isteacher/1">更多</a></span></h3>
+		</div>
+		<div class="panel-body">
+		<volist name='arr' id='ar' empty="没有数据">
+			<div class="panel panel-default">    
+				<div class="media">
+					<a class="media-left" href="#">
+						<img src="__UPLOAD__<{$ar.img}>" alt="<{$ar.img}>" class="img-thumbnail">
+					</a>
+					<div class="media-body">
+						<h4 class="media-heading"><{$ar.realname}>【<{$ar.course}>】<{$ar.coursetype}></h4>
+						<{$ar.remark}>
+					</div>
+				</div>     
+			</div>
+		</volist> 
+		</div>			       		
+	</div>					  		 
+</div>
+</notempty>
+<hr>

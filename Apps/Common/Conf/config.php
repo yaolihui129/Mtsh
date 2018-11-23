@@ -6,8 +6,9 @@ return array(
     'URL_MODEL'             => '2',//URL模式
     'MODULE_ALLOW_LIST'     => array(
         'Admin',        //管理后台
-        'Back',       //金瑞恒生后台
-        'Jinruihs',     //金瑞恒生
+        'Demo',         //演示APP
+        'Back',         //业务后台
+        'Jinruihs',     //金瑞恒升
         'Business',     //商户中心
         'Coupon',       //优惠券
         'Goods',        //商品中心

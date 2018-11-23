@@ -12,6 +12,7 @@ return array(
     'TMPL_ACTION_ERROR' => 'Public:error',
     'TMPL_ACTION_SUCCESS' => 'Public:success',
     'PRODUCT' => 'Jinruihs',
+    'MERCHANTID'=>'6', //商户ID
     'WEBSITE'=>'https://xiuliguanggao.com',
     //公众号配置
     'appID'=>'wx3090bf31097834ac',

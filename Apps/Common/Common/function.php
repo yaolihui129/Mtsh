@@ -93,7 +93,6 @@
         session_destroy();// 销毁sesstion
     }
 
-
     //获得访客浏览器类型
     function GetBrowser(){
         if(!empty($_SERVER['HTTP_USER_AGENT'])){
@@ -296,233 +295,6 @@
         return $data;
     }
 
-
-    //微信纯文本回复
-    function wxReplyText($toUser,$fromUser,$content){
-        //回复用户消息(纯文本格式)
-        $msgType   = 'text';
-        $time      = time();
-        $template  ="<xml>
-                        <ToUserName><![CDATA[%s]]></ToUserName>
-                        <FromUserName><![CDATA[%s]]></FromUserName>
-                        <CreateTime>%s</CreateTime>
-                        <MsgType><![CDATA[%s]]></MsgType>
-                        <Content><![CDATA[%s]]></Content>
-                    </xml>";
-        echo sprintf($template,$toUser,$fromUser,$time,$msgType,$content);
-    }
-
-    //微信图文回复
-    function wxReplyNews($toUser,$fromUser,$arr){
-        $msgType   = 'news';
-        $time      = time();
-        $template = "<xml>
-            <ToUserName><![CDATA[%s]]></ToUserName>
-            <FromUserName><![CDATA[%s]]></FromUserName>
-            <CreateTime>%s</CreateTime>
-            <MsgType><![CDATA[%s]]></MsgType>
-            <ArticleCount>".count($arr)."</ArticleCount>
-            <Articles>";
-                foreach($arr as $v){
-                    $template .="<item>
-                    <Title><![CDATA[".$v['title']."]]></Title>
-                    <Description><![CDATA[".$v['description']."]]></Description>
-                    <PicUrl><![CDATA[".$v['picUrl']."]]></PicUrl>
-                    <Url><![CDATA[".$v['url']."]]></Url>
-                    </item>";
-                }
-            $template .="
-            </Articles>
-        </xml> ";
-        echo sprintf($template, $toUser, $fromUser, $time, $msgType);
-    }
-
-    //微信图片回复
-    function wxReplyImage($toUser,$fromUser,$mediaId){
-        $msgType   = 'image';
-        $time      = time();
-        $template  = "<xml>
-            <ToUserName><![CDATA[%s]]></ToUserName>
-            <FromUserName><![CDATA[%s]]></FromUserName>
-            <CreateTime>%s</CreateTime>
-            <MsgType><![CDATA[%s]]></MsgType>
-            <Image><MediaId><![CDATA[%s]]></MediaId></Image>
-        </xml>";
-        echo sprintf($template, $toUser, $fromUser, $time, $msgType,$mediaId);
-    }
-
-    //微信语音回复
-    function wxReplyVoice($toUser,$fromUser,$mediaId){
-        $msgType   = 'voice';
-        $time      = time();
-        $template  = "<xml>
-            <ToUserName><![CDATA[%s]]></ToUserName>
-            <FromUserName><![CDATA[%s]]></FromUserName>
-            <CreateTime>%s</CreateTime>
-            <MsgType><![CDATA[%s]]></MsgType>
-            <Voice><MediaId><![CDATA[%s]]></MediaId></Voice>
-        </xml>";
-        echo sprintf($template, $toUser, $fromUser, $time, $msgType,$mediaId);
-    }
-
-    //微信视频回复
-    function wxReplyVideo($toUser,$fromUser,$mediaId,$title,$description){
-        $msgType   = 'video';
-        $time      = time();
-        $template = "<xml>
-            <ToUserName><![CDATA[%s]]></ToUserName>
-            <FromUserName><![CDATA[%s]]></FromUserName>
-            <CreateTime>%s</CreateTime>
-            <MsgType><![CDATA[%s]]></MsgType>
-            <Video>
-                <MediaId><![CDATA[%s]]></MediaId>
-                <Title><![CDATA[%s]]></Title>
-                <Description><![CDATA[%s]]></Description>
-            </Video>                
-        </xml>";
-        echo sprintf($template, $toUser, $fromUser, $time, $msgType,$mediaId,$title,$description);
-    }
-
-    //微信音乐回复
-    function wxReplyMusic($toUser,$fromUser,$mediaId,$title,$description,$musicUrl,$HQMusicUrl,$thumbMediaId){
-        $msgType   = 'music';
-        $time      = time();
-        $template = "<xml>
-            <ToUserName><![CDATA[%s]]></ToUserName>
-            <FromUserName><![CDATA[%s]]></FromUserName>
-            <CreateTime>%s</CreateTime>
-            <MsgType><![CDATA[%s]]></MsgType>
-            <Music>
-                <Title><![CDATA[%s]]></Title>
-                <Description><![CDATA[%s]]></Description>
-                <MusicUrl><![CDATA[%s]]></MusicUrl>
-                <HQMusicUrl><![CDATA[%s]]></HQMusicUrl>
-                <ThumbMediaId><![CDATA[%s]]></ThumbMediaId>
-            </Music>
-        </xml>";
-        echo sprintf($template, $toUser, $fromUser, $time, $msgType,$title,$description,$musicUrl,$HQMusicUrl,$thumbMediaId);
-    }
-
-    function wxNewsArr($size){
-        $str=array();
-        for ($x=0; $x<=$size; $x++) {
-        $str.="array(
-            'title'        =>  ".'$data['.$x."]['name'],
-            'description'  =>  ".'$data['.$x."]['content'],
-            'picUrl'       =>  C(WEBSERVER).'/Upload/'.".'$data['.$x."]['productimg'],
-            'url'          =>  C(WEBSERVER).'/index.php/'.C(PRODUCT).'/Service/index/id/'.".'$data['.$x."]['productid']".".'/wxOpenId/'".'.$toUser.'."'/wxAppId/'".'.$fromUser,'."
-            ),";
-        }
-        return $str;
-    }
-
-    //换取微信短链接
-    function getShortUrl($token,$long_url){
-    $url='https://api.weixin.qq.com/cgi-bin/shorturl?access_token='.$token;
-    $array=array('action'=>'long2short','long_url'=>$long_url );                        //组装数组
-    $postJson = json_encode($array);                                                    //封装json
-    $res = httpPost($url, $postJson);
-    $res = json_decode($res,true);
-    return $res['short_url'];
-    }
-
-    //获取临时二维码
-    function getTimeQrCode($token,$scene_id,$expire=30){
-        $url='https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token='.$token;
-        $expire = $expire*24*60*60;
-        $postArr =array(                                                                //组装数组
-            'expire_seconds'=>$expire,
-            'action_name'=>"QR_SCENE",
-            'action_info'=>array('scene'=>array('scene_id'=>$scene_id) )
-        );
-        $postJson = json_encode($postArr);                                              //封装json
-        $res = httpPost($url, $postJson);                                               //获取 $ticket
-        $res = json_decode($res,true);                                          //转换成数组
-        $long_url='https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket='.$res['ticket']; //使用$ticket换去二维码图片
-        return getShortUrl($token,$long_url);
-    }
-
-    //获取永久二维码
-    function getForeverQrCode($token,$scene_id){
-        $url='https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token='.$token;
-        $postArr =array(                                                                //1.组装数组
-            'action_name'=>"QR_LIMIT_SCENE",
-            'action_info'=>array('scene'=>array('scene_id'=>$scene_id))
-        );
-        $postJson = json_encode($postArr);                                              //2.封装json
-        $res = httpPost($url, $postJson);
-        $res = json_decode($res,true);
-        $long_url='https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket='.$res['ticket']; //3.使用$ticket换去二维码图片
-        return getShortUrl($token,$long_url);
-    }
-
-    //群发接口
-    function wxSendMsgAll($token,$array,$type='preview'){
-        if($type=='preview'){           //预览接口
-            $url='https://api.weixin.qq.com/cgi-bin/message/mass/preview?access_token='.$token;
-            $postJson =urldecode(json_encode($array));
-            $res = httpPost($url, $postJson);
-            return $res;
-        }elseif ($type=='send'){        //群发接口
-            $url='https://api.weixin.qq.com/cgi-bin/message/mass/send?access_token='.$token;
-            $postJson =urldecode(json_encode($array));
-            $res = httpPost($url, $postJson);
-            return $res;
-        }else {
-            return '发送类型不合规！';
-        }
-    }
-
-    //获取微信服务器IP
-    function wxGetServerIp($token){
-        if(!$_SESSION['wx_ip_list']){
-            $url = "https://api.weixin.qq.com/cgi-bin/getcallbackip?access_token=".$token;
-            $res = httpGet($url);
-            $_SESSION['wx_ip_list'] =json_decode($res,true);
-        }
-        return $_SESSION['wx_ip_list'];
-    }
-
-    //获取wxGetJsApiTicket全局票据
-    function wxGetJsApiTicket($token){
-        if ((time()-$_SESSION['jsapi_ticket_expire_time']) < 0){
-            //从session中取值  jsapi_ticket
-            $jsapi_ticket = $_SESSION['jsapi_ticket'];
-        }else {
-            //重新获取jsapi_ticket
-            $url = "https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=".$token."&type=jsapi";
-            $res =json_decode(httpGet($url),true);
-            $_SESSION['jsapi_ticket']=$res['ticket'];
-            $_SESSION['jsapi_ticket_expire_time']=time()+7000;
-            $jsapi_ticket=$res['ticket'];
-        }
-        return $jsapi_ticket;
-    }
-
-    //发送微信模板消息
-    function wxSendTemplateMsg($token,$touser,$template_id,$call_url,$data){
-        $url      = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token='.$token;
-        $Meg      = array('touser'=>$touser,'template_id'=>$template_id,'url'=>$call_url,'data'=>$data);   //2.组装数组
-        $postJson = json_encode($Meg);      //将数组转化成json
-        $res      = httpPost($url, $postJson);
-        return $res;
-    }
-
-    //创建自定义菜单
-    function wxMenuCreat($token,$postJson) {
-        $url      = 'https://api.weixin.qq.com/cgi-bin/menu/create?access_token='.$token;
-        $res      = httpPost($url,$postJson);
-        return $res;
-    }
-
-    //获取自定义菜单
-    function wxGetMenu($token) {
-        $url   = 'https://api.weixin.qq.com/cgi-bin/menu/get?access_token='.$token;
-        $res   = httpGet($url);
-        $arr   = json_decode($res,true);
-        return $arr;
-    }
-
     //截取字符串最后的“。”（不管几个一并截取）用于语音识别结果
     function wxRtrim($arr,$a='。'){
         $arr=rtrim($arr, $a);
@@ -577,7 +349,6 @@
     //获取某一字段值
     function getName($table,$id,$name='name'){
         $data=M($table)->find($id);
-//        dump($data['real_name']);
         if($data[$name]){
             return $data[$name];
         }else{
@@ -597,38 +368,6 @@
     }
 
 
-
-    //状态选择控件,@param $name 控件name;@param $value 选中值
-    function formselect($value="正常",$name="state",$type="state") {
-        $where=array("type"=>$type,"state"=>"正常");
-        $cats = M('tp_dict')->where($where)->order('k')->select();
-        $html = '<select name="'.$name.'" class="form-control">';
-        foreach($cats as $v) {
-            $selected = ($v['v']==$value) ? "selected" : "";
-            $html .= '<option '.$selected.' value="'.$v['v'].'">'.$v['v'].'</option>';
-        }
-        $html .='</select>';
-        return $html;
-    }
-    //周期积分汇总
-    function sumScore($user,$quarter){
-        $m=M('tp_my_score');
-        $where=array('quarter'=>$quarter,'type'=>'1','user'=>$user,'deleted'=>'0');
-        $jiaf=$m->where($where)->sum('score');
-        $where=array('quarter'=>$quarter,'type'=>'2','user'=>$user,'deleted'=>'0');
-        $jianf=$m->where($where)->sum('score');
-        return $jiaf-$jianf;
-    }
-
-    function countOwnerProject($user){
-        $where['testgp'] = 'YX';
-        $where['deleted']='0';
-        $status = array('wait', 'doing','suspended');
-        $where['status'] = array('in', $status);
-        $where['QD']=$user;
-        $count =M('project')->where($where)->count();
-        return $count;
-    }
 
     //获取禅道用户名
     function getZTUserName($account){
@@ -727,21 +466,12 @@
         return false;
     }
 
-    function chaxun($t,$w,$o){
-        $token=get_token();
-        $postArr=array('token'=>$token,'t'=>$t,'w'=>$w,'o'=>$o);
-        $postJson=json_encode($postArr);
-        $url=C(WEBSERVER).'/index.php/Api/Device/chaxun';
-        $json=httpPost($url,$postJson);
-        $data = json_decode(trim($json,chr(239).chr(187).chr(191)),true);
-        return $data['data'];
-    }
+
 
     function get_token(){
         if (!S(C(PRODUCT) . 'access_token')) {//缓存中没有token先获取token，并设置失效时间
             $url=C(WEBSERVER).'/index.php/Api/Oauth/token'.'?grant_type=client_credential'.'&appid='.C(XL_APPID).'&secret='.C(XL_SECRET);
             $data=httpGet($url);
-            dump($data);
             $info = json_decode(trim($data,chr(239).chr(187).chr(191)),true);
             S(C(PRODUCT) . 'access_token', $info['data']['access_token'], 7200);
             return S(C(PRODUCT) . 'access_token');
@@ -773,7 +503,6 @@
         $ckey_length = 4;
         // 密匙
         $key = md5($key ? $key : $GLOBALS['discuz_auth_key']);
-
         // 密匙a会参与加解密
         $keya = md5(substr($key, 0, 16));
         // 密匙b会用来做数据完整性验证
@@ -829,11 +558,15 @@
         }
     }
 
-
-    function lock_url($txt,$key='xiuliguanggao.com')
+    //加密函数，$type='1',可变密文；$type='0',不变密文
+    function lock_url($txt,$key='Mtsh',$type='0')
     {
         $chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-=+";
-        $nh = rand(0,64);
+        if($type){
+            $nh = rand(0,64);
+        }else{
+            $nh = 5;
+        }
         $ch = $chars[$nh];
         $mdKey = md5($key.$ch);
         $mdKey = substr($mdKey,$nh%8, $nh%8+7);
@@ -848,7 +581,7 @@
         return urlencode($ch.$tmp);
     }
     //解密函数
-    function unlock_url($txt,$key='xiuliguanggao.com')
+    function unlock_url($txt,$key='Mtsh')
     {
         $txt = urldecode($txt);
         $chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-=+";
