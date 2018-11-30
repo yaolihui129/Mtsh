@@ -7,7 +7,7 @@ class AppController extends BaseController
         $data = array(
             'table_app'  => 'app',
             'name'       => 'App',
-            'where'      => array('deleted'=>'0'),
+            'where'      => array(),
             'order'      =>'id'
         );
         return $data;
@@ -19,7 +19,7 @@ class AppController extends BaseController
         $info = $this->init();
         $where=$info['where'];
         //处理查询条件
-        $typeList=get_dict_list('app_type');
+        $typeList=get_dict_list('app_type','dict');
         $this->assign("typeList", $typeList);
         $type=I('type',$typeList[0]['key']);
         $this->assign("type", $type);
@@ -28,7 +28,7 @@ class AppController extends BaseController
         $this->assign('search', $search);
         $where['name|subtype|email|website|appid'] = array('like', '%' . $search . '%');
         //查询数据
-        $data=M($info['table_app'])->where($where)->order($info['order'])->select();
+        $data=getList($info['table_app'],$where,$info['order']);
         $this->assign("data", $data);
 
         $this->display();
@@ -37,25 +37,23 @@ class AppController extends BaseController
     function app_update(){
         //初始化
         $info = $this->init();
-        $_POST['table']=$info['table_app'];
         if(I('id')){
-            $this->update();
+            $this->update($info['table_app'],$_POST);
         }else{
-            $this->insert();
+            $this->insert($info['table_app'],$_POST);
         }
     }
     //废弃APP
     function shan_chu_app(){
         //初始化
         $info = $this->init();
-        $_GET['table']=$info['table_app'];
-        $this->del();
+        $this->delete($info['table_app'],I('id'));
     }
     //获取APP
     function app_info(){
         //初始化
         $info = $this->init();
-        $data=M($info['table_app'])->find(I('id'));
+        $data=find($info['table_app'],I('id'));
         if($data){
             $res=array(
                 'errorcode'=>'0',

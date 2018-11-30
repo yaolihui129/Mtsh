@@ -8,7 +8,7 @@ class RoleController extends BaseController
             'table_role' => 'role',
             'table_app'  => 'app',
             'name'       => 'Role',
-            'where'      =>array('deleted'=>'0'),
+            'where'      =>array(),
             'order'      => 'id'
         );
         return $data;
@@ -31,7 +31,7 @@ class RoleController extends BaseController
         $this->assign('search', $search);
         $where['name'] = array('like', '%' . $search . '%');
         //查询数据
-        $data=M($info['table_role'])->where($where)->order($info['order'])->select();
+        $data=getList($info['table_role'],$where,$info['order']);
         $this->assign("data", $data);
 
         $this->display();
@@ -41,11 +41,10 @@ class RoleController extends BaseController
     function role_update(){
         //初始化
         $info = $this->init();
-        $_POST['table']=$info['table_role'];
         if(I('id')){
-            $this->update();
+            $this->update($info['table_role'],$_POST);
         }else{
-            $this->insert();
+            $this->insert($info['table_role'],$_POST);
         }
     }
 
@@ -53,14 +52,13 @@ class RoleController extends BaseController
     function role_del(){
         //初始化
         $info = $this->init();
-        $_GET['table']=$info['table_role'];
-        $this->del();
+        $this->delete($info['table_role'],I('id'));
     }
     //获取
     function role_info(){
         //初始化
         $info = $this->init();
-        $data=M($info['table_role'])->find(I('id'));
+        $data=find($info['table_role'],I('id'));
         if($data){
             $res=array(
                 'errorcode'=>'0',

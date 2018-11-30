@@ -16,71 +16,24 @@ class BaseController extends Controller
             C('DEFAULT_V_LAYER', 'Amaze');
         }
     }
-
     function _empty()
     {
         $this->display('index');
     }
 
-    function getAppList(){
-        $where=array('user_id'=>cookie(C(PRODUCT).'_user'),'deleted'=>'0');
-        $data=M('admin_user_app')->where($where)->field('app_id')->select();
-        $appList=array();
-        if($data){
-            foreach ($data as $k=>$da){
-                $appList[$k]['key']=$da['app_id'];
-                $appList[$k]['value']=getName('admin_app',$da['app_id'],'website');
-            }
-        }
-        return $appList;
-    }
-
-    function getMerchantList(){
-        $where=array('user_id'=>cookie(C(PRODUCT).'_user'),'deleted'=>'0');
-        $data=M('admin_merchant_user')->where($where)->field('merchant_id')->select();
-        $merchantList=array();
-        if($data){
-            foreach ($data as $k=>$da){
-                $merchantList[$k]['key']=$da['merchant_id'];
-                $merchantList[$k]['value']=getName('admin_merchant',$da['merchant_id']);
-            }
-        }
-        return $merchantList;
-    }
-
-
-    function getPublicNumberList($merchant=''){
-
-        if(!$merchant){
-            $where=array('user_id'=>cookie(C(PRODUCT).'_user'),'deleted'=>'0');
-            $data=M('admin_merchant_user')->where($where)->field('merchant_id')->select();
-            $merchant=$data[0];
-        }
-        $where=array('merchant_id'=>$merchant,'deleted'=>'0');
-        $where['type']=array('in',['0','1']);
-        $data=M('admin_merchant_app')->where($where)->field('app_id')->select();
-        $publicNumberList=array();
-        if($data){
-            foreach ($data as $k=>$da){
-                $publicNumberList[$k]['key']=$da['app_id'];
-                $publicNumberList[$k]['value']=getName('admin_app',$da['app_id']);
-            }
-        }
-        return $publicNumberList;
-    }
-    
-    function select($data, $name, $value)
-    {
-        $html = '<select name="' . $name . '" class="form-control">';
-        foreach ($data as $v) {
-            $selected = ($v['key'] == $value) ? "selected" : "";
-            $html .= '<option ' . $selected . ' value="' . $v['key'] . '">' . $v['value'] . '</option>';
-        }
-        $html .= '<select>';
-        return $html;
-    }
-
-    public function order()
+    /**
+     ** 操作数据库
+     **   1. 排序
+     **   2. 插入
+     **   3. 修改
+     **   4. 逻辑删除
+     **   5. 物理删除
+     **   6. 获取列表
+     **   7. 查找数据
+     **   8. 查找符合条件的一条数据
+     **   9. 计数
+     */
+    function order()
     {
         $num = 0;
         foreach ($_POST['sn'] as $id => $sn) {
@@ -92,85 +45,192 @@ class BaseController extends Controller
             $this->error("排序失败...");
         }
     }
-
-    public function insert()
+    function insert($table,$data,$file='',$msg='成功',$eMsg='失败')
     {
-        $m = D(I('table'));
-        if (IS_GET) {
-            $_GET['adder'] = cookie(C(PRODUCT).'_user');
-            $_GET['moder'] = cookie(C(PRODUCT).'_user');
-            $_GET['ctime'] = time();
-            if (!$m->create($_GET)) {
-                $this->error($m->getError());
-            }
-            if ($m->add($_GET)) {
-                if ($_GET['url']) {
-                    $this->success("成功", U($_GET['url']));
-                } else {
-                    $this->success("成功");
-                }
+        $_POST=$data;
+        if($_POST[$file]){
+            $info=$this->uploadFile(C(PRODUCT),'img');
+            $_POST[$file]=$info[$file]['savepath'].$info[$file]['savename'];
+            $this->tailoringImg($info,$file);
+        }
+        $user=getLoginUser();
+        $_POST['adder'] = $user;
+        $_POST['moder'] = $user;
+        $_POST['ctime'] = time();
+        $m = D($table);
+        if (!$m->create()) {
+            $this->error($m->getError());
+        }
+        if ($m->add()) {
+            if ($_POST['url']) {
+                $this->success($msg, U($_POST['url']));
             } else {
+                $this->success($msg);
+            }
+        } else {
+            $this->error($eMsg);
+        }
+    }
+    function update($table,$data,$file='',$msg='成功',$eMsg='失败')
+    {
+        $_POST=$data;
+        if($file){
+            $info=$this->uploadFile();
+            $_POST[$file]=$info[$file]['savepath'].$info[$file]['savename'];
+            $this->tailoringImg($info,$file);
+        }
+        $_POST['moder'] = getLoginUser();
+        if (D($table)->save($_POST)) {
+            if ($_POST['url']) {
+                $this->success($msg, U($_POST['url']));
+            } else {
+                $this->success($msg);
+            }
+        } else {
+            $this->error($eMsg);
+        }
+    }
+    function delete($table,$arrId,$msg='成功',$eMsg='失败')
+    {
+        $user=getLoginUser();
+        $info='';
+        if(is_array($arrId)){
+            foreach ($arrId as $vo){
+                $_POST['id'] = $vo;
+                $_POST['moder'] = $user;
+                $_POST['deleted'] = 1;
+                $info[]=D($table)->save($_POST);
+            }
+        }else{
+            $_POST['id'] = $arrId;
+            $_POST['moder'] = $user;
+            $_POST['deleted'] = 1;
+            $info=D($table)->save($_POST);
+        }
+        if ($info) {
+            $this->success($msg);
+        } else {
+            $this->error($eMsg);
+        }
+    }
+    function realDelete($table,$arrId,$msg='成功',$eMsg='失败')
+    {
+        $count = D($table)->delete($arrId);
+        if ($count > 0) {
+            $this->success($msg);
+        } else {
+            $this->error($eMsg);
+        }
+    }
+
+    function imgUpdate($table,$savePath,$data,$img='img',$url='',$msg='成功',$eMsg='失败'){
+        $user=jie_mi(cookie(C(PRODUCT).'_user'));
+        $_POST=$data;
+        $_POST['moder']=$user;
+        //处理上传图片
+        $upload = new \Think\Upload();// 实例化上传类
+        $upload->maxSize  =     7145728 ;// 设置附件上传大小
+        $upload->exts     =     array('jpg', 'gif', 'png', 'jpeg');// 设置附件上传类型
+        $upload->rootPath =  './Upload';// 设置附件上传目录
+        $upload->savePath = '/'.$savePath.'/'; // 设置附件上传目录
+        $info  =   $upload->upload();
+        if(!$info) {// 上传错误提示错误信息或没有上传图片
+            if (D($table)->save($_POST)){
+                if($url){
+                    $this->success("修改成功！",U($_POST['url']));
+                }else{
+                    $this->success("修改成功！");
+                }
+            }else{
                 $this->error("失败");
             }
-        } else {
-            $_POST['adder'] = cookie(C(PRODUCT).'_user');
-            $_POST['moder'] = cookie(C(PRODUCT).'_user');
-            $_POST['ctime'] = time();
-            if (!$m->create()) {
-                $this->error($m->getError());
-            }
-            if ($m->add()) {
-                if ($_POST['url']) {
-                    $this->success("成功", U($_POST['url']));
-                } else {
-                    $this->success("成功");
+        }else {
+            $_POST[$img]=$info[$img]['savepath'].$info[$img]['savename'];
+            if (D($table)->save($_POST)){
+                $image = new \Think\Image();
+                $image->open('./Upload/'.$info[$img]['savepath'].$info[$img]['savename']);
+                $image->thumb(600, 400)->save('./Upload/'.$info[$img]['savepath'].$info[$img]['savename']);
+                if($url){
+                    $this->success("修改成功！",U($_POST['url']));
+                }else{
+                    $this->success("修改成功！");
                 }
-            } else {
+            }else{
+                $this->error("修改失败！");
+            }
+        }
+    }
+    function imgInsert($table,$savePath,$data,$img='img',$url='',$msg='成功',$eMsg='失败'){
+        $user=jie_mi(cookie(C(PRODUCT).'_user'));
+        $_POST=$data;
+        $_POST['moder']=$user;
+        //处理上传图片
+        $upload = new \Think\Upload();// 实例化上传类
+        $upload->maxSize  =     7145728 ;// 设置附件上传大小
+        $upload->exts     =     array('jpg', 'gif', 'png', 'jpeg');// 设置附件上传类型
+        $upload->rootPath =  './Upload';// 设置附件上传目录
+        $upload->savePath = '/'.$savePath.'/'; // 设置附件上传目录
+        $info  =   $upload->upload();
+        $m = D($table);
+        if (!$m->create()) {
+            $this->error($m->getError());
+        }
+        if(!$info) {// 上传错误提示错误信息或没有上传图片
+            if ($m->add()){
+                if($url){
+                    $this->success($msg,U($url));
+                }else{
+                    $this->success("修改成功！");
+                }
+            }else{
                 $this->error("失败");
             }
-        }
-    }
-
-    //修改
-    public function update()
-    {
-        if (IS_GET) {
-            $_GET['moder'] = cookie(C(PRODUCT).'_user');
-            if (D(I('table'))->save($_GET)) {
-                if ($_GET['url']) {
-                    $this->success("成功", U($_GET['url']));
-                } else {
-                    $this->success("成功");
+        }else {
+            $_POST[$img]=$info[$img]['savepath'].$info[$img]['savename'];
+            if ($m->add()){
+                $image = new \Think\Image();
+                $image->open('./Upload/'.$info[$img]['savepath'].$info[$img]['savename']);
+                $image->thumb(600, 400)->save('./Upload/'.$info[$img]['savepath'].$info[$img]['savename']);
+                if($url){
+                    $this->success("修改成功！",U($url));
+                }else{
+                    $this->success("修改成功！");
                 }
-            } else {
-                $this->error("失败！");
-            }
-        } else {
-            $_POST['moder'] = $_SESSION['user'];
-            if (D(I('table'))->save($_POST)) {
-                if ($_POST['url']) {
-                    $this->success("成功", U($_POST['url']));
-                } else {
-                    $this->success("成功");
-                }
-            } else {
-                $this->error("失败！");
+            }else{
+                $this->error("修改失败！");
             }
         }
     }
 
-    //逻辑删除
-    public function del()
-    {
-        $_POST['id'] = I('id');
-        $_POST['moder'] = cookie(C(PRODUCT).'_user');
-        $_POST['deleted'] = 1;
-        if (D(I('table'))->save($_POST)) {
-            $this->success("删除成功！");
-        } else {
-            $this->error("删除失败！");
+    //文件上传
+    function uploadFile($savePath='Jira',$type='img'){
+        $upload = new \Think\Upload();
+        // 设置附件上传大小
+        $upload->maxSize  = 7145728 ;
+        // 设置附件上传类型
+        if($type=='img'){
+            $upload->exts = array('jpg', 'gif', 'png', 'jpeg');
+        }elseif ($type=='excel'){
+            $upload->exts = array('xls', 'xlsx');
+        }else{
+            $upload->exts = array();
         }
+        // 设置附件上传目录
+        $upload->rootPath =  './Upload';
+        // 设置附件上传目录
+        $upload->savePath = '/'.$savePath.'/';
+        $info =  $upload->upload();
+        return $info;
     }
+    //图片剪裁
+    function tailoringImg($info,$img,$width='600',$height='400'){
+        $image = new \Think\Image();
+        $imgUrl='./Upload/'.$info[$img]['savepath'].$info[$img]['savename'];
+        $image->open($imgUrl);
+        $image->thumb($width, $height)->save($imgUrl);
+    }
+
+
 
 
 

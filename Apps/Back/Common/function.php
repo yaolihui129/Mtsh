@@ -1,21 +1,58 @@
 <?php
-    //获取字典列表
-    function get_dict_list($type,$lim=''){
-        $where=array('type'=>$type,'deleted'=>'0');
-        if($lim){
-            $where['key']=array('in',$lim);
-        }
-        $data=M('admin_dict')->where($where)->order('sn')->select();
-        return $data;
+
+    function dictInfo($type,$key){
+        $res=get_dict_info($type,$key,'admin_dict');
+        return $res;
     }
 
-    //获取字典信息
-    function get_dict_info($type,$key,$what='value'){
-        $where=array('type'=>$type,'key'=>$key,'deleted'=>'0');
-        $data=M('admin_dict')->where($where)->find();
-        if($what=='value'){
-            return $data['value'];
-        }else{
-            return $data;
+    function getJieMiName($user_id){
+        $user=jie_mi($user_id);
+        $arr=find('admin_user',$user);
+        return $arr['real_name'];
+    }
+
+    function getAppList(){
+        $where=array('user_id'=>getLoginUserID());
+        $data=getList('admin_user_app',$where);
+        $appList=array();
+        if($data){
+            foreach ($data as $k=>$da){
+                $appList[$k]['key']=$da['app_id'];
+                $appList[$k]['value']=getName('admin_app',$da['app_id'],'website');
+            }
         }
+        return $appList;
+    }
+
+    function getMerchantList(){
+        $where=array('user_id'=>getLoginUserID());
+        $data=getList('admin_merchant_user',$where);
+        $merchantList=array();
+        if($data){
+            foreach ($data as $k=>$da){
+                $merchantList[$k]['key']=$da['merchant_id'];
+                $merchantList[$k]['value']=getName('admin_merchant',$da['merchant_id']);
+            }
+        }
+        return $merchantList;
+    }
+
+    function getPublicNumberList($merchant=''){
+
+        if(!$merchant){
+            $where=array('user_id'=>getLoginUserID());
+            $data=getList('admin_merchant_user',$where);
+            $merchant=$data[0];
+        }
+        $where=array('merchant_id'=>$merchant);
+        $where['type']=array('in',['0','1']);
+        $data=getList('admin_merchant_app',$where);
+        $publicNumberList=array();
+        if($data){
+            foreach ($data as $k=>$da){
+                $publicNumberList[$k]['key']=$da['app_id'];
+                $publicNumberList[$k]['value']=getName('admin_app',$da['app_id']);
+            }
+        }
+        return $publicNumberList;
     }

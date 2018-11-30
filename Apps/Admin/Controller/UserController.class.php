@@ -7,7 +7,7 @@ class UserController extends BaseController
         $data = array(
             'table_user' => 'user',
             'name'       => 'User',
-            'where'      => array('deleted'=>'0'),
+            'where'      => array(),
             'order'      => 'id'
         );
         return $data;
@@ -22,7 +22,7 @@ class UserController extends BaseController
         $this->assign('search', $search);
         $where['name'] = array('like', '%' . $search . '%');
         //查询数据
-        $data=M($info['table_user'])->where($where)->order($info['order'])->select();
+        $data=getList($info['table_user'],$where,$info['order']);
         $this->assign("data", $data);
 
         $this->display();
@@ -32,45 +32,41 @@ class UserController extends BaseController
     function user_update(){
         //初始化
         $info = $this->init();
-        $_POST['table']=$info['table_user'];
         if(I('id')){
-            $this->update();
+            $this->update($info['table_user'],$_POST);
         }else{
-            $this->insert();
+            $this->insert($info['table_user'],$_POST);
         }
     }
     //变更状态
     function user_status(){
         //初始化
         $info = $this->init();
-        $_GET['table']=$info['table_user'];
         if(I('status')=='1'){
             $_GET['status']='2';
         }else{
             $_GET['status']='1';
         }
-        $this->update();
+        $this->update($info['table_user'],$_GET);
     }
     //重置密码
     function reset_password(){
         //初始化
         $info = $this->init();
         $_GET['password']=md5('123456');
-        $_GET['table']=$info['table_user'];
-        $this->update();
+        $this->update($info['table_user'],$_GET);
     }
     //废弃
     function user_del(){
         //初始化
         $info = $this->init();
-        $_GET['table']=$info['table_user'];
-        $this->del();
+        $this->delete($info['table_user'],$_GET);
     }
     //获取
     function user_info(){
         //初始化
         $info = $this->init();
-        $data=M($info['table_user'])->find(I('id'));
+        $data=find($info['table_user'],I('id'));
         if($data){
             $res=array(
                 'errorcode'=>'0',

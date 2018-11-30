@@ -1,24 +1,288 @@
 <?php
+
+    //手机端模板
+    function ismobile() {
+        // 如果有HTTP_X_WAP_PROFILE则一定是移动设备
+        if (isset ($_SERVER['HTTP_X_WAP_PROFILE']))
+            return true;
+        //此条摘自TPM智能切换模板引擎，适合TPM开发
+        if(isset ($_SERVER['HTTP_CLIENT']) &&'PhoneClient'==$_SERVER['HTTP_CLIENT'])
+            return true;
+        //如果via信息含有wap则一定是移动设备,部分服务商会屏蔽该信息
+        if (isset ($_SERVER['HTTP_VIA']))
+            //找不到为flase,否则为true
+            return stristr($_SERVER['HTTP_VIA'], 'wap') ? true : false;
+        //判断手机发送的客户端标志,兼容性有待提高
+        if (isset ($_SERVER['HTTP_USER_AGENT'])) {
+            $clientkeywords = array(
+                'nokia','sony','ericsson','mot','samsung','htc','sgh','lg','sharp','sie-','philips','panasonic','alcatel','lenovo','iphone','ipod','blackberry','meizu','android','netfront','symbian','ucweb','windowsce','palm','operamini','operamobi','openwave','nexusone','cldc','midp','wap','mobile'
+            );
+            //从HTTP_USER_AGENT中查找手机浏览器的关键字
+            if (preg_match("/(" . implode('|', $clientkeywords) . ")/i", strtolower($_SERVER['HTTP_USER_AGENT']))) {
+                return true;
+            }
+        }
+        //协议法，因为有可能不准确，放到最后判断
+        if (isset ($_SERVER['HTTP_ACCEPT'])) {
+            // 如果只支持wml并且不支持html那一定是移动设备
+            // 如果支持wml和html但是wml在html之前则是移动设备
+            if ((strpos($_SERVER['HTTP_ACCEPT'], 'vnd.wap.wml') !== false) && (strpos($_SERVER['HTTP_ACCEPT'], 'text/html') === false || (strpos($_SERVER['HTTP_ACCEPT'], 'vnd.wap.wml') < strpos($_SERVER['HTTP_ACCEPT'], 'text/html')))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     ** 数据库操作
+     */
+    function insert($table,$data){
+        $_POST=$data;
+        $user=getLoginUser();
+        $_POST['adder'] = $user;
+        $_POST['moder'] = $user;
+        $_POST['ctime'] = time();
+        $m = D($table);
+        $m -> create();
+        $id=$m -> add();
+        return $id;
+    }
+    function update($table,$data){
+        $_POST=$data;
+        $user=getLoginUser();
+        $_POST['moder'] = $user;
+        $info=D($table)->save($_POST);
+        return $info;
+    }
+    function del($table,$arrId){
+        $user=getLoginUser();
+        $info='';
+        if(is_array($arrId)){
+            foreach ($arrId as $vo){
+                $_POST['id'] = $vo;
+                $_POST['moder'] = $user;
+                $_POST['deleted'] = 1;
+                $info[]=D($table)->save($_POST);
+            }
+        }else{
+            $_POST['id'] = $arrId;
+            $_POST['moder'] = $user;
+            $_POST['deleted'] = 1;
+            $info=D($table)->save($_POST);
+        }
+        return $info;
+    }
+    function realDelete($table,$arrId)
+    {
+        $count = D($table)->delete($arrId);
+        return $count;
+    }
+    function getList($table,$where,$order = 'id', $field = '',$page='',$size=''){
+        $where['deleted'] = '0';
+        if($page){
+            $data = M($table)->where($where)->order($order)->field($field)->page($page,$size)->select();
+        }else{
+            $data = M($table)->where($where)->order($order)->field($field)->select();
+        }
+        return $data;
+    }
+    function find($table,$id,$field = ''){
+        $data = M($table)->field($field)->find($id);
+        return $data;
+    }
+    function findOne($table, $where, $order = 'id desc', $field = ''){
+        $where['deleted'] = '0';
+        $data = M($table)->where($where)->order($order)->field($field)->find();
+        return $data;
+    }
+    function countId($table,$where){
+        $where['deleted']='0';
+        $count=M($table)->where($where)->count();
+        return $count;
+    }
+    function getId($table, $where)
+    {
+        $data = M($table)->where($where)->find();
+        return $data['id'];
+    }
+    function getName($table,$id,$name='name'){
+        $data=M($table)->find($id);
+        if($data[$name]){
+            return $data[$name];
+        }else{
+            return $id;
+        }
+    }
+
+    /**
+     **模板输出
+     */
+    function baseGetList($assign,$table,$where,$order = 'id', $field = '',$page='',$size=''){
+        $data=getList($table,$where,$order, $field,$page,$size);
+        $this->assign($assign, $data);
+        return true;
+    }
+    /**
+     **对象输出
+     */
+    function baseUpdata($init_table,$data){
+        //初始化
+        $info = $this->init();
+        if(I('id')){
+            $res=$this->update($info[$init_table],$data);
+        }else{
+            $res=$this->insert($info[$init_table],$data);
+        }
+        return $res;
+    }
+    function baseDelete($init_table,$id){
+        //初始化
+        $info = $this->init();
+        $res=$this->delete($info[$init_table],$id);
+        return $res;
+    }
+    function baseGetInfo($init_table,$id){
+        //初始化
+        $info = $this->init();
+        $data=find($info[$init_table],$id);
+        if($data){
+            $res=array(
+                'errorcode'=>'0',
+                'message'=>'ok',
+                'result'=>$data
+            );
+        }else{
+            $res=array(
+                'errorcode'=>'0',
+                'message'=>'ok'
+            );
+        }
+        $this->ajaxReturn($res);
+    }
+
+
+    /**
+     ** 加解密操作
+     */
+    function passport_encrypt($txt, $key = 'xiuliguanggao.com')
+    {
+        srand((double)microtime() * 1000000);
+        $encrypt_key = md5(rand(0, 32000));
+        $ctr = 0;
+        $tmp = '';
+        for($i = 0;$i < strlen($txt); $i++) {
+            $ctr = $ctr == strlen($encrypt_key) ? 0 : $ctr;
+            $tmp .= $encrypt_key[$ctr].($txt[$i] ^ $encrypt_key[$ctr++]);
+        }
+        return urlencode(base64_encode(passport_key($tmp, $key)));
+    }
+    function passport_decrypt($txt, $key = 'xiuliguanggao.com')
+    {
+        $txt = passport_key(base64_decode(urldecode($txt)), $key);
+        $tmp = '';
+        for($i = 0;$i < strlen($txt); $i++) {
+            $md5 = $txt[$i];
+            $tmp .= $txt[++$i] ^ $md5;
+        }
+        return $tmp;
+    }
+    function passport_key($txt, $encrypt_key)
+    {
+        $encrypt_key = md5($encrypt_key);
+        $ctr = 0;
+        $tmp = '';
+        for($i = 0; $i < strlen($txt); $i++) {
+            $ctr = $ctr == strlen($encrypt_key) ? 0 : $ctr;
+            $tmp .= $txt[$i] ^ $encrypt_key[$ctr++];
+        }
+        return $tmp;
+    }
+
+    function jia_mi($data,$key='',$type='1'){
+        if(!$key){
+            $key=C(PRODUCT);
+        }
+        $data=lock_url($data,$key,$type);
+        return $data;
+    }
+    function jie_mi($data,$key=''){
+        if(!$key){
+            $key=C(PRODUCT);
+        }
+        $data=unlock_url($data,$key);
+        return $data;
+    }
+    //加密函数，$type='1',可变密文；$type='0',不变密文
+    function lock_url($txt,$key,$type='0')
+    {
+        $chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-=+";
+        if($type){
+            $nh = rand(0,64);
+        }else{
+            $nh = 5;
+        }
+        $ch = $chars[$nh];
+        $mdKey = md5($key.$ch);
+        $mdKey = substr($mdKey,$nh%8, $nh%8+7);
+        $txt = base64_encode($txt);
+        $tmp = '';
+        $i=0;$j=0;$k = 0;
+        for ($i=0; $i<strlen($txt); $i++) {
+            $k = $k == strlen($mdKey) ? 0 : $k;
+            $j = ($nh+strpos($chars,$txt[$i])+ord($mdKey[$k++]))%64;
+            $tmp .= $chars[$j];
+        }
+        return urlencode($ch.$tmp);
+    }
+    //解密函数
+    function unlock_url($txt,$key)
+    {
+        $txt = urldecode($txt);
+        $chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-=+";
+        $ch = $txt[0];
+        $nh = strpos($chars,$ch);
+        $mdKey = md5($key.$ch);
+        $mdKey = substr($mdKey,$nh%8, $nh%8+7);
+        $txt = substr($txt,1);
+        $tmp = '';
+        $i=0;$j=0; $k = 0;
+        for ($i=0; $i<strlen($txt); $i++) {
+            $k = $k == strlen($mdKey) ? 0 : $k;
+            $j = strpos($chars,$txt[$i])-$nh - ord($mdKey[$k++]);
+            while ($j<0) $j+=64;
+            $tmp .= $chars[$j];
+        }
+        return base64_decode($tmp);
+    }
+
+
     //根据pid获取分类数
     function countCate($pidCateId){
         $where=array('pidCateId'=>$pidCateId);
         $data=M('tp_cate')->where($where)->count();
         return $data;
     }
-
-    //封装下啦菜单
-    function select($data, $name, $value)
-    {
-        $html = '<select name="' . $name . '" class="form-control">';
-        foreach ($data as $v) {
-            $selected = ($v['key'] == $value) ? "selected" : "";
-            $html .= '<option ' . $selected . ' value="' . $v['key'] . '">' . $v['value'] . '</option>';
+    //根据ModuleId获取功能信息
+    function getParentModule($id){
+        $data=M("module")->find($id);
+        if($data['parent']){
+            $str=getModuleName($data['parent']).'-';
+        }else{
+            $str='';
         }
-        $html .= '<select>';
-        return $html;
+        return $str;
     }
-
-//获取分类名字
+    //根据$pathid获取模块名
+    function getModuleName($pathid){
+        $data=M('module')->find($pathid);
+        if ($data['parent']){
+            $str=getModuleName($data['parent']).'-'.$data['name'];
+        }else {
+            $str=$data['name'];
+        }
+        return $str;
+    }
+    //获取分类名字
     function getCatname($cateid){
         if ($cateid){
             $data=M('tp_cate')->find($cateid);
@@ -28,12 +292,16 @@
             return "|-";
         }
     }
-
     //获取父级分类ID
     function getCatePid($cateId){
         $data=M('tp_cate')->find($cateId);
         return $data['pidcateid'];
     }
+
+
+
+
+
     //获取页面信息
     function getWebInfo($qz){
         $data=M('xl_web')->where(array('qz'=>$qz))->field('id,web,adress,desc,phone,tel,qq,qz,url,record')->find();
@@ -42,12 +310,8 @@
         $_SESSION['browser']=GetBrowser();
         $_SESSION['os']=GetOs();
     }
-    //获取征信电话
-    function getCreditidPhone($creditId){
-        $data=M('tp_credit')->find($creditId);
-        $str = substr_replace($data['phone'],'****',3,4);
-        return $str;
-    }
+
+
 
     //登录
     function login($phone,$password){
@@ -83,7 +347,6 @@
             return 0;
         }
     }
-
     //注销
     function logout(){
         $_SESSION = array();
@@ -93,47 +356,46 @@
         session_destroy();// 销毁sesstion
     }
 
+
     //获得访客浏览器类型
     function GetBrowser(){
         if(!empty($_SERVER['HTTP_USER_AGENT'])){
             $br = $_SERVER['HTTP_USER_AGENT'];
-        if (preg_match('/MSIE/i',$br)) {
-            $br = 'MSIE';
-        }elseif (preg_match('/Firefox/i',$br)) {
-            $br = 'Firefox';
-        }elseif (preg_match('/Chrome/i',$br)) {
-            $br = 'Chrome';
-        }elseif (preg_match('/Safari/i',$br)) {
-            $br = 'Safari';
-        }elseif (preg_match('/Opera/i',$br)) {
-            $br = 'Opera';
-        }else {
-            $br = 'Other';
-        }
-
+            if (preg_match('/MSIE/i',$br)) {
+                $br = 'MSIE';
+            }elseif (preg_match('/Firefox/i',$br)) {
+                $br = 'Firefox';
+            }elseif (preg_match('/Chrome/i',$br)) {
+                $br = 'Chrome';
+            }elseif (preg_match('/Safari/i',$br)) {
+                $br = 'Safari';
+            }elseif (preg_match('/Opera/i',$br)) {
+                $br = 'Opera';
+            }else {
+                $br = 'Other';
+            }
             return $br;
         }else{
             return "获取浏览器信息失败！";
         }
     }
-
     //获取访客操作系统
     function GetOs(){
         if(!empty($_SERVER['HTTP_USER_AGENT'])){
             $OS = $_SERVER['HTTP_USER_AGENT'];
-        if (preg_match('/win/i',$OS)) {
-            $OS = 'Windows';
-        }elseif (preg_match('/mac/i',$OS)) {
-            $OS = 'MAC';
-        }elseif (preg_match('/linux/i',$OS)) {
-            $OS = 'Linux';
-        }elseif (preg_match('/unix/i',$OS)) {
-            $OS = 'Unix';
-        }elseif (preg_match('/bsd/i',$OS)) {
-            $OS = 'BSD';
-        }else {
-            $OS = 'Other';
-        }
+            if (preg_match('/win/i',$OS)) {
+                $OS = 'Windows';
+            }elseif (preg_match('/mac/i',$OS)) {
+                $OS = 'MAC';
+            }elseif (preg_match('/linux/i',$OS)) {
+                $OS = 'Linux';
+            }elseif (preg_match('/unix/i',$OS)) {
+                $OS = 'Unix';
+            }elseif (preg_match('/bsd/i',$OS)) {
+                $OS = 'BSD';
+            }else {
+                $OS = 'Other';
+            }
             return $OS;
         }else{
             return "获取访客操作系统信息失败！";
@@ -155,6 +417,24 @@
         }
         return $tmpstr;
     }
+    //截取字符串最后的“。”
+    function wxRtrim($arr,$a='。'){
+        $arr=rtrim($arr, $a);
+        return $arr;
+    }
+    //获取征信电话
+    function getCreditidPhone($creditId){
+        $data=M('tp_credit')->find($creditId);
+        $str = substr_replace($data['phone'],'****',3,4);
+        return $str;
+    }
+    //接收Json并转换为数组；
+    function getJsonToArray()
+    {
+        $json = file_get_contents('php://input');
+        $array = json_decode($json, true);
+        return $array;
+    }
 
     // CURL_GET操作
     function httpGet($url){
@@ -172,7 +452,6 @@
         }
         return $res;
     }
-
     function httpAuthGet($url, $user = 'ylh', $password = '123456')
     {
         $ch = curl_init(); //1.获取初始化URL
@@ -191,7 +470,6 @@
         }
         return $res;
     }
-
     function httpPost($url,$postJson){
         //1.获取初始化URL
         $ch=curl_init();
@@ -210,7 +488,6 @@
         }
         return $res;
     }
-
     function httpJsonPost($url, $postJson)
     {
         //1.获取初始化URL
@@ -231,7 +508,6 @@
         }
         return $res;
     }
-
     function httpPut($url, $putJson)
     {
         $ch = curl_init();
@@ -249,7 +525,6 @@
         }
         return $res;
     }
-
     function httpAuthPost($url, $postJson, $user = 'ylh', $password = '123456')
     {
         //1.获取初始化URL
@@ -277,7 +552,6 @@
         }
         return $res;
     }
-
     //封装请求API
     function requestApi($url,$method='GET',$data='',$type='array'){
         if($method=='GET'){
@@ -295,11 +569,7 @@
         return $data;
     }
 
-    //截取字符串最后的“。”（不管几个一并截取）用于语音识别结果
-    function wxRtrim($arr,$a='。'){
-        $arr=rtrim($arr, $a);
-        return $arr;
-    }
+
 
     //根据日期获取星期
     function wk($date) {
@@ -314,51 +584,44 @@
         return  $weekarray[$shuchu];
     }
 
-    //根据ModuleId获取功能信息
-    function getParentModule($id){
-        $data=M("module")->find($id);
-        if($data['parent']){
-            $str=getModuleName($data['parent']).'-';
-        }else{
-            $str='';
-        }
-        return $str;
+
+
+
+    //获取登录用户
+    function getLoginUser(){
+        $user=jie_mi(cookie(C(PRODUCT).'_user'));
+        return $user;
+    }
+    function getLoginUserID(){
+        $userID=jie_mi(cookie(C(PRODUCT).'_user_id'));
+        return $userID;
     }
 
-    //根据$pathid获取模块名
-    function getModuleName($pathid){
-        $data=M('module')->find($pathid);
-        if ($data['parent']){
-            $str=getModuleName($data['parent']).'-'.$data['name'];
-        }else {
-            $str=$data['name'];
-        }
-        return $str;
-    }
 
-    function countId($table,$name,$value){
-        $where=array($name=>$value,"deleted"=>'0');
-        $count=M($table)->where($where)->count();
-        return $count;
+    /**
+     ** Cookie相关的操作
+     * @param $key
+     * @return mixed
+     */
+    //获取cookiekey的信息
+    function getCookieKey($key){
+        $data=cookie(C(PRODUCT).'_'.$key);
+        return $data;
     }
-    function countRId($table,$name,$value){
-        $where=array($name=>$value,"removed"=>'0');
-        $count=M($table)->where($where)->count();
-        return $count;
+    //设置cookiekey
+    function setCookieKey($key,$value,$expire=3600){
+        cookie($key,$value,array('expire'=>$expire,'prefix'=>C(PRODUCT).'_'));
     }
-    //获取某一字段值
-    function getName($table,$id,$name='name'){
-        $data=M($table)->find($id);
-        if($data[$name]){
-            return $data[$name];
-        }else{
-            return $id;
-        }
+    //清除cookie
+    function clearCookie(){
+        //  清空指定前缀的所有cookie值
+        $res=cookie(null,C(PRODUCT).'_');
+        return $res;
     }
 
     //获取某一字典值
-    function getDictValue($type,$key,$value='v'){
-        $where=array('type'=>$type,'k'=>$key,'deleted'=>'0');
+    function getDictValue($type,$key,$value='value'){
+        $where=array('type'=>$type,'key'=>$key,'deleted'=>'0');
         $data=M('tp_dict')->where($where)->find();
         if($data[$value]){
             return $data[$value];
@@ -366,19 +629,53 @@
             return $key;
         }
     }
-
-
-
-    //获取禅道用户名
-    function getZTUserName($account){
-        if($account){
-            $where=array('account'=>$account);
-            $arr=M('user')->where($where)->find();
-            return $arr['realname'];
-        }else {
-            return 'NoBody';
+    //获取列表
+    function get_list($table,$where,$name='name',$order='id'){
+        $data=M($table)->where($where)->order($order)->select();
+        $list=array();
+        foreach ($data as $k=>$da){
+            $list[$k]['key']=$da['id'];
+            $list[$k]['value']=$da[$name];
+        }
+        return $list;
+    }
+    //获取字典列表
+    function get_dict_list($type,$table='tp_dict',$lim=''){
+        $where=array('type'=>$type,'deleted'=>'0');
+        if($lim){
+            $where['key']=array('in',$lim);
+        }
+        $data=M($table)->where($where)->order('sn')->select();
+        return $data;
+    }
+    //获取字典信息
+    function get_dict_info($type,$key,$table='tp_dict',$what='value'){
+        $where=array('type'=>$type,'key'=>$key,'deleted'=>'0');
+        $data=M($table)->where($where)->find();
+        if($what=='value'){
+            return $data['value'];
+        }else{
+            return $data;
         }
     }
+    //封装字典为下拉菜单
+    function dict_list($type,$field,$table='tp_dict',$default='0',$lim=''){
+        $data=get_dict_list($type,$table,$lim);
+        $var=select($data,$field,$default);
+        return $var;
+    }
+    //基础下拉菜单
+    function select($data, $name, $value)
+    {
+        $html = '<select name="' . $name . '" class="form-control">';
+            foreach ($data as $v) {
+                $selected = ($v['key'] == $value) ? "selected" : "";
+                $html .= '<option ' . $selected . ' value="' . $v['key'] . '">' . $v['value'] . '</option>';
+            }
+        $html .= '</select>';
+        return $html;
+    }
+
 
     //获取加密签名
     function get_sign($array,$_timestamp,$appkey,$type='md5'){
@@ -407,7 +704,7 @@
         }
         return $str;
     }
-
+    //校验签名
     function verify_sign($array,$appkey,$type='md5')
     {
         $clientSign=$array['_sign'];
@@ -433,40 +730,6 @@
             return 1;//验证成功
         }
     }
-    //手机端模板
-    function ismobile() {
-        // 如果有HTTP_X_WAP_PROFILE则一定是移动设备
-        if (isset ($_SERVER['HTTP_X_WAP_PROFILE']))
-            return true;
-        //此条摘自TPM智能切换模板引擎，适合TPM开发
-        if(isset ($_SERVER['HTTP_CLIENT']) &&'PhoneClient'==$_SERVER['HTTP_CLIENT'])
-            return true;
-        //如果via信息含有wap则一定是移动设备,部分服务商会屏蔽该信息
-        if (isset ($_SERVER['HTTP_VIA']))
-            //找不到为flase,否则为true
-            return stristr($_SERVER['HTTP_VIA'], 'wap') ? true : false;
-        //判断手机发送的客户端标志,兼容性有待提高
-        if (isset ($_SERVER['HTTP_USER_AGENT'])) {
-            $clientkeywords = array(
-                'nokia','sony','ericsson','mot','samsung','htc','sgh','lg','sharp','sie-','philips','panasonic','alcatel','lenovo','iphone','ipod','blackberry','meizu','android','netfront','symbian','ucweb','windowsce','palm','operamini','operamobi','openwave','nexusone','cldc','midp','wap','mobile'
-            );
-            //从HTTP_USER_AGENT中查找手机浏览器的关键字
-            if (preg_match("/(" . implode('|', $clientkeywords) . ")/i", strtolower($_SERVER['HTTP_USER_AGENT']))) {
-                return true;
-            }
-        }
-        //协议法，因为有可能不准确，放到最后判断
-        if (isset ($_SERVER['HTTP_ACCEPT'])) {
-            // 如果只支持wml并且不支持html那一定是移动设备
-            // 如果支持wml和html但是wml在html之前则是移动设备
-            if ((strpos($_SERVER['HTTP_ACCEPT'], 'vnd.wap.wml') !== false) && (strpos($_SERVER['HTTP_ACCEPT'], 'text/html') === false || (strpos($_SERVER['HTTP_ACCEPT'], 'vnd.wap.wml') < strpos($_SERVER['HTTP_ACCEPT'], 'text/html')))) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
 
     function get_token(){
         if (!S(C(PRODUCT) . 'access_token')) {//缓存中没有token先获取token，并设置失效时间
@@ -479,25 +742,6 @@
             return S(C(PRODUCT) . 'access_token');
         }
     }
-
-
-    function arrDate($data, $message = 'ok')
-    {
-        if ($data) {
-            $arr = array(
-                'code' => 200,
-                'data' => $data,
-                'message' => $message
-            );
-        } else {
-            $arr = array(
-                'code' => 400,
-                'message' => 'error'
-            );
-        }
-        return $arr;
-    }
-
     function authcode($string, $operation = 'DECODE', $key = '', $expiry = 0) {
         // 动态密匙长度，相同的明文会生成不同密文就是依靠动态密匙
         $ckey_length = 4;
@@ -558,102 +802,7 @@
         }
     }
 
-    //加密函数，$type='1',可变密文；$type='0',不变密文
-    function lock_url($txt,$key='Mtsh',$type='0')
-    {
-        $chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-=+";
-        if($type){
-            $nh = rand(0,64);
-        }else{
-            $nh = 5;
-        }
-        $ch = $chars[$nh];
-        $mdKey = md5($key.$ch);
-        $mdKey = substr($mdKey,$nh%8, $nh%8+7);
-        $txt = base64_encode($txt);
-        $tmp = '';
-        $i=0;$j=0;$k = 0;
-        for ($i=0; $i<strlen($txt); $i++) {
-            $k = $k == strlen($mdKey) ? 0 : $k;
-            $j = ($nh+strpos($chars,$txt[$i])+ord($mdKey[$k++]))%64;
-            $tmp .= $chars[$j];
-        }
-        return urlencode($ch.$tmp);
-    }
-    //解密函数
-    function unlock_url($txt,$key='Mtsh')
-    {
-        $txt = urldecode($txt);
-        $chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-=+";
-        $ch = $txt[0];
-        $nh = strpos($chars,$ch);
-        $mdKey = md5($key.$ch);
-        $mdKey = substr($mdKey,$nh%8, $nh%8+7);
-        $txt = substr($txt,1);
-        $tmp = '';
-        $i=0;$j=0; $k = 0;
-        for ($i=0; $i<strlen($txt); $i++) {
-            $k = $k == strlen($mdKey) ? 0 : $k;
-            $j = strpos($chars,$txt[$i])-$nh - ord($mdKey[$k++]);
-            while ($j<0) $j+=64;
-            $tmp .= $chars[$j];
-        }
-        return base64_decode($tmp);
-    }
-
-    function passport_encrypt($txt, $key = 'www.jb51.net')
-    {
-        srand((double)microtime() * 1000000);
-        $encrypt_key = md5(rand(0, 32000));
-        $ctr = 0;
-        $tmp = '';
-        for($i = 0;$i < strlen($txt); $i++) {
-            $ctr = $ctr == strlen($encrypt_key) ? 0 : $ctr;
-            $tmp .= $encrypt_key[$ctr].($txt[$i] ^ $encrypt_key[$ctr++]);
-        }
-        return urlencode(base64_encode(passport_key($tmp, $key)));
-    }
-    function passport_decrypt($txt, $key = 'www.jb51.net')
-    {
-        $txt = passport_key(base64_decode(urldecode($txt)), $key);
-        $tmp = '';
-        for($i = 0;$i < strlen($txt); $i++) {
-            $md5 = $txt[$i];
-            $tmp .= $txt[++$i] ^ $md5;
-        }
-        return $tmp;
-    }
-    function passport_key($txt, $encrypt_key)
-    {
-//        $encrypt_key = md5($encrypt_key);
-        $ctr = 0;
-        $tmp = '';
-        for($i = 0; $i < strlen($txt); $i++) {
-            $ctr = $ctr == strlen($encrypt_key) ? 0 : $ctr;
-            $tmp .= $txt[$i] ^ $encrypt_key[$ctr++];
-        }
-        return $tmp;
-    }
-
-    //获取列表
-    function get_list($table,$where,$name='name',$order='id'){
-        $data=M($table)->where($where)->order($order)->select();
-        $list=array();
-        foreach ($data as $k=>$da){
-            $list[$k]['key']=$da['id'];
-            $list[$k]['value']=$da[$name];
-        }
-        return $list;
-    }
-
-    //封装字典为下拉菜单
-    function dict_list($type,$field,$default='0',$lim=''){
-        $data=$this->get_dict_list($type,$lim);
-        $var=$this->select($data,$field,$default);
-        return $var;
-    }
-
-
+    //Excel相关的函数
     /**
      **根据下标获得单元格所在列位置
      **/
@@ -666,7 +815,6 @@
         );
         return $arr[$index];
     }
-
     /**
      **获取边框样式代码
      **/
@@ -681,9 +829,15 @@
         );
         return $styleArray;
     }
-
+    /**
+     ** 导出Excel到浏览器
+     * @param $type
+     * @param $filename
+     * @param $objPHPExcel
+     */
     function browser_export($type,$filename,$objPHPExcel){
-        ob_end_clean();//清除缓冲区,避免乱码
+        //清除缓冲区,避免乱码
+        ob_end_clean();
         if($type=='PDF'){
             header('Content-Type: application/pdf');
         }elseif ($type=='Excel5'){
@@ -696,6 +850,5 @@
         header('Content-Disposition: attachment;filename="'.$filename.'"');
         header('Cache-Control: max-age=0');
         $objWriter=\PHPExcel_IOFactory::createWriter($objPHPExcel,$type);
-
         $objWriter->save('php://output');
     }

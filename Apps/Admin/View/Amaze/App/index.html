@@ -16,7 +16,7 @@
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                        aria-haspopup="true" aria-expanded="false">
-                        分类：<{$type|get_dict_info='app_type',###}>
+                        分类：<{$type|dictInfo='app_type',###}>
                         <span class="am-icon-caret-down"></span>
                     </a>
                     <ul class="dropdown-menu">
@@ -27,7 +27,7 @@
                 </li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-                <form action="__URL__/index " method="post" class="navbar-form navbar-left" role="search">
+                <form action="__SELF__ " method="post" class="navbar-form navbar-left" role="search">
                     <div class="form-group input-group">
                         <input type="text" class="form-control" name="search" value="<{$search}>" placeholder="名称、关键字">
                         <span class="input-group-btn">
@@ -51,7 +51,6 @@
                 <th class="table-type" bgcolor="#ccc">子分类</th>
                 <th class="table-title" bgcolor="#ccc">账号</th>
                 <th class="table-title" bgcolor="#ccc">密码</th>
-                <th class="table-title" bgcolor="#ccc">目录</th>
                 <th class="table-title" bgcolor="#ccc">appID</th>
                 <th class="table-title" bgcolor="#ccc">appsecret</th>
                 <th class="table-type" bgcolor="#ccc">操作</th>
@@ -60,12 +59,11 @@
         <tbody>
             <volist name='data' id='vo' empty="没有数据">
                 <tr>
-                    <td><{$vo.name}></td>
-                    <td><{$vo.type|get_dict_info='app_type',###}></td>
+                    <td title="<{$vo.website}>"><{$vo.name}></td>
+                    <td><{$vo.type|dictInfo='app_type',###}></td>
                     <td><{$vo.subtype}></td>
                     <td><{$vo.email}></td>
                     <td><{$vo.passwd}></td>
-                    <td><{$vo.website}></td>
                     <td><{$vo.appid}></td>
                     <td><{$vo.appsecret}></td>
                     <td>

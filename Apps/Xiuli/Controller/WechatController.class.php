@@ -1,5 +1,5 @@
 <?php
-namespace Jinruihs\Controller;
+namespace Xiuli\Controller;
 use Think\Controller;
 class WechatController extends Controller{
     public function msg(){//验证消息接口
@@ -16,9 +16,9 @@ class WechatController extends Controller{
             echo $echostr;
             exit;
         }
-        else {
-            $this->reponseMsg();
-        }
+//        else {
+//            $this->reponseMsg();
+//        }
     }
 
     public function reponseMsg()

@@ -11,7 +11,7 @@ class MerchantController extends BaseController
             'table_merchant_app'  => 'merchant_app',
             'table_app'           => 'app',
             'name'                => 'Merchant',
-            'where'               =>array('deleted'=>'0'),
+            'where'               =>array(),
             'order'               =>'id'
         );
         return $data;
@@ -23,7 +23,7 @@ class MerchantController extends BaseController
         $info = $this->init();
         $where=$info['where'];
         //处理查询条件
-        $typeList=get_dict_list('merchant_type');
+        $typeList=get_dict_list('merchant_type','dict');
         $this->assign("typeList", $typeList);
         $type=I('type',$typeList[0]['key']);
         $this->assign("type", $type);
@@ -32,7 +32,7 @@ class MerchantController extends BaseController
         $this->assign('search', $search);
         $where['name'] = array('like', '%' . $search . '%');
         //查询数据
-        $data=M($info['table_merchant'])->where($where)->order($info['order'])->select();
+        $data=getList($info['table_merchant'],$where,$info['order']);
         $this->assign("data", $data);
 
         $this->display();
@@ -41,37 +41,34 @@ class MerchantController extends BaseController
     function merchant_update(){
         //初始化
         $info = $this->init();
-        $_POST['table']=$info['table_merchant'];
         if(I('id')){
-            $this->update();
+            $this->update($info['table_merchant'],$_POST);
         }else{
-            $this->insert();
+            $this->insert($info['table_merchant'],$_POST);
         }
     }
     //变更公司状态
     function merchant_status(){
         //初始化
         $info = $this->init();
-        $_GET['table']=$info['table_merchant'];
         if(I('status')=='0'){
             $_GET['status']='1';
         }else{
             $_GET['status']='0';
         }
-        $this->update();
+        $this->update($info['table_merchant'],$_GET);
     }
     //废弃
     function merchant_del(){
         //初始化
         $info = $this->init();
-        $_GET['table']=$info['table_merchant'];
-        $this->del();
+        $this->delete($info['table_merchant'],I('id'));
     }
     //获取
     function merchant_info(){
         //初始化
         $info = $this->init();
-        $data=M($info['table_merchant'])->find(I('id'));
+        $data=find($info['table_merchant'],I('id'));
         if($data){
             $res=array(
                 'errorcode'=>'0',
@@ -93,12 +90,11 @@ class MerchantController extends BaseController
         $info = $this->init();
         $where=$info['where'];
         //处理查询条件
-        $order=$info['order'];
         $merchant=I('id');
         $this->assign("merchant", $merchant);
         $where['merchant_id']=$merchant;
         //查询数据
-        $data=M($info['table_merchant_user'])->where($where)->order($order)->select();
+        $data=getList($info['table_merchant_user'],$where,$info['order']);
         $this->assign("data", $data);
         //处理查询条件
         $map=$info['where'];
@@ -115,7 +111,7 @@ class MerchantController extends BaseController
         }
 
         //查询数据
-        $user=M($info['table_user'])->where($map)->select();
+        $user=getList($info['table_user'],$map);
 
         $this->assign("user", $user);
 
@@ -125,15 +121,13 @@ class MerchantController extends BaseController
     function user_add(){
         //初始化
         $info = $this->init();
-        $_GET['table']=$info['table_merchant_user'];
-        $this->insert();
+        $this->insert($info['table_merchant_user'],$_GET);
     }
     //撤销用户
     function user_del(){
         //初始化
         $info = $this->init();
-        $_GET['table']=$info['table_merchant_user'];
-        $this->del();
+        $this->delete($info['table_merchant_user'],I('id'));
     }
     //商户下的应用
     public function merchant_app(){
@@ -141,12 +135,11 @@ class MerchantController extends BaseController
         $info = $this->init();
         $where=$info['where'];
         //处理查询条件
-        $order=$info['order'];
         $merchant=I('id');
         $this->assign("merchant", $merchant);
         $where['merchant_id']=$merchant;
         //查询数据
-        $data=M($info['table_merchant_app'])->where($where)->order($order)->select();
+        $data=getList($info['table_merchant_app'],$where,$info['order']);
         $this->assign("data", $data);
         //处理查询条件
         $map=$info['where'];
@@ -161,7 +154,7 @@ class MerchantController extends BaseController
             $map['id']=array('not in',$appList);
         }
         //查询数据
-        $app=M($info['table_app'])->where($map)->select();
+        $app=getList($info['table_app'],$map);
         $this->assign("app", $app);
 
         $this->display();
@@ -177,8 +170,7 @@ class MerchantController extends BaseController
     function app_del(){
         //初始化
         $info = $this->init();
-        $_GET['table']=$info['table_merchant_app'];
-        $this->del();
+        $this->delete($info['table_merchant_app'],I('id'));
     }
 
 }

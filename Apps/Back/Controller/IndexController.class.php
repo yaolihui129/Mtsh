@@ -4,20 +4,21 @@ class IndexController extends BaseController
 {
     public function index()
     {
-        $appList=$this->getAppList();
+        $time=2*7*24*3600;
+        $appList=getAppList();
         $this->assign('appList', $appList);
         $app=I('app',$appList[0]['key']);
-        cookie('app',$app,array('expire'=>2*7*24*3600,'prefix'=>C(PRODUCT).'_'));
+        setCookieKey('app',$app,$time);
 
-        $merchantList=$this->getMerchantList();
+        $merchantList=getMerchantList();
         $this->assign('merchantList', $merchantList);
         $merchant=I('merchant',$merchantList[0]['key']);
-        cookie('merchant',$merchant,array('expire'=>2*7*24*3600,'prefix'=>C(PRODUCT).'_'));
+        setCookieKey('merchant',$merchant,$time);
 
-        $publicNumberList=$this->getPublicNumberList($merchant);
+        $publicNumberList=getPublicNumberList($merchant);
         $this->assign('publicNumberList', $publicNumberList);
         $publicNumber=I('publicNumber',$publicNumberList[0]['key']);
-        cookie('publicNumber',$publicNumber,array('expire'=>2*7*24*3600,'prefix'=>C(PRODUCT).'_'));
+        setCookieKey('publicNumber',$publicNumber,$time);
 
         $this->display();
     }

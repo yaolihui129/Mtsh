@@ -20,7 +20,6 @@ class ActivityController extends BaseController
         //初始化
         $info = $this->init();
         $id=I('id');
-        $this->countPV($id);
         $openid=cookie(C(appID).'_openid');
         $userid=cookie(C(appID).'_isLogin');
 
@@ -35,7 +34,6 @@ class ActivityController extends BaseController
         $signPackage=$this->getSignPackage();
         $this->assign("signPackage", $signPackage);
 
-        $this->countUV($id,$userid);
         $data=M($info['table_activity'])->find($id);
         $this->assign("data", $data);
         $user=M($info['table_third'])->find($userid);
@@ -43,6 +41,11 @@ class ActivityController extends BaseController
         $where=array('activity_id'=>$id,'deleted'=>'0');
         $uv=M($info['table_activity_uv'])->where($where)->order('access_date desc')->select();
         $this->assign("uv", $uv);
+
+        $link='https://xiuliguanggao.com/Jinruihs/Activity/index/id/'.$id;
+        $this->assign("link", $link);
+        $imgUrl='https://xiuliguanggao.com/Upload'.$data['img'];
+        $this->assign("imgUrl", $imgUrl);
 
         $this->display();
     }

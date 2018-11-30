@@ -1,0 +1,44 @@
+<layout name="layout"/>
+<div class="admin-content container-fluid" style="min-height: 500px">
+    <div class="row">
+        <div class="col-xs-12">
+            <a href="#" class="thumbnail">
+                <img class="thumbnail" src="__UPLOAD__<{$data.img}>" alt=""/>
+                <div class="caption">
+                    <p><{$data.desc}></p>
+                </div>
+            </a>
+        </div>
+
+    </div>
+    <div class="container">
+        <h1><{$data.title}></h1>
+        <a href="__URL__/index">金瑞恒升</a>
+        <p><{$data.content}></p>
+        <p class="am-text-left">阅读(<{$data.clicknum}>)
+            <span class="pull-right"><{$data.utime}></span>
+        </p>
+    </div>
+    <hr>
+    <h2>UV统计表</h2>
+    <table class="am-table am-table-striped am-table-hover table-main table-bordered">
+        <thead>
+        <tr>
+            <th class="table-date" bgcolor="#ccc">日期</th>
+            <th class="table-type" bgcolor="#ccc">公众号appID</th>
+            <th class="table-type" bgcolor="#ccc">微信用户</th>
+            <th class="table-type" bgcolor="#ccc">openid</th>
+        </tr>
+        </thead>
+        <tbody>
+        <volist name='uv' id='vo' empty="没有数据">
+            <tr>
+                <td><{$vo.access_date}></td>
+                <td><{$vo.customer_third_id|getName='customer_third_party',###,'app_id'}></td>
+                <td><{$vo.customer_third_id|getName='customer_third_party',###,'nickname'}></td>
+                <td><{$vo.customer_third_id|getName='customer_third_party',###,'openid'}></td>
+            </tr>
+        </volist>
+        </tbody>
+    </table>
+</div>

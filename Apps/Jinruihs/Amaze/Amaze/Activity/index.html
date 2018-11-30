@@ -1,34 +1,131 @@
 <layout name="layout"/>
+<script src="https://res2.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
 <div class="am-cf admin-main">
-    <div class="admin-content container" style="min-height: 500px">
-        <h3></h3>
-        <h1 ><{$data.title}></h1>
-        <a href="https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzU5OTcyNDcxNw==&scene=124#wechat_redirect" class="am-text-left">金瑞恒升</a>
-        <p><{$data.desc}></p>
-        <img src="<{$user.headimgurl}>" class="img-circle">
-        <p>微信昵称：<{$user.nickname}></p>
-        <p>openid：<{$user.openid}></p>
-        <p><{$data.content}></p>
-        <p class="am-text-left">阅读(<{$data.clicknum}>)</p>
-        <h2>UV统计表（这个以后会迁移至后台页面）</h2>
-        <table class="am-table am-table-striped am-table-hover table-main table-bordered">
-            <thead>
-            <tr>
-                <th class="table-date" bgcolor="#ccc">日期</th>
-                <th class="table-type" bgcolor="#ccc">微信用户</th>
-                <th class="table-type" bgcolor="#ccc">openid</th>
-            </tr>
-            </thead>
-            <tbody>
-            <volist name='uv' id='vo' empty="没有数据">
-                <tr>
-                    <td><{$vo.access_date}></td>
-                    <td><{$vo.customer_third_id|getName='customer_third_party',###,'nickname'}></td>
-                    <td><{$vo.customer_third_id|getName='customer_third_party',###,'openid'}></td>
-                </tr>
-            </volist>
-            </tbody>
-        </table>
+    <div class="admin-content container-fluid" style="min-height: 650px">
+        <ul class=" am-avg-lg-12 gallery-list">
+            <li>
+                <a href="#">
+                    <img class="am-img-thumbnail am-img-bdrs" src="__UPLOAD__<{$data.img}>" alt=""/>
+                    <div class="gallery-desc"><{$data.desc}></div>
+                </a>
+            </li>
+        </ul>
+        <div class="container">
+            <h1><{$data.title}></h1>
+            <a href="https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzU5OTcyNDcxNw==&scene=124#wechat_redirect" class="am-text-left">金瑞恒升</a>
+            <p><{$data.content}></p>
+            <p class="am-text-left">阅读(<{$data.clicknum}>)
+                <span class="pull-right"><{$data.utime}></span>
+            </p>
+        </div>
     </div>
-
 </div>
+
+
+<script>
+    /*
+     * 注意：
+     * 1. 所有的JS接口只能在公众号绑定的域名下调用，公众号开发者需要先登录微信公众平台进入“公众号设置”的“功能设置”里填写“JS接口安全域名”。
+     * 2. 如果发现在 Android 不能分享自定义内容，请到官网下载最新的包覆盖安装，Android 自定义分享接口需升级至 6.0.2.58 版本及以上。
+     * 3. 常见问题及完整 JS-SDK 文档地址：http://mp.weixin.qq.com/wiki/7/aaa137b55fb2e0456bf8dd9148dd613f.html
+     */
+    wx.config({
+        debug: false,
+        appId:"<{$signPackage.appId}>",
+        timestamp:"<{$signPackage.timestamp}>",
+        nonceStr:"<{$signPackage.nonceStr}>",
+        signature: "<{$signPackage.signature}>",
+        jsApiList: [
+            // 所有要调用的 API 都要加到这个列表中
+            'onMenuShareTimeline',
+            'onMenuShareAppMessage',
+            'onMenuShareQQ',
+            'onMenuShareWeibo',
+            'onMenuShareQZone'
+        ]
+    });
+
+    wx.ready(function () {   //需在用户可能点击分享按钮前就先调用
+        wx.checkJsApi({
+            jsApiList: [
+                'onMenuShareTimeline',
+                'onMenuShareAppMessage',
+                'onMenuShareQQ',
+                'onMenuShareWeibo',
+                'onMenuShareQZone'
+            ], // 需要检测的JS接口列表，所有JS接口列表见附录2,
+            success: function(res) {
+                // 以键值对的形式返回，可用的api值true，不可用为false
+                // 如：{"checkResult":{"chooseImage":true},"errMsg":"checkJsApi:ok"}
+            },
+        });
+        /*分享到朋友圈*/
+        wx.onMenuShareTimeline({
+            title: "<{$data.title}>", // 分享标题
+            desc: "<{$data.desc}>", // 分享描述
+            link: "<{$link}>", // 分享链接
+            imgUrl: "<{$imgUrl}>", // 分享图标
+            success: function () {
+                // 用户确认分享后执行的回调函数
+                alert("分享成功");
+            },
+            cancel: function () {
+                // 用户取消分享后执行的回调函数
+                alert('分享取消');
+            }
+        });
+        /*分享给朋友*/
+        wx.onMenuShareAppMessage({
+            title: "<{$data.title}>", // 分享标题
+            desc: "<{$data.desc}>", // 分享描述
+            link: "<{$link}>", // 分享链接
+            imgUrl: "<{$imgUrl}>", // 分享图标
+            type: 'link', // 分享类型,music、video或link，不填默认为link
+            dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+            success: function () {
+                // 用户确认分享后执行的回调函数
+                alert("分享成功");
+            },
+            cancel: function () {
+                // 用户取消分享后执行的回调函数
+                alert('分享取消');
+            }
+        });
+        wx.onMenuShareQQ({
+            title: "<{$data.title}>", // 分享标题
+            desc: "<{$data.desc}>", // 分享描述
+            link: "<{$link}>", // 分享链接
+            imgUrl: "<{$imgUrl}>", // 分享图标
+            success: function () {
+                // 用户确认分享后执行的回调函数
+            },
+            cancel: function () {
+                // 用户取消分享后执行的回调函数
+            }
+        });
+        wx.onMenuShareWeibo({
+            title: "<{$data.title}>", // 分享标题
+            desc: "<{$data.desc}>", // 分享描述
+            link: "<{$link}>", // 分享链接
+            imgUrl: "<{$imgUrl}>", // 分享图标
+            success: function () {
+                // 用户确认分享后执行的回调函数
+            },
+            cancel: function () {
+                // 用户取消分享后执行的回调函数
+            }
+        });
+        wx.onMenuShareQZone({
+            title:"<{$data.title}>", // 分享标题
+            desc:"<{$data.desc}>", // 分享描述
+            link: "<{$link}>", // 分享链接
+            imgUrl: "<{$imgUrl}>", // 分享图标
+            success: function () {
+                // 用户确认分享后执行的回调函数
+            },
+            cancel: function () {
+                // 用户取消分享后执行的回调函数
+            }
+        });
+    });
+</script>

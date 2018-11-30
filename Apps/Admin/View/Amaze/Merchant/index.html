@@ -16,7 +16,7 @@
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                        aria-haspopup="true" aria-expanded="false">
-                        分类：<{$type|get_dict_info='merchant_type',###}>
+                        分类：<{$type|dictInfo='merchant_type',###}>
                         <span class="am-icon-caret-down"></span>
                     </a>
                     <ul class="dropdown-menu">
@@ -61,10 +61,10 @@
             <tr>
                 <td><{$vo.certificate_code}></td>
                 <td title="<{$vo.full_name}>"><{$vo.name}></td>
-                <td><{$vo.type|get_dict_info='merchant_type',###}></td>
+                <td><{$vo.type|dictInfo='merchant_type',###}></td>
                 <td>
                     <a href="__URL__/merchant_status/id/<{$vo.id}>/status/<{$vo.status}>" >
-                        <{$vo.status|get_dict_info='merchant_status',###}>
+                        <{$vo.status|dictInfo='merchant_status',###}>
                     </a>
                 </td>
                 <td><{$vo.contact_name}></td>

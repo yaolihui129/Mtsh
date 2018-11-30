@@ -1,27 +1,18 @@
 <?php
-namespace Admin\Controller;
-use Think\Controller;
-class BaseController extends Controller
+namespace Tuocai\Controller;
+class BaseController extends WechatController
 {
-    //初始化
     public function _initialize()
     {
-        //判定登录态
-        $isLogin=cookie(C(PRODUCT).'_isLogin');
-        $user=cookie(C(PRODUCT).'_user');
-        if($isLogin==''||$user==''){
-            $this->redirect(C(PRODUCT).'/Login/index');
-        }
         if (ismobile()) {//设置默认默认主题为 Amaze
             C('DEFAULT_V_LAYER', 'Amaze');
         }
     }
-    //空页面跳转
+
     function _empty()
     {
         $this->display('index');
     }
-
 
     /**
      ** 操作数据库
@@ -30,6 +21,10 @@ class BaseController extends Controller
      **   3. 修改
      **   4. 逻辑删除
      **   5. 物理删除
+     **   6. 获取列表
+     **   7. 查找数据
+     **   8. 查找符合条件的一条数据
+     **   9. 计数
      */
     function order()
     {
@@ -123,7 +118,7 @@ class BaseController extends Controller
 
 
     //文件上传
-    function uploadFile($savePath='Admin',$type='img'){
+    function uploadFile($savePath='Jira',$type='img'){
         $upload = new \Think\Upload();
         // 设置附件上传大小
         $upload->maxSize  = 7145728 ;
@@ -149,9 +144,6 @@ class BaseController extends Controller
         $image->open($imgUrl);
         $image->thumb($width, $height)->save($imgUrl);
     }
-
-
-
 
 
 

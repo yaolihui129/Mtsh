@@ -1,9 +1,8 @@
 <?php
-namespace Jinruihs\Controller;
+namespace Anshun\Controller;
 use Think\Controller;
 class WechatController extends Controller{
     public function msg(){//验证消息接口
-//        header("Content-Type:text/plain;charset=utf-8");
         $nonce      = I('nonce');
         $token      = "wechat";
         $timestamp  = I('timestamp');
@@ -16,9 +15,9 @@ class WechatController extends Controller{
             echo $echostr;
             exit;
         }
-        else {
-            $this->reponseMsg();
-        }
+//        else {
+//            $this->reponseMsg();
+//        }
     }
 
     public function reponseMsg()

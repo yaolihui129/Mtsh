@@ -61,7 +61,7 @@
             <tr>
                 <td><{$vo.certificate_code}></td>
                 <td title="<{$vo.full_name}>"><{$vo.name}></td>
-                <td><{$vo.type|get_dict_info='merchant_type',###}></td>
+                <td><{$vo.type}></td>
                 <td>
                     <a href="__URL__/merchant_status/id/<{$vo.id}>/status/<{$vo.status}>" >
                         <{$vo.status|get_dict_info='merchant_status',###}>

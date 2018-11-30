@@ -1,11 +1,18 @@
 <?php
 namespace Business\Controller;
-class IndexController extends WebInfoController
+class IndexController extends BasicController
 {
-    public function index()
+    function init()
     {
-        
-        $this->display();
+        $data = array(
+            'table' => 'component',
+            'where' => '',
+            'map'   => '',
+            'order' => '',
+            'field' => '',
+            'page'  => ''
+        );
+        return $data;
     }
 
 

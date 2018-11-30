@@ -16,7 +16,7 @@
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                        aria-haspopup="true" aria-expanded="false">
-                        分类：<{$type|get_dict_info='activity_type',###}>
+                        分类：<{$type|dictInfo='activity_type',###}>
                         <span class="am-icon-caret-down"></span>
                     </a>
                     <ul class="dropdown-menu">
@@ -48,34 +48,40 @@
     <table class="am-table am-table-striped am-table-hover table-main table-bordered">
         <thead>
         <tr>
-            <th class="table-type" bgcolor="#ccc">顺序</th>
             <th class="table-title" bgcolor="#ccc">标题</th>
             <th class="table-type" bgcolor="#ccc">图片</th>
             <th class="table-type" bgcolor="#ccc">状态</th>
-            <th class="table-type" bgcolor="#ccc">开始</th>
-            <th class="table-title" bgcolor="#ccc">结束</th>
-            <th class="table-title" bgcolor="#ccc">点击次数</th>
+            <th class="table-date" bgcolor="#ccc">开始-结束</th>
+            <th class="table-type" bgcolor="#ccc">点击次数</th>
             <th class="table-type" bgcolor="#ccc">操作</th>
         </tr>
         </thead>
         <tbody>
         <volist name='data' id='vo' empty="没有数据">
             <tr>
-                <td><{$vo.sn}></td>
-                <td title="<{$vo.desc}>"><{$vo.title}></td>
-                <td><{$vo.img}></td>
+                <td title="<{$vo.desc}>">
+                    <a href="__URL__/details/id/<{$vo.id}>" target="_blank"><{$vo.title}></a>
+                </td>
                 <td>
-                    <a href="__URL__/activity_status/id/<{$vo.id}>/status/<{$vo.status}>" >
-                        <{$vo.status|get_dict_info='activity_status',###}>
+                    <a href="__URL__/img/id/<{$vo.id}>">
+                        <empty name="vo.img">
+                            <img src="__IMG__/moren.jpg" alt="__IMG__/moren.jpg"  width="30px" height="30px">
+                            <else />
+                            <img src="__UPLOAD__<{$vo.img}>" alt="<{$vo.img}> "  width="30px" height="30px">
+                        </empty>
                     </a>
                 </td>
-                <td><{$vo.begin}></td>
-                <td><{$vo.end}></td>
+                <td>
+                    <a href="__URL__/activity_status/id/<{$vo.id}>/status/<{$vo.status}>" >
+                        <{$vo.status|dictInfo='activity_status',###}>
+                    </a>
+                </td>
+                <td>【<{$vo.begin}>】-【<{$vo.end}>】</td>
                 <td><{$vo.clicknum}></td>
                 <td>
-                    <a data-toggle="modal" href="#mod" id="<{$vo.id}>" onclick="mod(this.id)">修改信息</a>
-                    <a href="__URL__/activity_del/id/<{$vo.id}>" onclick="return confirm('你确定要下线：<{$vo.title}>吗？')">下线</a>
+                    <a data-toggle="modal" href="#mod" id="<{$vo.id}>" onclick="mod(this.id)">修改</a>
                     <a href="__URL__/activity_content/id/<{$vo.id}>" >内容</a>
+                    <a href="__URL__/activity_del/id/<{$vo.id}>" onclick="return confirm('你确定要下线：<{$vo.title}>吗？')">下线</a>
                 </td>
             </tr>
         </volist>
@@ -113,7 +119,7 @@
 <div class="modal fade" id="add" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form action="__URL__/activity_update" method="post" enctype='multipart/form-data' class="form-horizontal" role="form"   >
+            <form action="__URL__/activity_update" enctype="multipart/form-data" method="post" class="form-horizontal" role="form"   >
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">
                         <span aria-hidden="true">&times;</span>
@@ -124,24 +130,15 @@
                 <div class="modal-body">
                     <input type="hidden" name="type" value="<{$type}>" />
                     <input type="hidden" name="app_id" value="<{$Think.cookie.Back_app}>" />
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">顺序</label>
-                        <div class="col-sm-8">
-                            <input type="text" class="form-control" name="sn" value="<{$count+1}>" placeholder="顺序">
-                        </div>
-                        <div class="col-sm-2 control-label"></div>
-                    </div>
+                    <input type="hidden" name="merchant_id" value="<{$Think.cookie.Back_merchant}>" />
                     <div class="form-group">
                         <label class="col-sm-2 control-label">标题</label>
-                        <div class="col-sm-8">
+                        <div class="col-sm-6">
                             <input type="text" class="form-control" name="title" value="" placeholder="标题">
                         </div>
-                        <div class="col-sm-2 control-label"></div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">选择图片</label>
-                        <div class="col-sm-8">
-                            <input id="input-1" type="file" class="file form-control" name="img">
+                        <div class="col-sm-1 control-label">顺序</div>
+                        <div class="col-sm-1">
+                            <input type="text" class="form-control" name="sn" value="<{$count+1}>" placeholder="顺序">
                         </div>
                         <div class="col-sm-2 control-label"></div>
                     </div>
@@ -161,11 +158,6 @@
                         <div class="col-sm-3">
                             <input type="datetime-local" class="form-control" name="end" value="" placeholder="开始">
                         </div>
-                        <div class="col-sm-2 control-label"></div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">内容</label>
-                        <div class="col-sm-8"> <{$content}></div>
                         <div class="col-sm-2 control-label"></div>
                     </div>
 
@@ -208,13 +200,6 @@
                         <div class="col-sm-2 control-label"></div>
                     </div>
                     <div class="form-group">
-                        <label class="col-sm-2 control-label">选择图片</label>
-                        <div class="col-sm-8">
-                            <input id="input-2" type="file" class="file form-control" name="img">
-                        </div>
-                        <div class="col-sm-2 control-label"></div>
-                    </div>
-                    <div class="form-group">
                         <label class="col-sm-2 control-label">描述</label>
                         <div class="col-sm-8">
                             <input type="text" class="form-control" id="mod_desc" name="desc" value="" placeholder="描述">
@@ -232,8 +217,6 @@
                         </div>
                         <div class="col-sm-2 control-label"></div>
                     </div>
-
-
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>

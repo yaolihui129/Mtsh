@@ -7,7 +7,7 @@ class SetController extends BaseController
         $data = array(
             'table_dict' => 'dict',
             'name'       => 'Set',
-            'where'      => array('deleted'=>'0'),
+            'where'      => array(),
             'order'      =>'id'
         );
         return $data;
@@ -28,7 +28,7 @@ class SetController extends BaseController
         $this->assign('search', $search);
         $where['type'] = array('like', '%' . $search . '%');
         //查询数据
-        $data=M($info['table_dict'])->where($where)->order($info['order'])->select();
+        $data=getList($info['table_dict'],$where,$info['order']);
         //返回数据
         $typeList=array();
         foreach ($data as $da){
@@ -41,7 +41,7 @@ class SetController extends BaseController
         $this->assign("type", $type);
         $where['type']=$type;
         //查询数据
-        $data=M('dict')->where($where)->order($info['order'])->select();
+        $data=getList($info['table_dict'],$where,$info['order']);
         //返回数据
         $this->assign("data", $data);
         $this->assign("count", sizeof($data));
@@ -52,25 +52,23 @@ class SetController extends BaseController
     function dict_update(){
         //初始化
         $info = $this->init();
-        $_POST['table']=$info['table_dict'];
         if(I('id')){
-            $this->update();
+            $this->update($info['table_dict'],$_POST);
         }else{
-            $this->insert();
+            $this->insert($info['table_dict'],$_POST);
         }
     }
     //废弃数据字典值
     function shan_chu_dict(){
         //初始化
         $info = $this->init();
-        $_GET['table']=$info['table_dict'];
-        $this->del();
+        $this->delete($info['table_dict'],I('id'));
     }
     //获取数据字典值
     function dict_info(){
         //初始化
         $info = $this->init();
-        $data=M($info['table_dict'])->find(I('id'));
+        $data=find($info['table_dict'],I('id'));
         if($data){
             $res=array(
                 'errorcode'=>'0',

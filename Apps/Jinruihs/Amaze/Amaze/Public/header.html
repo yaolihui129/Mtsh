@@ -3,7 +3,15 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>金瑞恒升</title>
+        <title>
+            <empty name="data.title">
+                金瑞恒升
+                <else />
+                <{$data.title}>
+            </empty>
+        </title>
+        <meta name="keywords" content="私人定制" />
+　　    <meta name="description" content="<{$data.desc}>" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
         <meta name="renderer" content="webkit">
         <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
