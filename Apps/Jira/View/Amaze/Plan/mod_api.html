@@ -1,0 +1,97 @@
+<layout name="layout"/>
+<div class="admin-content" style="min-height: 500px">
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                           aria-expanded="false">
+                            编辑接口
+                        </a>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="__URL__/detail/tp/<{$api.planid}>">返回</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="row">
+        <div class="col-md-8">
+            <form action="__URL__/update" method="post" class="form-horizontal" role="form">
+                <input type="hidden" name="id" value="<{$api.id}>"/>
+                <input type="hidden" name="table" value="tp_project_plan_api"/>
+                <div class="form-group">
+                    <label  class="col-sm-2 control-label">接口:</label>
+                    <div class="col-sm-10">
+                        <p class="form-control-static"><{$api.api|getName='eo_api',###,'apiuri'}></p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label  class="col-sm-2 control-label">接口名:</label>
+                    <div class="col-sm-10">
+                        <p class="form-control-static"><{$api.api|getName='eo_api',###,'apiname'}></p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label  class="col-sm-2 control-label">脚本名:</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="name" value="<{$api.name}>"  placeholder="脚本名">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">业务占比</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="ratio" value="<{$api.ratio}>"  placeholder="业务占比">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">可参数化域</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="domain" value="<{$api.domain}>"  placeholder="可参数化域">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">脚本存放位置</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="path" value="<{$api.path}>"  placeholder="脚本存放位置">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label"></label>
+                    <div class="col-sm-10"></div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label"></label>
+                    <div class="col-sm-5">
+                        <button type="submit" class="btn btn-info btn-block ">提 交</button>
+                    </div>
+                    <div class="col-sm-5">
+                        <a href="__URL__/detail/tp/<{$api.planid}>" class="btn btn-warning btn-block">返回</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">Api列表</div>
+                <ul class="list-group">
+                    <volist name='data' id='st' empty="没有数据">
+                        <eq name="api.id" value="$st.id">
+                            <li class="list-group-item list-group-item-warning">
+                                <else/>
+                            <li class="list-group-item ">
+                        </eq>
+                            <a href="__URL__/mod_api/id/<{$st.id}>">
+                                <small><{$st.api|getName='eo_api',###,'apiuri'}>(<{$st.name}>)</small>
+                            </a>
+                        </li>
+                    </volist>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-1"></div>
+
+    </div>
+</div>

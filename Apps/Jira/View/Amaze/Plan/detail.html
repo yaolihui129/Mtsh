@@ -1,0 +1,109 @@
+<layout name="layout"/>
+<div class="admin-content container" style="min-height: 500px">
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            测试计划：<{$Think.cookie.Jira_pkey}>-<{$plan.issuenum}>：<{$plan.summary}>
+            <div class="btn-group pull-right">
+                <notempty name="editable">
+                    <a href="__URL__/change_type/id/<{$plan.id}>/ptype/1" class=" btn am-btn-primary btn-xs ">
+                        <span class="glyphicon glyphicon-retweet"> Api测试</span>
+                    </a>
+                    <a href="__URL__/change_type/id/<{$plan.id}>/ptype/2" class=" btn am-btn-success btn-xs ">
+                        <span class="glyphicon glyphicon-retweet">性能测试</span>
+                    </a>
+                </notempty>
+                <a href="__URL__/index/project/<{$Think.cookie.Jira_project}>/type/<{$Think.cookie.Jira_type_plan}>"
+                   class=" btn btn-warning btn-xs ">返回</a>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="well">
+                <div class="row">
+                    <div class="col-md-3">
+                        经办人: <{$plan.assignee|getJiraName=###}>，
+                        状态:【<{$plan.issuestatus|getIssueStatus=###}>】
+                    </div>
+                    <div class="col-md-7">
+                        有效bug:【<{$Think.cookie.Jira_bug_num}>个】，
+                        Bug修复率:【<{$Think.cookie.Jira_xiufl_num}>%】，
+                        其中：P0级Bug:【<{$Think.cookie.Jira_p0_num}>个】,
+                        P1级Bug:【<{$Think.cookie.Jira_p1_num}>个】
+                    </div>
+                    <div class="col-md-2">
+                        <a href="__URL__/repulse/planid/<{$plan.id}>" class="btn btn-warning"> 预警邮件</a>
+                        <a href="__APP__/<{$Think.config.PRODUCT}>/Report/index/planid/<{$plan.id}>/status/<{$plan.issuestatus}>"
+                           class="btn btn-info pull-right">测试报告</a>
+                    </div>
+                </div>
+            </div>
+
+            <ul class="nav nav-pills" role="tablist">
+                <li role="presentation" class="active">
+                    <a href="__URL__/detail/tp/<{$tp}>">周期&范围</a></li>
+                <li role="presentation">
+                    <a href="__URL__/tcase/tp/<{$tp}>">关联用例
+                        <span class="badge"><{$case|sizeof=###}></span>
+                    </a>
+                </li>
+                <li role="presentation">
+                    <a href="__URL__/bug/tp/<{$tp}>">本期缺陷
+                        <span class="badge"><{$Think.cookie.Jira_bug_num}></span>
+                    </a>
+                </li>
+                <li role="presentation">
+                    <a href="__URL__/yiliu/tp/<{$tp}>">遗留BUG
+                        <span class="badge"><{$Think.cookie.Jira_bug_yiliu}></span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-7">测试周期</div>
+                        <div class="col-md-1">状态</div>
+                        <div class="col-md-2">环境</div>
+                        <div class="col-md-2">版本</div>
+                    </div>
+                </div>
+                <ul class="list-group">
+                    <volist name='data' id='st' empty="没有数据">
+                        <li class="list-group-item">
+                            <div class="row">
+                                <div class="col-md-7">
+                                    <a href="__URL__/run/cyc/<{$st.id}>"> <{$st.name}></a>
+                                    <span class="badge pull-right">
+                                        <{$st.planned_start_time|substr=###,0,10}>--><{$st.planned_end_time|substr=###,0,10}>
+                                    </span>
+                                </div>
+                                <div class="col-md-1">
+                                    <switch name="st.status">
+                                        <case value="Draft">未开始</case>
+                                        <case value="Completed">完成</case>
+                                        <case value="Active">进行中</case>
+                                    </switch>
+                                </div>
+                                <div class="col-md-2"><{$st.environment}></div>
+                                <div class="col-md-2"><{$st.build}></div>
+                            </div>
+
+                        </li>
+                    </volist>
+                </ul>
+            </div>
+            <div class="panel panel-info">
+                <div class="panel-heading">覆盖功能点（测试范围） <span class="badge"><{$c}></span></div>
+                <ul class="list-group">
+                    <volist name='func' id='st' empty="没有数据">
+                        <li class="list-group-item">
+                            <small>
+                                <{$Think.cookie.Jira_pkey}>-<{$st.issuenum}>
+                                <{$st.summary}>
+                            </small>
+                        </li>
+                    </volist>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

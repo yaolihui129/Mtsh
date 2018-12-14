@@ -1,0 +1,129 @@
+<layout name="layout"/>
+<div class="admin-content container" style="min-height: 500px">
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                           aria-expanded="false">
+                            测试计划：<{$Think.cookie.Jira_pname}>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <volist name='project' id='pro'>
+                                <li><a href="__URL__/index/project/<{$pro.key}>"><{$pro.value}></a></li>
+                            </volist>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                           aria-expanded="false">
+                            <switch name="Think.cookie.Jira_type_plan">
+                                <case value="online">已上线</case>
+                                <case value="done">已完成</case>
+                                <case value="doing">进行中</case>
+                            </switch>
+                            <span class="am-icon-caret-down"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="__URL__/index/project/<{$Think.cookie.Jira_project}>/testGroup/<{$Think.cookie.Jira_testGroup}>">进行中</a></li>
+                            <li><a href="__URL__/index/type/done/project/<{$Think.cookie.Jira_project}>/testGroup/<{$Think.cookie.Jira_testGroup}>">已完成</a></li>
+                            <li><a href="__URL__/index/type/online/project/<{$Think.cookie.Jira_project}>/testGroup/<{$Think.cookie.Jira_testGroup}>">已上线</a></li>
+                        </ul>
+                    </li>
+                    <if condition="$_COOKIE['Jira_project'] eq '10006' ">
+                        <li role="presentation">
+                            <if condition="$testGroup eq 'one' ">
+                                <a href="__URL__/index/project/<{$Think.cookie.Jira_project}>/testGroup/two"> 切换到二组</a>
+                                <else />
+                                <a href="__URL__/index/project/<{$Think.cookie.Jira_project}>/testGroup/one"> 切换到一组</a>
+                            </if>
+                        </li>
+                    </if>
+                    <if condition="$_SESSION['user'] eq 'ylh' ">
+                        <li role="presentation">
+                            <a href="__URL__/appraisal">考核计划</a>
+                        </li>
+                    </if>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <form action="__URL__/index " method="post" class="navbar-form navbar-left" role="search">
+                        <div class="form-group input-group">
+                            <input type="text" class="form-control" name="search" value="<{$search}>"
+                                   placeholder="名称、关键字">
+                            <input type="hidden" class="form-control" name="project" value="<{$Think.cookie.Jira_project}>">
+                            <input type="hidden" class="form-control" name="testGroup" value="<{$Think.cookie.Jira_testGroup}>">
+                            <input type="hidden" class="form-control" name="type" value="<{$Think.cookie.Jira_type_plan}>">
+                            <span class="input-group-btn">
+                                 <button type="submit" class="btn btn-default"><span
+                                         class="glyphicon glyphicon-search"></span></button>
+                            </span>
+                        </div>
+                    </form>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <table class="am-table am-table-striped am-table-hover table-main table-bordered">
+        <thead>
+        <tr>
+            <th class="table-type" bgcolor="#ccc">KEY</th>
+            <th class="table-title" bgcolor="#ccc">测试计划</th>
+            <th class="table-type" bgcolor="#ccc">报告人</th>
+            <th class="table-type" bgcolor="#ccc">经办人</th>
+        </tr>
+        </thead>
+        <tbody>
+        <volist name='data' id='da' empty="没有数据">
+            <tr>
+                <td>
+                    <a href="http://jira.zhidaohulian.com/browse/<{$da.pkey}>" target="_blank"><{$da.pkey}></a>
+                    <span class="pull-right">【<{$da.issuestatus|getName='issuestatus',###,'pname'}>】</span>
+                </td>
+                <td>
+                    <switch name="da.plantype">
+                        <case value="0">
+                            <span class="label label-success">功能</span>
+                            <a href="__URL__/gongneng/tp/<{$da.id}>"><{$da.summary}></a>
+                            <span class="pull-right">
+                                <a href="__URL__/change_type/id/<{$da.id}>/plantype/1" class=" btn am-btn-danger btn-xs ">
+                                    <span class="glyphicon glyphicon-retweet"> 性能 </span>
+                                </a>
+                                <a href="__URL__/change_type/id/<{$da.id}>/plantype/2" class=" btn am-btn-primary btn-xs ">
+                                    <span class="glyphicon glyphicon-retweet"> Api </span>
+                                </a>
+                            </span>
+                        </case>
+                        <case value="1">
+                            <span class="label label-danger">性能</span>
+                            <a href="__URL__/xingneng/tp/<{$da.id}>"><{$da.summary}></a>
+                            <span class="pull-right">
+                                <a href="__URL__/change_type/id/<{$da.id}>/plantype/0" class=" btn am-btn-success btn-xs ">
+                                    <span class="glyphicon glyphicon-retweet"> 功能 </span>
+                                </a>
+                                <a href="__URL__/change_type/id/<{$da.id}>/ptype/2" class=" btn am-btn-primary btn-xs ">
+                                    <span class="glyphicon glyphicon-retweet"> Api </span>
+                                </a>
+                            </span>
+                        </case>
+                        <case value="2">
+                            <span class="label label-primary">api</span>
+                            <a href="__URL__/api/tp/<{$da.id}>"><{$da.summary}></a>
+                            <span class="pull-right">
+                                <a href="__URL__/change_type/id/<{$da.id}>/plantype/0" class=" btn am-btn-success btn-xs ">
+                                    <span class="glyphicon glyphicon-retweet"> 功能 </span>
+                                </a>
+                                <a href="__URL__/change_type/id/<{$da.id}>/plantype/1" class=" btn am-btn-primary btn-xs ">
+                                    <span class="glyphicon glyphicon-retweet"> 性能 </span>
+                                </a>
+                            </span>
+                        </case>
+                    </switch>
+                </td>
+                <td><{$da.reporter|getJiraName=###}></td>
+                <td><{$da.assignee|getJiraName=###}></td>
+            </tr>
+        </volist>
+        </tbody>
+    </table>
+</div>

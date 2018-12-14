@@ -1,0 +1,94 @@
+<layout name="layout"/>
+<div class="admin-content" style="min-height: 500px">
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                           aria-expanded="false">
+                            eoLinker接口用例 <span class="badge"> <{$data|sizeof=###}></span>
+                        </a>
+                    </li>
+                    <li role="presentation">
+                        <a href="__URL__/index/branch/<{$branch}>">Api文档</a>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <form action="__URL__/apicase " method="post" class="navbar-form navbar-left" role="search">
+                        <div class="form-group input-group pull-right">
+                            <input type="text" class="form-control" name="search" value="<{$search}>"
+                                   placeholder="Api用例名称">
+                            <input type="hidden" name="branch" value="<{$branch}>"/>
+                            <span class="input-group-btn">
+                                <button type="submit" class="btn btn-default">
+                                    <span class="glyphicon glyphicon-search"></span>
+                                </button>
+                            </span>
+                        </div>
+                    </form>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="row">
+        <div class="col-md-10">
+            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                <volist name='data' id='st' empty="没有数据">
+                    <div class="panel am-panel-warning">
+                        <div class="panel-heading" role="tab" id="heading<{$st.caseid}>">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion" href="#<{$st.caseid}>"
+                                   aria-expanded="true" aria-controls="<{$st.caseid}>">
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <small>
+                                                <{$st.projectid|getName='eo_project',###,'projectname'}>-
+                                                <{$st.groupid|getName='eo_project_test_case_group',###,'groupname'}>
+                                            </small>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <small><{$st.casename}></small>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <small><{$st.updateuserid|getELUser=###}>&nbsp;更新于:<{$st.updatetime}></small>
+                                            <span class="badge pull-right"><{$st.caseid|countId='eo_project_test_case_single','caseID',###}></span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="<{$st.caseid}>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading<{$st.caseid}>">
+                            <ul class="list-group"><{$st.caseid|apiCase=###}></ul>
+                        </div>
+                    </div>
+                </volist>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <ul class="list-group">
+                <volist name="project" id="vo">
+                    <eq name="vo" value="$branch">
+                        <li class="list-group-item list-group-item-warning">
+                            <else/>
+                        <li class="list-group-item ">
+                    </eq>
+                    <a href="__URL__/apicase/branch/<{$vo}>">
+                        <small>
+                            <{$vo|getName='eo_project',###,'projectname'}>
+                            <span class="badge pull-right"><{$vo|countRId='eo_project_test_case','projectID',###}></span>
+                        </small>
+                    </a>
+                    </li>
+                </volist>
+                <eq name="branch" value="">
+                    <li class="list-group-item list-group-item-warning">
+                        <else/>
+                    <li class="list-group-item ">
+                </eq>
+                <a href="__URL__/index"><small>全部</small></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

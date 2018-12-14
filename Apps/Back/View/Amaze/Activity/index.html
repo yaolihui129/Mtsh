@@ -27,6 +27,7 @@
                 </li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown"><a  href="__APP__/<{$Think.config.PRODUCT}>/Channel"  > 渠道管理</a></li>
                 <form action="__URL__/index " method="post" class="navbar-form navbar-left" role="search">
                     <div class="form-group input-group">
                         <input type="hidden" name="type" value="<{$type}>" />
@@ -36,7 +37,7 @@
                              <button type="submit" class="btn btn-default">
                                  <span class="glyphicon glyphicon-search"></span>
                              </button>
-                            <a data-toggle="modal" href="#add" type="button" class="btn btn-success" > 添加</a>
+                            <a data-toggle="modal" href="#add" type="button" class="btn am-btn-success" > 添加</a>
                         </span>
                     </div>
                 </form>
@@ -44,13 +45,14 @@
         </div>
     </nav>
 
-
     <table class="am-table am-table-striped am-table-hover table-main table-bordered">
         <thead>
         <tr>
             <th class="table-title" bgcolor="#ccc">标题</th>
             <th class="table-type" bgcolor="#ccc">图片</th>
             <th class="table-type" bgcolor="#ccc">状态</th>
+            <th class="table-type" bgcolor="#ccc">URL</th>
+            <th class="table-type" bgcolor="#ccc">二维码</th>
             <th class="table-date" bgcolor="#ccc">开始-结束</th>
             <th class="table-type" bgcolor="#ccc">点击次数</th>
             <th class="table-type" bgcolor="#ccc">操作</th>
@@ -61,27 +63,38 @@
             <tr>
                 <td title="<{$vo.desc}>">
                     <a href="__URL__/details/id/<{$vo.id}>" target="_blank"><{$vo.title}></a>
+                    <span class="pull-right">
+                        <a data-toggle="modal" href="#mod" id="<{$vo.id}>" onclick="mod(this.id)" class="btn btn-primary btn-xs" >修改</a>
+                    </span>
                 </td>
                 <td>
-                    <a href="__URL__/img/id/<{$vo.id}>">
-                        <empty name="vo.img">
-                            <img src="__IMG__/moren.jpg" alt="__IMG__/moren.jpg"  width="30px" height="30px">
-                            <else />
-                            <img src="__UPLOAD__<{$vo.img}>" alt="<{$vo.img}> "  width="30px" height="30px">
-                        </empty>
-                    </a>
+                    <empty name="vo.img">
+                        <a href="__URL__/img/id/<{$vo.id}>" class="btn btn-danger btn-xs">上传图片 </a>
+                        <else />
+                        <img src="__UPLOAD__<{$vo.img}>" alt="<{$vo.img}> "  width="30px" height="30px" >
+                    </empty>
                 </td>
                 <td>
                     <a href="__URL__/activity_status/id/<{$vo.id}>/status/<{$vo.status}>" >
                         <{$vo.status|dictInfo='activity_status',###}>
                     </a>
+                    <span class="pull-right">
+                        <a href="__URL__/activity_del/id/<{$vo.id}>" onclick="return confirm('你确定要下线：<{$vo.title}>吗？')">下线</a>
+                    </span>
+                </td>
+                <td><{$vo.short_url}></td>
+                <td>
+                    <empty name="vo.qr_code">
+                        <a href="__URL__/getActivityQrCode/id/<{$vo.id}>" class="btn btn-success btn-xs">二维码</a>
+                        <else />
+                        <img src="<{$vo.qr_code}>" alt="<{$vo.qr_code}> "  width="30px" height="30px">
+                    </empty>
                 </td>
                 <td>【<{$vo.begin}>】-【<{$vo.end}>】</td>
                 <td><{$vo.clicknum}></td>
                 <td>
-                    <a data-toggle="modal" href="#mod" id="<{$vo.id}>" onclick="mod(this.id)">修改</a>
-                    <a href="__URL__/activity_content/id/<{$vo.id}>" >内容</a>
-                    <a href="__URL__/activity_del/id/<{$vo.id}>" onclick="return confirm('你确定要下线：<{$vo.title}>吗？')">下线</a>
+                    <a href="__URL__/activity_content/id/<{$vo.id}>" class="btn btn-primary btn-xs" >内容</a>
+                    <a href="__URL__/channel/id/<{$vo.id}>" class="btn btn-primary btn-xs" >投放渠道</a>
                 </td>
             </tr>
         </volist>
@@ -186,19 +199,17 @@
                 <div class="modal-body">
                     <input type="hidden" name="id" id="mod_id" value="" />
                     <div class="form-group">
-                        <label class="col-sm-2 control-label">顺序</label>
-                        <div class="col-sm-8">
-                            <input type="text" class="form-control" id="mod_sn" name="sn" value="" placeholder="顺序">
-                        </div>
-                        <div class="col-sm-2 control-label"></div>
-                    </div>
-                    <div class="form-group">
                         <label class="col-sm-2 control-label">标题</label>
-                        <div class="col-sm-8">
-                            <input type="text" class="form-control" id="mod_title" name="title" value="" placeholder="标题">
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control" id="mod_title"  name="title" value="" placeholder="标题">
+                        </div>
+                        <div class="col-sm-1 control-label">顺序</div>
+                        <div class="col-sm-1">
+                            <input type="text" class="form-control" id="mod_sn"  name="sn" value="" placeholder="顺序">
                         </div>
                         <div class="col-sm-2 control-label"></div>
                     </div>
+
                     <div class="form-group">
                         <label class="col-sm-2 control-label">描述</label>
                         <div class="col-sm-8">
@@ -209,11 +220,11 @@
                     <div class="form-group">
                         <label class="col-sm-2 control-label">开始</label>
                         <div class="col-sm-3">
-                            <input type="datetime" class="form-control" id="mod_begin" name="begin" value="" placeholder="开始">
+                            <input type="text" class="form-control" id="mod_begin" name="begin" value="" placeholder="开始">
                         </div>
                         <label class="col-sm-2 control-label">结束</label>
                         <div class="col-sm-3">
-                            <input type="datetime" class="form-control" id="mod_end" name="end" value="" placeholder="开始">
+                            <input type="text" class="form-control" id="mod_end" name="end" value="" placeholder="开始">
                         </div>
                         <div class="col-sm-2 control-label"></div>
                     </div>

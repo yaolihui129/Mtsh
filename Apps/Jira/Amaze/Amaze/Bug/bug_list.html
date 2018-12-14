@@ -1,0 +1,24 @@
+<layout name="layout"/>
+<div class="admin-content container" style="min-height: 500px">
+
+    <volist name='data' id='st' empty="没有数据">
+        <div class="panel panel-default" style="margin-bottom:0px;">
+            <div class="panel-heading" role="tab" id="heading<{$st.id}>">
+                <a data-toggle="collapse" data-parent="#accordion" href="#<{$st.id}>"
+                   aria-expanded="true" aria-controls="<{$st.id}>">
+                    <{$st.reporter|getJiraName=###}>
+                    【<{$Think.session.pkey}>-<{$st.issuenum}>】
+                    <{$st.summary}>
+                    <{$st.assignee|getJiraName=###}>
+                    <span class="badge pull-right"> <{$st.issuestatus|getIssueStatus=###}></span>
+                </a>
+            </div>
+            <div id="<{$st.id}>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading<{$st.id}>">
+                <div class="panel-body">
+                    <{$st.description}>
+                </div>
+
+            </div>
+        </div>
+    </volist>
+</div>

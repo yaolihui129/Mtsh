@@ -7,8 +7,11 @@ class ActivityController extends BaseController
         $data = array(
             'table_activity'      => 'marketing_activity',
             'table_activity_uv'   => 'marketing_activity_uv',
+            'table_channel'       => 'marketing_channel',
+            'table_scene'         => 'wechat_scene',
+            'table_app'           => 'admin_app',
             'name'                => 'Activity',
-            'where'               =>array(),
+            'where'               => array(),
             'order'               =>'sn desc'
         );
         return $data;
@@ -38,7 +41,7 @@ class ActivityController extends BaseController
 
         $this->display();
     }
-
+    //上传图片
     public function img(){
         //初始化
         $info = $this->init();
@@ -47,14 +50,14 @@ class ActivityController extends BaseController
 
         $this->display();
     }
-
-    public function imgUP(){
+    //上传图片接口
+    function imgUP(){
         //初始化
         $info = $this->init();
         $_POST['url']='/' . C(PRODUCT) . '/Activity';
         $this->update($info['table_activity'],$_POST,'img');
     }
-
+    //活动详情
     public function details(){
         //初始化
         $info = $this->init();
@@ -126,8 +129,40 @@ class ActivityController extends BaseController
         }
         $this->ajaxReturn($res);
     }
+    //投放渠道
+    public function channel(){
 
+        $this->display();
+    }
 
+    //获取二维码
+    function getActivityQrCode(){
+        //初始化
+        $info = $this->init();
+        $id=I('id');
+        $var=find($info['table_activity'],$id,'qr_code,expire');
+        //判定是否过期
+        if(time()-$var['expire']>0){
+            //获取场景ID
+            $arr=find($info['table_app'],getCookieKey('publicNumber'));
+            $where['appid']=$arr['appid'];
+            $where['marketing']=getCookieKey('merchant');
+            $where['activityid']=$id;
+            $data=findOne($info['table_scene'],$where,'id desc','id');
+            if(!$data){
+                $where['url']='https://xiuliguanggao.com/Jinruihs'.'/Activity/index/id/'.$id;
+                $data['id']=insert($info['table_scene'],$where);
+            }
+            $time=15*24*60*60;
+            $var['id']=$id;
+            $var['qr_code']=$this->getTimeQrCode($data['id'],$arr['appid'],$time);
+            $var['expire']=time()+$time*24*60*60;
+            $this->update($info['table_activity'],$var);
+        }else{
+            $this->error('二维码还未过期');
+        }
+
+    }
 
 
 }

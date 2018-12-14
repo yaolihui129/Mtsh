@@ -1,0 +1,23 @@
+<layout name="layout"/>
+<div class="admin-content container" style="min-height: 500px">
+    <ul class="nav nav-pills" role="tablist">
+        <li role="presentation"><a href="__URL__/index">测试迭代评估</a></li>
+        <li role="presentation" class="active"><a href="__URL__/manage">测试迭代管理</a></li>
+        <li role="presentation"><a href="__URL__/bug">测试BUG管理</a></li>
+        <li role="presentation"><a href="__URL__/admittance">测试准入制度</a></li>
+        <li role="presentation"><a href="__URL__/score">考核积分计划</a></li>
+        <li role="presentation"><a href="__URL__/warning">预警邮件模板</a></li>
+    </ul>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="starter-template">
+                <ul class="list-group">
+                    <volist name='var' id='st'>
+                        <li class="list-group-item"><{$st}></li>
+                    </volist>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>

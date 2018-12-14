@@ -2,18 +2,21 @@
 <script src="https://res2.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
 <div class="am-cf admin-main">
     <div class="admin-content container-fluid" style="min-height: 650px">
-        <ul class=" am-avg-lg-12 gallery-list">
-            <li>
-                <a href="#">
-                    <img class="am-img-thumbnail am-img-bdrs" src="__UPLOAD__<{$data.img}>" alt=""/>
-                    <div class="gallery-desc"><{$data.desc}></div>
+        <div class="row">
+            <div class="col-xs-12">
+                <a href="#" class="thumbnail">
+                    <img class="thumbnail" src="__UPLOAD__<{$data.img}>" alt=""/>
+                    <div class="caption">
+                        <p><{$data.desc}></p>
+                    </div>
                 </a>
-            </li>
-        </ul>
+            </div>
+        </div>
         <div class="container">
             <h1><{$data.title}></h1>
             <a href="https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzU5OTcyNDcxNw==&scene=124#wechat_redirect" class="am-text-left">金瑞恒升</a>
             <p><{$data.content}></p>
+            <img src="<{$data.qr_code}>">
             <p class="am-text-left">阅读(<{$data.clicknum}>)
                 <span class="pull-right"><{$data.utime}></span>
             </p>

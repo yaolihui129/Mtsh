@@ -20,28 +20,32 @@ class ActivityController extends BaseController
         //初始化
         $info = $this->init();
         $id=I('id');
-//        $this->countPV($id);
-        $openid=cookie(C(appID).'_openid');
-//        $userid=cookie(C(appID).'_isLogin');
-
-        if ($openid){
-            $this->openidLogin(C(appID),$openid);
-        }else{
-            $_SESSION['uri'] =C(WEBSITE). '/'.C(PRODUCT).'/Activity/index/id/'.$id;
-            //$scope='snsapi_base';
-            $scope='snsapi_userinfo';
-            $this->getBaseInfo($scope,$id);
-        }
-        $signPackage=$this->getSignPackage();
-        $this->assign("signPackage", $signPackage);
-
-//        $this->countUV($id,$userid);
+        //计算PV
+        $this->countPV($id);
         $data=M($info['table_activity'])->find($id);
         $this->assign("data", $data);
-        $link='https://xiuliguanggao.com/Jinruihs/Activity/index/id/'.$id;
-        $this->assign("link", $link);
-        $imgUrl='https://xiuliguanggao.com/Upload'.$data['img'];
-        $this->assign("imgUrl", $imgUrl);
+
+        if(strpos($_SERVER['HTTP_USER_AGENT'], 'MicroMessenger')){
+            //微信浏览器
+            $openid=cookie(C(appID).'_openid');
+            if ($openid){
+                $this->openidLogin(C(appID),$openid);
+            }else{
+                $_SESSION['uri'] =C(WEBSITE). '/'.C(PRODUCT).'/Activity/index/id/'.$id;
+                //$scope='snsapi_base';
+                $scope='snsapi_userinfo';
+                $this->getBaseInfo($scope,$id);
+            }
+            $signPackage=$this->getSignPackage();
+            $this->assign("signPackage", $signPackage);
+            $link='https://xiuliguanggao.com/Jinruihs/Activity/index/id/'.$id;
+            $this->assign("link", $link);
+            $imgUrl='https://xiuliguanggao.com/Upload'.$data['img'];
+            $this->assign("imgUrl", $imgUrl);
+        }
+        $user=cookie(C(appID).'_isLogin');
+        $ip=GetIP();
+        $this->countUV($id,$ip,$user);
 
         $this->display();
     }
@@ -55,12 +59,27 @@ class ActivityController extends BaseController
         update($info['table_activity'],$var);
     }
 
-    function countUV($id,$user){
+    function countUV($id,$ip,$user){
         //初始化
         $info = $this->init();
+        $var['activity_id']=$id;
+        $var['access_date']=date('Y-m-d',time());
+        $var['customer_ip']=$ip;
         if($user){
-            $var['activity_id']=$id;
             $var['customer_third_id']=$user;
+        }
+        $data=M($info['table_activity_uv'])->where($var)->find();
+        if (!$data){
+            insert($info['table_activity_uv'],$var);
+        }
+    }
+
+    function countIPUV($id,$ip){
+        //初始化
+        $info = $this->init();
+        if($ip){
+            $var['activity_id']=$id;
+            $var['ip']=$ip;
             $var['access_date']=date('Y-m-d',time());
             $data=M($info['table_activity_uv'])->where($var)->find();
             if (!$data){
@@ -68,8 +87,6 @@ class ActivityController extends BaseController
             }
         }
     }
-
-
 
 
 

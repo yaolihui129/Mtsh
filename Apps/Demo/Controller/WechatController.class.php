@@ -3,34 +3,85 @@ namespace Demo\Controller;
 use Think\Controller;
 class WechatController extends Controller{
     public function msg(){//验证消息接口
-//        header("Content-Type:text/plain;charset=utf-8");
-        $nonce      = I('nonce');
-        $token      = "wechat";
-        $timestamp  = I('timestamp');
-        $echostr    = I('echostr');
-        $signature  = I('signature');
-        $array = array($nonce,$timestamp,$token);               //形成数组,
-        sort($array);                                           //按字典排序
-        $str =sha1(implode($array));                            //拼接成字符串，sha1加密,然后与signature进行校验
-        if($str == $signature){                     //第一次接入Weixin api 接口的时候
-            echo $echostr;
-            exit;
-        }
-//        else {
-//            $this->reponseMsg();
+//        $echoStr = $_GET["echostr"];
+//        if($this->checkSignature()){
+//            header("content-type:text;charset=utf-8");
+//            ob_clean();
+//            echo $echoStr;
+//            exit;
 //        }
+        $this->reponseMsg();
     }
 
-    public function reponseMsg()
-    {   //接收事件推送并回复
-        $postArr = $GLOBALS['HTTP_RAW_POST_DATA'];    //1.获取到微信推送过来的post数据（xml格式）
-        $postObj = simplexml_load_string($postArr);   //2.处理消息类型，并设置回复类型和内容
-        $toUser = $postObj->FromUserName;
-        $fromUser = $postObj->ToUserName;
-        if(strtolower($postObj->MsgType) == 'event'){
-
+    private function checkSignature()
+    {
+        $signature = $_GET["signature"];//从用户端获取签名赋予变量signature
+        $timestamp = $_GET["timestamp"];//从用户端获取时间戳赋予变量timestamp
+        $nonce = $_GET["nonce"];	//从用户端获取随机数赋予变量nonce
+        $token = C(PRODUCT);//将常量token赋予变量token
+        $tmpArr = array($token, $timestamp, $nonce);//简历数组变量tmpArr
+        sort($tmpArr, SORT_STRING);//新建排序
+        $tmpStr = implode( $tmpArr );//字典排序
+        $tmpStr = sha1( $tmpStr );//shal加密
+        //tmpStr与signature值相同，返回真，否则返回假
+        $data['name']=json_encode($_GET);
+        $data['web']=C(PRODUCT);
+        $data['signature']=$tmpStr;
+        insert('token',$data);
+        if( $tmpStr == $signature ){
+            return true;
+        }else{
+            return false;
         }
-     }
+    }
+    //接收事件推送并回复
+    public function reponseMsg()
+    {
+        $postArr        = $GLOBALS['HTTP_RAW_POST_DATA'];
+        $postObj        = simplexml_load_string($postArr);
+        $msgType        = strtolower($postObj->MsgType);
+        $event          = strtolower($postObj->Event);
+        //事件推送
+        if($msgType== 'event') {
+            if ($event == 'subscribe') {
+                //如果是关注subscrine事件
+                $this->wxEventSubscribe($postObj);
+            }elseif ($event == 'click') {
+                //自定义菜单“推”事件
+                $this->wxEventClick($postObj);
+            }elseif($event == 'location'){
+                //上传地理位置
+                $this->wxEventLocation($postObj);
+            }elseif ($event == 'link'){
+                //上传链接
+                $this->wxEventLink($postObj);
+            }elseif($event == 'scan'){
+                //扫描二维码
+                $this->wxEventScan($postObj);
+            }else{
+                $toUser         = $postObj->FromUserName;
+                $fromUser       = $postObj->ToUserName;
+                $content   = '暂不支持该事件';
+                $this->wxReplyText($toUser,$fromUser,$content);
+            }
+        }
+        //语音回复
+        if($msgType== 'voice'){
+            $this->wxVoice($postObj);
+        }
+        //关键字回复
+        if($msgType== 'text'){
+            $this->wxText($postObj);
+        }
+        //图片信息回复
+        if($msgType== 'image'){
+            $this->wxImage($postObj);
+        }
+        //视频信息回复
+        if($msgType== 'video'){
+            $this->wxVideo($postObj);
+        }
+    }
 
     function getAccessToken() {
         $appID=C(appID);
@@ -96,38 +147,37 @@ class WechatController extends Controller{
         return $ticket;
     }
 
-
     function getBaseInfo($scope='snsapi_userinfo',$state='123'){
         //1.获取code $scope='snsapi_base';snsapi_userinfo
         $appid = C(appID);
         $redirect_uri = urlencode(C(WEBSITE).'/'.C(PRODUCT).'/Wechat/getUserOpenId');
         $url='https://open.weixin.qq.com/connect/oauth2/authorize?appid='.$appid
-              .'&redirect_uri='.$redirect_uri.'&response_type=code&scope='.$scope.'&state='.$state.'#wechat_redirect';
+            .'&redirect_uri='.$redirect_uri.'&response_type=code&scope='.$scope.'&state='.$state.'#wechat_redirect';
         header('Location:'.$url);
     }
 
     function getUserOpenId(){
-      $appid     = C(appID);
-      $appsecret = C(appsecret);
-      $code = $_GET['code'];
-      $state= $_GET['state'];
-      $url= 'https://api.weixin.qq.com/sns/oauth2/access_token?appid='.$appid.'&secret='.$appsecret.'&code='.$code.'&grant_type=authorization_code';
-      $res = httpGet($url);
-      $arr = json_decode($res,true);
-      $access_token=$arr['access_token'];
+        $appid     = C(appID);
+        $appsecret = C(appsecret);
+        $code = $_GET['code'];
+        $state= $_GET['state'];
+        $url= 'https://api.weixin.qq.com/sns/oauth2/access_token?appid='.$appid.'&secret='.$appsecret.'&code='.$code.'&grant_type=authorization_code';
+        $res = httpGet($url);
+        $arr = json_decode($res,true);
+        $access_token=$arr['access_token'];
 
-      //用openID登陆
-      $this->openidLogin($appid,$arr['openid']);
-      cookie($appid.'_refresh_token',$arr['refresh_token']);
-      $scope=$arr['scope'];
-      if($scope=='snsapi_userinfo'){
-          $url = 'https://api.weixin.qq.com/sns/userinfo?access_token='.$access_token.'&openid='.$arr['openid'].'&lang=zh_CN';
-          $userinfo=httpGet($url);
-          cookie($appid.'_userinfo', $userinfo);
-          //更新用户信息
-          $this->updateCustomerThirdParty($userinfo,$state);
-      }
-      redirect($_SESSION['uri'].'/openid/'.$arr['openid']);
+        //用openID登陆
+        $this->openidLogin($appid,$arr['openid']);
+        cookie($appid.'_refresh_token',$arr['refresh_token']);
+        $scope=$arr['scope'];
+        if($scope=='snsapi_userinfo'){
+            $url = 'https://api.weixin.qq.com/sns/userinfo?access_token='.$access_token.'&openid='.$arr['openid'].'&lang=zh_CN';
+            $userinfo=httpGet($url);
+            cookie($appid.'_userinfo', $userinfo);
+            //更新用户信息
+            $this->updateCustomerThirdParty($userinfo,$state);
+        }
+        redirect($_SESSION['uri'].'/openid/'.$arr['openid']);
     }
 
     function openidLogin($appid,$openid){
@@ -136,53 +186,38 @@ class WechatController extends Controller{
         if(!$data){
             //插入数据
             if($openid){
-              $data['app_id']=$appid;
-              $data['merchant_id']=C(MERCHANTID);
-              $data['openid']=$openid;
-              $data['id']=insert('customer_third_party',$data);
+                $data['app_id']=$appid;
+                $data['merchant_id']=C(MERCHANTID);
+                $data['openid']=$openid;
+                $data['id']=insert('customer_third_party',$data);
             }
         }
-      //设置登录态
-      cookie($appid.'_isLogin',$data['id']);
-      cookie($appid.'_openid',$openid);
-      return true;
+        //设置登录态
+        cookie($appid.'_isLogin',$data['id']);
+        cookie($appid.'_openid',$openid);
+        return true;
 
     }
     //更新用户信息
     function updateCustomerThirdParty($userinfo,$state){
-      $userinfo=json_decode($userinfo,true);
-      $userinfo['id']= cookie(C(appID).'_isLogin');
-      $userinfo['source']= $state;
-      $userinfo['flag']= '0';
-      update('customer_third_party',$userinfo);
+        $userinfo=json_decode($userinfo,true);
+        $userinfo['id']= cookie(C(appID).'_isLogin');
+        $userinfo['source']= $state;
+        $userinfo['flag']= '0';
+        update('customer_third_party',$userinfo);
     }
 
-    function qrCodeTime($id,$day=30){//getTimeQrCode($wxId,$scene_id,$expire=30)
-        $url=$this->getTimeQrCode($this->getAccessToken(),$id,$day);
+    function qrCodeTime($id,$day=30){//getTimeQrCode($scene_id,$expire=30)
+        $url=$this->getTimeQrCode($id,$day);
         echo "临时二维码";
         echo "<img src='".$url."'/>";
     }
 
     function qrCodeForever($id){//getForeverQrCode($wxId,$scene_id);
-        $url=$this->getForeverQrCode($this->getAccessToken(),$id);
+        $url=$this->getForeverQrCode($id);
         echo "用久二维码";
         echo "<img src='".$url."'/>";
     }
-
-    function sendTemplateMsg($touser,$template_id,$call_url,$data){
-//        $touser='oZQWOxPB-cAH37NlpBsB3CuRIwYU';
-//        $template_id='H5Xu84_YhAT0-IpaYdzWcNFAKb2V6P7-7f0EMA2TYcI';
-//        $call_url='http://www.zhihuixinda.com';
-//        $data=array(
-//            'name'=>array('value'=>'微信号申请','color'=>"#173177"),
-//            'money'=>array('value'=>100,'color'=>"#173177"),
-//            'date'=>array('value'=>date('Y-m-d H:i:s')),'color'=>"#173177"
-//        );
-        $res = wxSendTemplateMsg($this->getAccessToken(),$touser,$template_id,$call_url,$data);
-        $this->ajaxReturn($res);
-    }
-
-
     //换取微信短链接
     function getShortUrl($long_url){
         $url='https://api.weixin.qq.com/cgi-bin/shorturl?access_token='.$this->getAccessToken();
@@ -192,7 +227,6 @@ class WechatController extends Controller{
         $res = json_decode($res,true);
         return $res['short_url'];
     }
-
     //获取临时二维码
     function getTimeQrCode($scene_id,$expire=30){
         $url='https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token='.$this->getAccessToken();
@@ -208,22 +242,19 @@ class WechatController extends Controller{
         $long_url='https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket='.$res['ticket']; //使用$ticket换去二维码图片
         return $this->getShortUrl($long_url);
     }
-
     //获取永久二维码
     function getForeverQrCode($scene_id){
         $url='https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token='.$this->getAccessToken();
-        $postArr =array(                                                                //1.组装数组
+        $postArr =array(
             'action_name'=>"QR_LIMIT_SCENE",
             'action_info'=>array('scene'=>array('scene_id'=>$scene_id))
         );
-        $postJson = json_encode($postArr);                                              //2.封装json
+        $postJson = json_encode($postArr);
         $res = httpPost($url, $postJson);
         $res = json_decode($res,true);
-        $long_url='https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket='.$res['ticket']; //3.使用$ticket换去二维码图片
+        $long_url='https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket='.$res['ticket'];
         return $this->getShortUrl($long_url);
     }
-
-
     //微信纯文本回复
     function wxReplyText($toUser,$fromUser,$content){
         //回复用户消息(纯文本格式)
@@ -238,7 +269,6 @@ class WechatController extends Controller{
                     </xml>";
         echo sprintf($template,$toUser,$fromUser,$time,$msgType,$content);
     }
-
     //微信图文回复
     function wxReplyNews($toUser,$fromUser,$arr){
         $msgType   = 'news';
@@ -252,32 +282,30 @@ class WechatController extends Controller{
             <Articles>";
         foreach($arr as $v){
             $template .="<item>
-                    <Title><![CDATA[".$v['title']."]]></Title>
-                    <Description><![CDATA[".$v['description']."]]></Description>
-                    <PicUrl><![CDATA[".$v['picUrl']."]]></PicUrl>
-                    <Url><![CDATA[".$v['url']."]]></Url>
-                    </item>";
+                            <Title><![CDATA[".$v['title']."]]></Title>
+                            <Description><![CDATA[".$v['description']."]]></Description>
+                            <PicUrl><![CDATA[".$v['picUrl']."]]></PicUrl>
+                            <Url><![CDATA[".$v['url']."]]></Url>
+                            </item>";
         }
         $template .="
             </Articles>
         </xml> ";
         echo sprintf($template, $toUser, $fromUser, $time, $msgType);
     }
-
     //微信图片回复
     function wxReplyImage($toUser,$fromUser,$mediaId){
         $msgType   = 'image';
         $time      = time();
         $template  = "<xml>
-            <ToUserName><![CDATA[%s]]></ToUserName>
-            <FromUserName><![CDATA[%s]]></FromUserName>
-            <CreateTime>%s</CreateTime>
-            <MsgType><![CDATA[%s]]></MsgType>
-            <Image><MediaId><![CDATA[%s]]></MediaId></Image>
-        </xml>";
+                            <ToUserName><![CDATA[%s]]></ToUserName>
+                            <FromUserName><![CDATA[%s]]></FromUserName>
+                            <CreateTime>%s</CreateTime>
+                            <MsgType><![CDATA[%s]]></MsgType>
+                            <Image><MediaId><![CDATA[%s]]></MediaId></Image>
+                        </xml>";
         echo sprintf($template, $toUser, $fromUser, $time, $msgType,$mediaId);
     }
-
     //微信语音回复
     function wxReplyVoice($toUser,$fromUser,$mediaId){
         $msgType   = 'voice';
@@ -291,7 +319,6 @@ class WechatController extends Controller{
         </xml>";
         echo sprintf($template, $toUser, $fromUser, $time, $msgType,$mediaId);
     }
-
     //微信视频回复
     function wxReplyVideo($toUser,$fromUser,$mediaId,$title,$description){
         $msgType   = 'video';
@@ -309,7 +336,6 @@ class WechatController extends Controller{
         </xml>";
         echo sprintf($template, $toUser, $fromUser, $time, $msgType,$mediaId,$title,$description);
     }
-
     //微信音乐回复
     function wxReplyMusic($toUser,$fromUser,$mediaId,$title,$description,$musicUrl,$HQMusicUrl,$thumbMediaId){
         $msgType   = 'music';
@@ -329,6 +355,116 @@ class WechatController extends Controller{
         </xml>";
         echo sprintf($template, $toUser, $fromUser, $time, $msgType,$title,$description,$musicUrl,$HQMusicUrl,$thumbMediaId);
     }
+    //微信推消息事件
+    function wxEventClick($postObj){
+        $toUser         = $postObj->FromUserName;
+        $fromUser       = $postObj->ToUserName;
+        $eventKey       = strtolower($postObj->EventKey);
+        if($eventKey == 'item1'){
+            $content   = '公司介绍';
+            $this->wxReplyText($toUser,$fromUser,$content);
+        }
+        if($eventKey == 'item2'){
+            $content   = '联想';
+            $this->wxReplyText($toUser,$fromUser,$content);
+        }
+        if($eventKey == 'item3'){
+            $content   = '因特尔';
+            $this->wxReplyText($toUser,$fromUser,$content);
+        }
+    }
+    //微信关注事件
+    function wxEventSubscribe($postObj){
+        $toUser         = $postObj->FromUserName;
+        $fromUser       = $postObj->ToUserName;
+        //推送图文消息，并发送优惠券
+    }
+    //微信接收地理位置
+    function wxEventLocation($postObj){
+        $toUser         = $postObj->FromUserName;
+        $fromUser       = $postObj->ToUserName;
+    }
+    //微信接收链接
+    function wxEventLink($postObj){
+        $toUser         = $postObj->FromUserName;
+        $fromUser       = $postObj->ToUserName;
+        $Title   = $postObj->Title;
+        $Url     = $postObj->Url;
+        $content = "<a href='". $Url."'>".$Title."</a>";
+        //回复用户消息(纯文本格式)
+        $this->wxReplyText($toUser,$fromUser,$content);
+    }
+    //微信扫码事件
+    function wxEventScan($postObj){
+        $toUser         = $postObj->FromUserName;
+        $fromUser       = $postObj->ToUserName;
+        $eventKey       = strtolower($postObj->EventKey);
+        $scene=find('wechat_scene',$eventKey);
+        if($scene){
+            $activity=find('marketing_activity',$scene['activityid']);
+            $arr=array(
+                array(
+                    'title'         => $activity['desc'],
+                    'description'   => $activity['title'],
+                    'picUrl'        => 'https://'.$_SERVER['SERVER_NAME'].'/Upload'.$activity['img'],
+                    'url'           => $scene['url'],
+                ),
+            );
+            $this->wxReplyNews($toUser,$fromUser,$arr);
+        }else{
+            //外部二维码
+            $content   = '外部二维码';
+            $this->wxReplyText($toUser,$fromUser,$content);
+        }
+    }
+    //微信语音事件
+    function wxVoice($postObj){
+        $toUser         = $postObj->FromUserName;
+        $fromUser       = $postObj->ToUserName;
+        //截取最后的“。”
+        $text=rtrim($postObj->Recognition,'。');
+        //回复用户消息(纯文本格式)
+        $content   = "您说的是：“".$text."”MediaId:".$postObj->MediaId;
+        $this->wxReplyText($toUser,$fromUser,$content);
+        //回复用户语音消息（语音）
+        $mediaId = $postObj->MediaId;
+        $this->wxReplyVoice($toUser,$fromUser,$mediaId);
+    }
+    //微信文本关键字事件
+    function wxText($postObj){
+        $toUser         = $postObj->FromUserName;
+        $fromUser       = $postObj->ToUserName;
+        $content   = trim($postObj->Content);
+        $this->wxReplyText($toUser,$fromUser,$content);
+    }
+    //微信上传图片事件
+    function wxImage($postObj){
+        $toUser         = $postObj->FromUserName;
+        $fromUser       = $postObj->ToUserName;
+        $arr = array(
+            array(
+                'title'         => '图片上传成功',
+                'description'   => "MediaId:".$postObj->MediaId,
+                'picUrl'        => $postObj->PicUrl,
+                'url'           => C(WEBSERVER),
+            ),
+        );
+        $this->wxReplyNews($toUser,$fromUser,$arr);
+    }
+    //微信上传视频事件
+    function wxVideo($postObj){
+        $toUser         = $postObj->FromUserName;
+        $fromUser       = $postObj->ToUserName;
+        $arr = array(
+            array(
+                'title'=>'视频上传成功',
+                'description'=>"MediaId:".$postObj->MediaId,
+                'picUrl'=>$postObj->ThumbMediaId,
+                'url'=>C(WEBSERVER),
+            ),
+        );
+        $this->wxReplyNews($toUser,$fromUser,$arr);
+    }
 
     function wxNewsArr($size){
         $str=array();
@@ -336,13 +472,12 @@ class WechatController extends Controller{
             $str.="array(
             'title'        =>  ".'$data['.$x."]['name'],
             'description'  =>  ".'$data['.$x."]['content'],
-            'picUrl'       =>  C(WEBSERVER).'/Upload/'.".'$data['.$x."]['productimg'],
-            'url'          =>  C(WEBSERVER).'/index.php/'.C(PRODUCT).'/Service/index/id/'.".'$data['.$x."]['productid']".".'/wxOpenId/'".'.$toUser.'."'/wxAppId/'".'.$fromUser,'."
+            'picUrl'       =>  C(WEBSITE).'/Upload/'.".'$data['.$x."]['productimg'],
+            'url'          =>  C(WEBSITE).'/index.php/'.C(PRODUCT).'/Service/index/id/'.".'$data['.$x."]['productid']".".'/wxOpenId/'".'.$toUser.'."'/wxAppId/'".'.$fromUser,'."
             ),";
         }
         return $str;
     }
-
     //群发接口
     function wxSendMsgAll($token,$array,$type='preview'){
         if($type=='preview'){           //预览接口
@@ -359,7 +494,6 @@ class WechatController extends Controller{
             return '发送类型不合规！';
         }
     }
-
     //获取微信服务器IP
     function wxGetServerIp($token){
         if(!$_SESSION['wx_ip_list']){
@@ -369,12 +503,11 @@ class WechatController extends Controller{
         }
         return $_SESSION['wx_ip_list'];
     }
-
     //发送微信模板消息
-    function wxSendTemplateMsg($token,$touser,$template_id,$call_url,$data){
-        $url      = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token='.$token;
-        $Meg      = array('touser'=>$touser,'template_id'=>$template_id,'url'=>$call_url,'data'=>$data);   //2.组装数组
-        $postJson = json_encode($Meg);      //将数组转化成json
+    function wxSendTemplateMsg($touser,$template_id,$call_url,$data){
+        $url      = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token='.$this->getAccessToken();
+        $Meg      = array('touser'=>$touser,'template_id'=>$template_id,'url'=>$call_url,'data'=>$data);
+        $postJson = json_encode($Meg);
         $res      = httpPost($url, $postJson);
         return $res;
     }

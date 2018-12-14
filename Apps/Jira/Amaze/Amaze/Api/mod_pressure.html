@@ -1,0 +1,92 @@
+<layout name="layout"/>
+<!-- content start -->
+<div class="admin-content container">
+    <div class="am-cf am-padding">
+        <div class="am-fl am-cf">
+            <strong class="am-text-primary am-text-lg"><a href="__URL__/press/id/<{$arr.api}>">API压测场景</a></strong> /
+            <small>编辑</small>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-7">
+            <div class="panel-body">
+                <form action="__URL__/update" method="post" class="form-horizontal" role="form">
+                    <input type="hidden" name="id" value="<{$arr.id}>"/>
+                    <input type="hidden" name="table" value="tp_api_scene_pressure"/>
+                    <div class="form-group">
+                        <label  class="col-sm-2 control-label">并发:</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" name="users" value="<{$arr.users}>"  placeholder="并发用户数">
+                        </div>
+                        <label  class="col-sm-2 control-label">预热:</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" name="in_seconds" value="<{$arr.in_seconds}>"  placeholder="预热时间">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label  class="col-sm-2 control-label">持续时间:</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" name="duration" value="<{$arr.duration}>" placeholder="持续时间（秒）">
+                        </div>
+                        <label  class="col-sm-2 control-label">延时启动:</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" name="startup_delay" value="<{$arr.startup_delay}>" placeholder="延时启动（秒）">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label  class="col-sm-2 control-label">TPM控制:</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" name="tpm" value="<{$arr.tpm}>"  placeholder="0即不做控制">
+                        </div>
+                        <label  class="col-sm-2 control-label">响应时间:</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" name="assertion_time" value="<{$arr.assertion_time}>"  placeholder="断言_相应时间">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">说明</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="name" value="<{$arr.name}>"  placeholder="场景说明">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"></label>
+                        <div class="col-sm-10"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"></label>
+                        <div class="col-sm-5">
+                            <button type="submit" class="btn btn-info btn-block ">提 交</button>
+                        </div>
+                        <div class="col-sm-5"><a href="__URL__/press/id/<{$arr.api}>" class="btn btn-warning btn-block">返回列表</a>
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+        <div class="col-md-5">
+            <ul class="list-group">
+                <volist name='data' id='vo' empty="没有数据">
+                    <li class="list-group-item">
+                        <a href="__URL__/mod_pressure/id/<{$vo.id}>">
+                            <{$vo.users}>并发
+                            <switch name="vo.in_seconds">
+                                <case value="0"></case>
+                                <default />,预热<{$vo.in_seconds}>秒
+                            </switch>
+                            ，持续<{$vo.duration}>秒
+                            <switch name="vo.tpm">
+                                <case value="0"></case>
+                                <default />,TPM<{$vo.tpm}>
+                            </switch>
+                            <span class="badge pull-right"><{$vo.author}></span>
+                        </a>
+                    </li>
+                </volist>
+            </ul>
+        </div>
+    </div>
+</div>

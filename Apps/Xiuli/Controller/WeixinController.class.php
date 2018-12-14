@@ -2,25 +2,7 @@
 namespace Xiuli\Controller;
 class WeixinController extends WebInfoController {
     public function index(){//验证消息接口
-        //获得参数 signature nonce token timestamp echostr
-        $nonce      = $_GET['nonce'];
-        $token      = "yaolihui";
-        $timestamp  = $_GET['timestamp'];
-        $echostr    = $_GET['echostr'];
-        $signature  = $_GET['signature'];
-        //形成数组,然后按字典排序
-        $array      = array($timestamp,$nonce,$token);
-        sort($array);
-        //拼接成字符串，sha1加密,然后与signature进行校验
-        $tmpstr=sha1(implode($array));
-        //3. 将加密后的字符串与 signature 进行对比, 判断该请求是否来自微信
-        if($tmpstr== $signature && $echostr)
-        {
-            echo $echostr;
-            exit;
-        }else{
-            $this->reponseMsg();
-        }
+        $this->reponseMsg();
     }
 
 

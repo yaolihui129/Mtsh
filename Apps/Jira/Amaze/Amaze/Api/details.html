@@ -1,0 +1,93 @@
+<layout name="layout"/>
+<div class="admin-content container">
+    <div class="starter-template">
+        <table class="am-table am-table-striped am-table-hover table-main table-bordered">
+            <thead>
+            <tr>
+                <th class="table-type" bgcolor="#ccc">平台-业务端</th>
+                <th class="table-title" bgcolor="#ccc">接口名称</th>
+                <th class="table-type" bgcolor="#ccc">线上版本</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td><{$data.projectid|getName='eo_project',###,'projectname'}></td>
+                <td><{$data.apiname}>【<{$data.apirequesttype}>】<{$data.apiuri}></td>
+                <td><{$data.online}></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="starter-template">
+                <div class="panel panel-default">
+                    <div class="panel-heading">逻辑说明</div>
+                    <{$apinote}>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">请求示例 </div>
+                <{$apirequestraw}>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">响应 </div>
+                <{$mockresult}>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-info">
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="__URL__/details/id/<{$data.apiid}>">参数信息<span class="badge"><{$count}></span></a></li>
+            <switch name="data.pressure">
+                <case value="0"></case>
+                <case value="1">
+                    <li role="presentation"><a href="__URL__/press/id/<{$data.apiid}>">性能场景</a></li>
+                </case>
+            </switch>
+        </ul>
+
+        <div class="row">
+            <div class="col-md-12">
+                <empty name="parameter">
+                    无需传递参数&还没有维护参数信息
+                    <else/>
+                    <div class="starter-template">
+                        <table class="am-table am-table-striped am-table-hover table-main table-bordered">
+                            <thead>
+                            <tr>
+                                <th class="table-type" bgcolor="#ccc">参数名</th>
+                                <th class="table-type" bgcolor="#ccc">类型-必填</th>
+                                <th class="table-type" bgcolor="#ccc">说明</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <volist name='parameter' id='param'>
+                                <tr>
+                                    <td><{$param.paramkey}></td>
+                                    <td><{$param.paramtype}>-<{$param.paramnotnull}></td>
+                                    <td><{$param.paramname}></td>
+                                </tr>
+                            </volist>
+                            </tbody>
+                        </table>
+                    </div>
+                </empty>
+            </div>
+        </div>
+    </div>
+
+
+
+
+</div>
+
+

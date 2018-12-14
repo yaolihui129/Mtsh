@@ -19,7 +19,6 @@ class MerchantController extends BaseController
     //商户首页
     public function index()
     {
-        //初始化
         $info = $this->init();
         $where=$info['where'];
         //处理查询条件
@@ -163,8 +162,7 @@ class MerchantController extends BaseController
     function app_add(){
         //初始化
         $info = $this->init();
-        $_GET['table']=$info['table_merchant_app'];
-        $this->insert();
+        $this->insert($info['table_merchant_app'],$_GET);
     }
     //撤销应用
     function app_del(){

@@ -1,7 +1,6 @@
 <?php
 namespace Back\Controller;
-use Think\Controller;
-class BaseController extends Controller
+class BaseController extends WechatController
 {
     public function _initialize()
     {

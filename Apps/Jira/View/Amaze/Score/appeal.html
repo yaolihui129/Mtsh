@@ -1,0 +1,65 @@
+<layout name="layout"/>
+<!-- content start -->
+<div class="admin-content container" style="min-height: 500px">
+    <div class="row">
+        <div class="col-md-7">
+            <div class="panel panel-default">
+                <div class="panel-heading">考核申诉
+                    <div class="btn-group pull-right">
+                        <a  href="__URL__/gengduo/user/<{$arr.user}>/quarter/<{$arr.quarter}>" class=" btn btn-warning btn-xs">返回</a>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <form action="__URL__/update" method="post" class="form-horizontal" role="form">
+                        <input type="hidden" name="id" value="<{$arr.id}>"/>
+                        <input type="hidden" name="status" value="1"/>
+                        <input type="hidden" name="dissent" value="0"/>
+                        <input type="hidden" name="url" value="Jira/Score/gengduo/user/<{$arr.user}>/quarter/<{$arr.quarter}>"/>
+                        <input type="hidden" name="table" value="tp_my_score"/>
+                        <div class="form-group">
+                            <div class="col-sm-2 control-label"></div>
+                            <div class="col-sm-10"> 申述时效:<{$shix}></div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">考核明细:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control"
+                                       value="<{$arr.pname}>--<{$arr.rules|getName='tp_score_rules',###,'cate'}>--<{$arr.rules|getName='tp_score_rules',###}>" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">申诉原因:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="content"  value="<{$arr.content}>" placeholder="填写申诉原因">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"></label>
+                            <div class="col-sm-10"></div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"></label>
+                            <div class="col-sm-5">
+                                <switch name="arr.dissent">
+                                    <case value="1">
+                                        <button type="submit" class="btn btn-info btn-block ">提 交</button>
+                                    </case>
+                                    <case value="0">
+                                        <button  class="btn btn-info btn-block " disabled="disabled">已提交</button>
+                                    </case>
+                                </switch>
+
+                            </div>
+                            <div class="col-sm-5">
+                                <a href="__URL__/gengduo/user/<{$arr.user}>/quarter/<{$arr.quarter}>" type="button" class="btn btn-warning btn-block ">返 回</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5">
+        </div>
+    </div>
+</div>

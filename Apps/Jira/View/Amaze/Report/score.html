@@ -1,0 +1,95 @@
+<layout name="layout"/>
+<div class="admin-content container" style="min-height: 500px">
+    <ul class="nav nav-pills" role="tablist">
+        <li role="presentation"><a href="__URL__/standard">测试迭代评估</a></li>
+        <li role="presentation"><a href="__URL__/manage">测试迭代管理</a></li>
+        <li role="presentation"><a href="__URL__/bug">测试BUG管理</a></li>
+        <li role="presentation"><a href="__URL__/admittance">测试准入制度</a></li>
+        <li role="presentation" class="active"><a href="__URL__/score">考核积分计划</a></li>
+    </ul>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="panel panel-info">
+                <div class="panel-heading">目的和原则</div>
+                <div class="panel-body">
+                    <div class="starter-template">
+                        <h3>目的</h3>
+                        <ul class="list-group">
+                            <volist name='var1' id='st'>
+                                <li class="list-group-item"><{$st}></li>
+                            </volist>
+                        </ul>
+                        <h3>原则</h3>
+                        <ul class="list-group">
+                            <volist name='var2' id='st'>
+                                <li class="list-group-item"><{$st}></li>
+                            </volist>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-success">
+                <div class="panel-heading">加分项</div>
+                <div class="panel-body">
+                    <div class="starter-template">
+                        <h3>一）初始分值</h3>
+                        <ul class="list-group">
+                            <volist name='var3' id='st'>
+                                <li class="list-group-item"><{$st}></li>
+                            </volist>
+                        </ul>
+                        <h3>二）迭代规模<span class="badge pull-right">负责/参与</span></h3>
+                        <p>初级工程师不负责B类及以上的迭代</p>
+                        <ul class="list-group">
+                            <volist name='var4' id='st'>
+                                <li class="list-group-item"><{$st}></li>
+                            </volist>
+                        </ul>
+                        <h3>三）其他</h3>
+                        <ul class="list-group">
+                            <volist name='var5' id='st'>
+                                <li class="list-group-item"><{$st}></li>
+                            </volist>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-danger">
+                <div class="panel-heading">减分项</div>
+                <div class="panel-body">
+                    <div class="starter-template">
+                        <h3>一）迭代完成</h3>
+                        <ul class="list-group">
+                            <volist name='var6' id='st'>
+                                <li class="list-group-item"><{$st}></li>
+                            </volist>
+                        </ul>
+
+                        <h3>二）上线后的质量</h3>
+                        <ul class="list-group">
+                            <volist name='var7' id='st'>
+                                <li class="list-group-item"><{$st}></li>
+                            </volist>
+                        </ul>
+
+                        <h3>三）测试规范</h3>
+                        <ul class="list-group">
+                            <volist name='var8' id='st'>
+                                <li class="list-group-item"><{$st}></li>
+                            </volist>
+                        </ul>
+
+                        <h3>四）人员素质</h3>
+                        <ul class="list-group">
+                            <volist name='var9' id='st'>
+                                <li class="list-group-item"><{$st}></li>
+                            </volist>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

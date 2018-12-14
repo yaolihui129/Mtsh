@@ -40,60 +40,8 @@ class ApiController extends Controller {
         }
     }
     
-    public function createwt(){
-        
-    }
-    
-    public function insert(){
-        $m=D(I('table'));
-        if (IS_GET){
-            $_GET['adder']=$_SESSION['realname'];
-            $_GET['moder']=$_SESSION['realname'];
-            $_GET['createTime']=date("Y-m-d H:i:s",time());
-            
-            if(!$m->create($_GET)){
-                echo  self::jsonEncode(402,'fail',I('table'));
-            }
-            $list=$m->add($_GET);
-            if($list){
-               echo  self::jsonEncode(200,'ok',$list);
-            }else{
-               echo  self::jsonEncode(403,'fail',$list);
-            }
-        }else {
-            $_POST['adder']=$_SESSION['realname'];
-            $_POST['moder']=$_SESSION['realname'];
-            $_POST['createTime']=date("Y-m-d H:i:s",time());
-            if(!$m->create()){
-                echo  self::jsonEncode(402,'fail',I('table'));
-            }
-            
-            $list=$m->add();
-            if($list){
-                  echo  self::jsonEncode(200,'ok',$list);
-            }else{
-                echo  self::jsonEncode(403,'fail',$list);
-            }
-        }
-    }
-    
-    public function update(){//修改
-        if (IS_GET){
-            $_GET['moder']=$_SESSION['realname'];
-            if (D(I('table'))->save($_GET)){
-//                 echo  self::jsonEncode(200,'ok',$list);
-            }else{
-                 //修改失败
-            }
-        }else {
-            $_POST['moder']=$_SESSION['realname'];
-            if (D(I('table'))->save($_POST)){
-                 //修改成功
-            }else{
-                 //修改失败
-            }
-        }
-    }
+
+
     
     //json
     public static function jsonEncode($code,$message='',$data='')

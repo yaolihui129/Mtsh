@@ -18,6 +18,6 @@ return array(
     //公众号配置
     'appID'                 =>'wx3090bf31097834ac',
     'appsecret'             =>'0f05798e9e7f2740706846aeba86308d',
-
+    'TOKEN'                 => 'yaolihui',
 
 );

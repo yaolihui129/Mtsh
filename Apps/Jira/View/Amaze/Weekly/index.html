@@ -1,0 +1,140 @@
+<layout name="layout"/>
+<div class="admin-content container" style="min-height: 500px">
+    <div class="panel panel-default">
+        <ul class="nav nav-pills" role="tablist">
+            <li role="presentation" >
+                <a href="__APP__/<{$Think.config.PRODUCT}>/Index/index/project/<{$Think.cookie.Jira_project}>">
+                    <switch name="Think.session.type.index">
+                        <case value="done">已完成<span class="badge"><{$count}></span></case>
+                        <case value="doing">进行中<span class="badge"><{$count}></span></case>
+                    </switch>
+                </a>
+            </li>
+            <li role="presentation"> <a href="__APP__/<{$Think.config.PRODUCT}>/Index/pending">分派</a> </li>
+            <li role="presentation">
+                <a href="__APP__/<{$Think.config.PRODUCT}>/Index/started/type/assigned/project/<{$Think.cookie.Jira_project}>">未开始</a>
+            </li>
+            <li role="presentation" class="active">
+                <a href="__APP__/<{$Think.config.PRODUCT}>/Weekly/index">测试周报</a>
+            </li>
+        </ul>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-9">
+                    <div class="panel panel-default">
+                        <div class="panel-heading text-center"><b>测试组周报（）</b></div>
+                        <ul class="list-group">
+                            <li class="list-group-item list-group-item-warning"><b>本周工作</b> </li>
+                            <li class="list-group-item list-group-item-info"><small> a)保险BC</small> </li>
+                            <empty name="data0">
+                                <li class="list-group-item"><small>暂无</small></li>
+                                <else />
+                                <volist name='data0' id='vo' empty="没有数据">
+                                    <li class="list-group-item">
+                                        <small><{$i}>.【<{$vo.pkey}>】【<{$vo.draw|getJiraName=###}>】<{$vo.pname}></small>
+                                        <span class="badge"><{$vo.issuestatus|getName='issuestatus',###,'pname'}></span>
+                                    </li>
+                                </volist>
+                            </empty>
+
+                            <li class="list-group-item list-group-item-info"><small> b)保险Saas</small> </li>
+                            <empty name="data1">
+                                <li class="list-group-item"><small>暂无</small></li>
+                                <else />
+                                <volist name='data1' id='vo' empty="没有数据">
+                                    <li class="list-group-item">
+                                        <small><{$i}>.【<{$vo.pkey}>】【<{$vo.draw|getJiraName=###}>】<{$vo.pname}></small>
+                                        <span class="badge"><{$vo.issuestatus|getName='issuestatus',###,'pname'}></span>
+                                    </li>
+                                </volist>
+                            </empty>
+                            <li class="list-group-item list-group-item-info"><small> d)用户/订单/优惠券/支付结算 </small></li>
+                            <empty name="data3">
+                                <li class="list-group-item"><small>暂无</small></li>
+                                <else />
+                                <volist name='data3' id='vo' empty="没有数据">
+                                    <li class="list-group-item">
+                                        <small><{$i}>.【<{$vo.pkey}>】【<{$vo.draw|getJiraName=###}>】<{$vo.pname}></small>
+                                        <span class="badge"><{$vo.issuestatus|getName='issuestatus',###,'pname'}></span>
+                                    </li>
+                                </volist>
+                            </empty>
+                            <li class="list-group-item list-group-item-info"><small> e)基础服务 </small></li>
+                            <empty name="data4">
+                                <li class="list-group-item"><small>暂无</small></li>
+                                <else />
+                                <volist name='data4' id='vo' empty="没有数据">
+                                    <li class="list-group-item">
+                                        <small><{$i}>.【<{$vo.pkey}>】【<{$vo.draw|getJiraName=###}>】<{$vo.pname}></small>
+                                        <span class="badge"><{$vo.issuestatus|getName='issuestatus',###,'pname'}></span>
+                                    </li>
+                                </volist>
+                            </empty>
+                        </ul>
+                        <ul class="list-group">
+                            <li class="list-group-item list-group-item-success"><b>下周计划</b> </li>
+                            <li class="list-group-item list-group-item-warning"><small> a)保险BC</small> </li>
+                            <empty name="doing0">
+                                <li class="list-group-item"><small>暂无</small></li>
+                                <else />
+                                <volist name='doing0' id='vo' empty="没有数据">
+                                    <li class="list-group-item">
+                                        <small><{$i}>.【<{$vo.pkey}>】【<{$vo.draw|getJiraName=###}>】<{$vo.pname}></small>
+                                        <span class="badge"><{$vo.issuestatus|getName='issuestatus',###,'pname'}></span>
+                                    </li>
+                                </volist>
+                            </empty>
+                            <li class="list-group-item list-group-item-warning"><small> b)保险Saas</small> </li>
+                            <empty name="doing1">
+                                <li class="list-group-item"><small>暂无</small></li>
+                                <else />
+                                <volist name='doing1' id='vo' empty="没有数据">
+                                    <li class="list-group-item">
+                                        <small><{$i}>.【<{$vo.pkey}>】【<{$vo.draw|getJiraName=###}>】<{$vo.pname}></small>
+                                        <span class="badge"><{$vo.issuestatus|getName='issuestatus',###,'pname'}></span>
+                                    </li>
+                                </volist>
+                            </empty>
+                            <li class="list-group-item list-group-item-warning"><small> d)用户/订单/优惠券/支付结算 </small></li>
+                            <empty name="doing3">
+                                <li class="list-group-item"><small>暂无</small></li>
+                                <else />
+                                <volist name='doing3' id='vo' empty="没有数据">
+                                    <li class="list-group-item">
+                                        <small><{$i}>.【<{$vo.pkey}>】【<{$vo.draw|getJiraName=###}>】<{$vo.pname}></small>
+                                        <span class="badge"><{$vo.issuestatus|getName='issuestatus',###,'pname'}></span>
+                                    </li>
+                                </volist>
+                            </empty>
+                            <li class="list-group-item list-group-item-warning"><small> e)基础服务 </small></li>
+                            <empty name="doing4">
+                                <li class="list-group-item"><small>暂无</small></li>
+                                <else />
+                                <volist name='doing4' id='vo' empty="没有数据">
+                                    <li class="list-group-item">
+                                        <small><{$i}>.【<{$vo.pkey}>】【<{$vo.draw|getJiraName=###}>】<{$vo.pname}></small>
+                                        <span class="badge"><{$vo.issuestatus|getName='issuestatus',###,'pname'}></span>
+                                    </li>
+                                </volist>
+                            </empty>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">周报列表</div>
+                        <ul class="list-group">
+                            <volist name='weekly' id='vo' empty="没有数据">
+                                <li class="list-group-item">
+                                    <a href="__URL__/index/id/<{$vo.id}>/status/<{$vo.status}>">
+                                        <small><{$vo.name}>(<{$vo.start}>--><{$vo.end}>)</small>
+                                    </a>
+                                </li>
+                            </volist>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

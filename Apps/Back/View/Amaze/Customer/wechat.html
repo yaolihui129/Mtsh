@@ -36,7 +36,7 @@
                              <button type="submit" class="btn btn-default">
                                  <span class="glyphicon glyphicon-search"></span>
                              </button>
-                            <!--<a data-toggle="modal" href="#add" type="button" class="btn btn-success" > 添加</a>-->
+                            <a data-toggle="modal" href="__URL__/getWechatCustomer/appId/<{$Think.cookie.Back_publicNumber}>" type="button" class="btn btn-warning" > 同步微信用户</a>
                         </span>
                     </div>
                 </form>
@@ -78,7 +78,7 @@
                 <td><{$vo.nickname}></td>
                 <td>
                     <switch name="vo.sex">
-                        <case value="0">女</case>
+                        <case value="0">保密</case>
                         <case value="1">男</case>
                         <case value="2">女</case>
                     </switch>
@@ -89,7 +89,7 @@
                 <td><{$vo.city}></td>
                 <td><{$vo.source}></td>
                 <td>
-                    <a data-toggle="modal" href="#mod" id="<{$vo.id}>" onclick="mod(this.id)">修改信息</a>
+                    <a href="__URL__/updateWechatCustomerInfo/appId/<{$Think.cookie.Back_publicNumber}>/id/<{$vo.id}>" >更新</a>
                 </td>
             </tr>
         </volist>

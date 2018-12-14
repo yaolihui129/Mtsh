@@ -1,0 +1,93 @@
+<layout name="layout"/>
+<div class="admin-content container" style="min-height: 500px">
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            性能方案：<{$plan.summary}>
+            <div class="btn-group pull-right">
+                <a href="__APP__/<{$Think.config.PRODUCT}>/Plan/detail/tp/<{$tp}>"
+                   class=" btn btn-warning btn-xs ">返回</a>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <form action="__URL__/chuangj" method="post" class="form-horizontal" role="form">
+                        <input type="hidden" name="id" value="<{$tp}>"/>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">测试目标：</label>
+                            <div class="col-sm-10">
+                                <textarea rows="3" class="form-control" name="target"  placeholder="测试目标"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">测试范围：</label>
+                            <div class="col-sm-10">
+                                <textarea rows="3" class="form-control" name="target"  placeholder="测试范围"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">响应时间:</label>
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control" name="main_func" value="50-200-500ms" placeholder="响应时间">
+                            </div>
+                            <label class="col-sm-2 control-label">成功率:</label>
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control" name="main_func" value="99.9%" placeholder="成功率">
+                            </div>
+                            <label class="col-sm-2 control-label">吞吐量:</label>
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control" name="main_func" value="" placeholder="吞吐量">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">网络拓扑:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="main_func" value="50--200-500ms" placeholder="网络拓扑">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">软硬件:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="main_func" value="50--200-500ms" placeholder="网络拓扑">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="__APP__/<{$Think.config.PRODUCT}>/Plan/detail/tp/<{$tp}>" type="button" class="btn btn-default" >返回</a>
+                            <button type="submit" class="btn btn-primary">保存</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-4">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">被测接口
+                            <div class="btn-group pull-right">
+                                <a href="__APP__/<{$Think.config.PRODUCT}>/Plan/detail/tp/<{$tp}>"
+                                   class=" btn btn-warning btn-xs ">选择接口</a>
+                            </div>
+                        </div>
+                        <ul class="list-group">
+                            <li class="list-group-item">Cras justo odio</li>
+                            <li class="list-group-item">Dapibus ac facilisis in</li>
+                            <li class="list-group-item">Morbi leo risus</li>
+                            <li class="list-group-item">Porta ac consectetur ac</li>
+                            <li class="list-group-item">Vestibulum at eros</li>
+                        </ul>
+                    </div>
+                    <div class="panel panel-info">
+                        <div class="panel-heading">测试工具
+                            <div class="btn-group pull-right">
+                                <a href="__APP__/<{$Think.config.PRODUCT}>/Testcycle/indexPlan/detail/tp/<{$tp}>"
+                                   class=" btn btn-warning btn-xs ">添加工具</a>
+                            </div>
+                        </div>
+                        <ul class="list-group">
+                            <li class="list-group-item">JMeter<span class="badge">4.0</span></li>
+                            <li class="list-group-item">NMP<span class="badge">2.0</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

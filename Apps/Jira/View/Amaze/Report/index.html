@@ -1,0 +1,242 @@
+<layout name="layout"/>
+<div class="admin-content container" style="min-height: 500px">
+    <ul class="nav nav-pills" role="tablist">
+        <li role="presentation" class="active"><a href="__URL__/index/planid/<{$planid}>" >线下测试报告 </a></li>
+        <li role="presentation" ><a href="__URL__/online/planid/<{$planid}>" >线上验收报告</a></li>
+    </ul>
+
+    <div class="panel panel-info">
+        <empty name="data">
+            <form action="__URL__/chuangj" method="post" class="form-horizontal" role="form">
+                <input type="hidden" name="planid" value="<{$planid}>"/>
+                <input type="hidden" name="subject" value="<{$subject}>"/>
+                <input type="hidden" name="report_url" value="<{$report_url}>"/>
+                <input type="hidden" name="type" value="1"/>
+                <div class="form-group">
+                    <label class="col-sm-1 control-label">发送给:</label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" name="mailto" value="<{$sendTo}>" placeholder="收件人邮件">
+                    </div>
+                    <label class="col-sm-1 control-label">抄送给:</label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" name="cc" value="<{$cc}>" placeholder="抄送人邮件">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-1 control-label">主题:</label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" value="<{$subject}>" placeholder="主题" readonly>
+                    </div>
+                    <label class="col-sm-1 control-label">测试结果:</label>
+                    <div class="col-sm-2">
+                        <input type="text" class="form-control" name="result" value="通过" placeholder="通过/不通过">
+                    </div>
+                    <label class="col-sm-1 control-label">遗留问题:</label>
+                    <div class="col-sm-1">
+                        <input type="text" class="form-control" name="bug_num" value="<{$Think.cookie.Jira_bug_yiliu}>" placeholder="遗留问题">
+                    </div>
+                    <label  class="col-sm-1  ">个</label>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-1 control-label">问题分布:</label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" name="bug_list" value="<{$bug_list}>" placeholder="如P2级1个，P3级1个">
+                    </div>
+                    <label class="col-sm-1 control-label">遗留原因:</label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" name="reason" value="" placeholder="遗留原因">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-1 control-label">原因:</label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" name="yuanyin" value="" placeholder="测试结果为不通过，才需要填写">
+                    </div>
+                    <label class="col-sm-1 control-label">IOS版本:</label>
+                    <div class="col-sm-2">
+                        <input type="text" class="form-control" name="ios" value="" placeholder="IOS版本">
+                    </div>
+                    <label class="col-sm-1 control-label">Android:</label>
+                    <div class="col-sm-2">
+                        <input type="text" class="form-control" name="android" value="" placeholder="Android版本">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-1 control-label">项目质量:</label>
+                    <div class="col-sm-11">
+                        <input type="text" class="form-control" name="quality" value="<{$quality}>"
+                               placeholder="有效bug X个，Bug修复率 X%；P0级Bug X个，P1级Bug X个。">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-1 control-label">主要功能:</label>
+                    <div class="col-sm-5">
+                        <input type="text" class="form-control" name="main_func" value="" placeholder="主要功能">
+                    </div>
+                    <label class="col-sm-1 control-label">测试周期:</label>
+                    <div class="col-sm-2">
+                        <input type="text" class="form-control" name="test_cycle" value="" placeholder="测试周期 ,如:8h">
+                    </div>
+                    <label class="col-sm-1 control-label">测试方法:</label>
+                    <div class="col-sm-2">
+                        <input type="text" class="form-control" name="method" value="功能测试" placeholder="如：接口测试、功能测试、性能测试">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-1 control-label">功能点:</label>
+                    <div class="col-sm-11">
+                        <textarea rows="3" class="form-control" name="func" placeholder="测试功能点"><{$func}></textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-1 control-label">主要问题&潜在风险:</label>
+                    <div class="col-sm-11">
+                        <textarea rows="3" class="form-control" name="risk"  placeholder="主要问题&潜在风险"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <a href="__APP__/<{$Think.config.PRODUCT}>/Plan/detail/tp/<{$planid}>" type="button" class="btn btn-default" >返回</a>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+            <else />
+            <switch name="data.mod">
+                <case value="2">
+                    <form action="__URL__/gengx" method="post" class="form-horizontal" role="form">
+                        <input type="hidden" name="id" value="<{$data.id}>"/>
+                        <input type="hidden" name="report_url" value="<{$data.report_url}>"/>
+                        <input type="hidden" name="mod" value="1"/>
+                        <div class="form-group">
+                            <label class="col-sm-1 control-label">发送给:</label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" name="mailto" value="<{$data.mailto}>" placeholder="收件人邮件">
+                            </div>
+                            <label class="col-sm-1 control-label">抄送给:</label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" name="cc" value="<{$data.cc}>" placeholder="抄送人邮件">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-1 control-label">主题:</label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" value="<{$data.subject}>" placeholder="主题" readonly>
+                            </div>
+                            <label class="col-sm-1 control-label">测试结果:</label>
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control" name="result" value="<{$data.result}>" placeholder="通过/不通过">
+                            </div>
+                            <label class="col-sm-1 control-label">遗留问题:</label>
+                            <div class="col-sm-1">
+                                <input type="text" class="form-control" name="bug_num" value="<{$data.bug_num}>" placeholder="遗留问题">
+                            </div>
+                            <label  class="col-sm-1  ">个</label>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-1 control-label">问题分布:</label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" name="bug_list" value="<{$data.bug_list}>" placeholder="如P2级1个，P3级1个">
+                            </div>
+                            <label class="col-sm-1 control-label">遗留原因:</label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" name="reason" value="<{$data.reason}>" placeholder="遗留原因">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-1 control-label">原因:</label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" name="yuanyin" value="<{$data.yuanyin}>" placeholder="测试结果为不通过，才需要填写">
+                            </div>
+                            <label class="col-sm-1 control-label">IOS版本:</label>
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control" name="ios" value="<{$data.ios}>" placeholder="IOS版本">
+                            </div>
+                            <label class="col-sm-1 control-label">Android:</label>
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control" name="android" value="<{$data.android}>" placeholder="Android版本">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-1 control-label">项目质量:</label>
+                            <div class="col-sm-11">
+                                <input type="text" class="form-control" name="quality" value="<{$data.quality}>"
+                                       placeholder="有效bug X个，Bug修复率 X%；P0级Bug X个，P1级Bug X个。">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-1 control-label">主要功能:</label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" name="main_func" value="<{$data.main_func}>" placeholder="主要功能">
+                            </div>
+                            <label class="col-sm-1 control-label">测试周期:</label>
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control" name="test_cycle" value="<{$data.test_cycle}>" placeholder="测试周期 ,如:8h">
+                            </div>
+                            <label class="col-sm-1 control-label">测试方法:</label>
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control" name="method" value="<{$data.method}>" placeholder="如：接口测试、功能测试、性能测试">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-1 control-label">功能点:</label>
+                            <div class="col-sm-11">
+                                <textarea rows="3" class="form-control" name="func" placeholder="测试功能点"><{$data.func}></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-1 control-label">主要问题&潜在风险:</label>
+                            <div class="col-sm-11">
+                                <textarea rows="3" class="form-control" name="risk"  placeholder="主要问题&潜在风险"><{$data.risk}></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="__APP__/<{$Think.config.PRODUCT}>/Plan/detail/tp/<{$planid}>" type="button" class="btn btn-default" >返回</a>
+                            <button type="submit" class="btn btn-primary">保存</button>
+                        </div>
+                    </form>
+                </case>
+                <case value="1">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <form action="mailto:<{$sendTo}>" class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">发送给:</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" name="mailto" value="<{$data.mailto}>" placeholder="收件人邮件" readonly>
+                                    </div>
+                                    <label class="col-sm-2 control-label">抄送给:</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control"  name="cc" value="<{$data.cc}>" placeholder="抄送人邮件" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">主题:</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control"  name='subject' value="<{$data.subject}>" placeholder="主题" readonly >
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">简要描述:</label>
+                                    <div class="col-sm-10"><{$resume}>
+                                        <span class="help-block">
+                                            <small><b>请不要在此页面进行修改，如果确实需要修改请点击【编辑】后，才可以保存成功</b></small>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <a href="__APP__/<{$Think.config.PRODUCT}>/Plan/detail/tp/<{$planid}>" type="button" class="btn btn-default" >返回</a>
+                                    <a href="__URL__/mod/id/<{$data.id}>" type="button" class="btn btn-primary" >编辑</a>
+                                    <button type="submit" class="btn btn-primary" >发送</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-md-5">
+                            <{$body}>
+                        </div>
+                    </div>
+                </case>
+            </switch>
+        </empty>
+    </div>
+</div>

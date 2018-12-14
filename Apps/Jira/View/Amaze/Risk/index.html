@@ -1,0 +1,29 @@
+<layout name="layout"/>
+<!-- content start -->
+<div class="admin-content container" style="min-height: 500px">
+    <div class="panel panel-info">
+        <div class="panel-heading"><h3 class="panel-title">风险及总结 </h3></div>
+        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+            <volist name='data' id='st' empty="暂时没有已记录的风险">
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="heading<{$st.id}>">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion" href="#<{$st.id}>"
+                               aria-expanded="true" aria-controls="<{$st.id}>">
+                                <small><{$st.subject}></small>
+                                <span class="pull-right"><{$st.priority}></span>
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="<{$st.id}>" class="panel-collapse collapse" role="tabpanel"
+                         aria-labelledby="heading<{$st.id}>">
+                        <div class="panel-body">
+                            <{$st.body}><br>
+                            <{$st.moder|getJiraName=###}>&nbsp;更新于:<{$st.utime}><br>
+                        </div>
+                    </div>
+                </div>
+            </volist>
+        </div>
+    </div>
+</div>

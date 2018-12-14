@@ -2,10 +2,7 @@
 namespace Xiuli\Controller;
 use Think\Controller;
 class WebInfoController extends Controller {
-    public function _empty(){ //错误网页重新定向到首页       
-         $this->redirect(C(PRODUCT).'/Index');
-    } 
-    
+
 function weiXinLogin($appid,$openid){//微信公众账号免登陆
        $map=array('wxopenid'=>$openid,'prodid'=>C(PRODID));
        $m=D('tp_customer');

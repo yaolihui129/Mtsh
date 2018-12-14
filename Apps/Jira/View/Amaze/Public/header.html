@@ -1,0 +1,148 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>蘑菇智行-产品质量平台</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <meta name="apple-mobile-web-app-title" content="Amaze UI"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="/favicon.ico" mce_href="/favicon.ico" type="image/x-icon">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="__CSS__/Amaze/flat.css">
+    <link rel="stylesheet" href="__CSS__/Amaze/amazeui.css"/>
+    <link rel="stylesheet" href="__CSS__/Amaze/admin.css">
+</head>
+<body>
+<!--[if lte IE 9]>
+<p class="browsehappy">你正在使用<strong>过时</strong>的浏览器，Amaze UI 暂不支持。 请 <a href="http://browsehappy.com/" target="_blank">升级浏览器</a>
+    以获得更好的体验！</p>
+<![endif]-->
+
+<header class="am-topbar admin-header navbar-static-top">
+    <div class="am-topbar-brand">
+        <img src="/favicon.ico" width="30px">
+        <strong>蘑菇智行</strong>
+        <small>产品质量平台</small>
+    </div>
+    <button class="am-topbar-btn am-topbar-toggle am-btn am-btn-sm am-btn-success am-show-sm-only"
+            data-am-collapse="{target: '#topbar-collapse'}">
+        <span class="am-sr-only">导航切换</span> <span class="am-icon-bars"></span>
+    </button>
+    <div class="am-collapse am-topbar-collapse" id="topbar-collapse">
+        <ul class="nav navbar-nav">
+            <li class="active hide" id="hide" onclick="hide()"><a href="#">隐藏菜单 </a></li>
+            <li class="active" id="show" onclick="show()"><a href="#">显示菜单 </a>
+            </li>
+        </ul>
+        <ul class="am-nav am-nav-pills am-topbar-nav am-topbar-right admin-header-list">
+            <li>
+                <a href="http://qc.zhidaoauto.com/eoLinker" target=_blank>
+                    <span class="glyphicon glyphicon-link"> eoLinke</span>
+                </a>
+            </li>
+            <li class="am-dropdown" data-am-dropdown>
+                <a class="am-dropdown-toggle" data-am-dropdown-toggle href="javascript:">
+                    <span class="glyphicon glyphicon-link"> 图书&设备</span>
+                    <span class="am-icon-caret-down"></span>
+                </a>
+                <ul class="am-dropdown-content">
+                    <li><a href="__APP__/<{$Think.config.PRODUCT}>/Books/index"><span class="glyphicon glyphicon-phone">  设备</span></a></li>
+                    <li><a href="__APP__/<{$Think.config.PRODUCT}>/Books/books"><span class="glyphicon glyphicon-book">  图书</span></a></li>
+                    <li><a href="__APP__/<{$Think.config.PRODUCT}>/Manager/index"><span class="glyphicon glyphicon-cog">  管理</span></a></li>
+                </ul>
+            </li>
+            <empty name="Think.cookie.Jira_user">
+                <li>
+                    <a href="__APP__/<{$Think.config.PRODUCT}>/Login"><i class="glyphicon glyphicon-log-in"> 登录</i></a>
+                </li>
+                <else/>
+                <li class="am-dropdown" data-am-dropdown>
+                    <a class="am-dropdown-toggle" data-am-dropdown-toggle href="javascript:">
+                        <i class="glyphicon glyphicon-user"> <{$Think.cookie.Jira_user|getJiraNameM=###}>  </i>
+                        <i class="am-icon-caret-down"></i>
+                    </a>
+                    <ul class="am-dropdown-content">
+                        <li><a href="__APP__/<{$Think.config.PRODUCT}>/Mine/index"><i class="glyphicon glyphicon-phone"> 设备</i> </a></li>
+                        <li><a href="__APP__/<{$Think.config.PRODUCT}>/Mine/books"><i class="glyphicon glyphicon-book"> 图书</i> </a></li>
+                        <li><a href="__APP__/<{$Think.config.PRODUCT}>/Score/gengduo/user/<{$_Think.cookie.Jira_user}>/quarter/<{$Think.config.KH_QUARTER}>">
+                            <i class="glyphicon glyphicon-credit-card"> 积分</i>
+                        </a>
+                        <li><a href="__APP__/<{$Think.config.PRODUCT}>/Mine/bug"><i class="am-icon-bug">&nbsp;&nbsp;Bug</i> </a></li>
+                        </li>
+                    </ul>
+                </li>
+                <li><a href="__APP__/<{$Think.config.PRODUCT}>/Set"><i class="am-icon-cog"> 设置 </i></a></li>
+                <li><a href="__APP__/<{$Think.config.PRODUCT}>/Login/logout"><i class="am-icon-power-off"> 退出 </i></a></li>
+            </empty>
+            <li>
+                <a href="javascript:" id="admin-fullscreen">
+                    <span class="am-icon-arrows-alt"></span>
+                    <span class="admin-fullText">开启全屏</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</header>
+<div class="am-cf admin-main">
+    <div class="admin-sidebar hide">
+        <ul class="am-list admin-sidebar-list">
+            <li>
+                <a href="__APP__/<{$Think.config.PRODUCT}>/Index/index/project/<{$Think.session.project}>">
+                    <span class="glyphicon glyphicon-home"> 迭代&任务</span>
+                </a>
+            </li>
+            <li>
+                <a href="__APP__/<{$Think.config.PRODUCT}>/Plan/index/project/<{$Think.session.project}>">
+                    <span class="am-icon-calendar"> &nbsp; &nbsp;  测试计划</span>
+                </a>
+            </li>
+            <li>
+                <a href="__APP__/<{$Think.config.PRODUCT}>/Bug"><span class="am-icon-bug"> &nbsp; &nbsp;  待处理Bug</span></a>
+            </li>
+            <li>
+                <a href="__APP__/<{$Think.config.PRODUCT}>/Risk/index/project/<{$Think.session.project}>">
+                    <span class="glyphicon glyphicon-glass"> 风险预警</span>
+                </a>
+            </li>
+            <li>
+                <a href="__APP__/<{$Think.config.PRODUCT}>/Api">
+                    <span class="glyphicon glyphicon-compressed"> 接口测试</span>
+                </a>
+            </li>
+            <in name="Think.cookie.Jira_user|jie_mi=###" value="ylh,wcz,mhh,fj,lixiaomei">
+                <li>
+                    <a href="__APP__/<{$Think.config.PRODUCT}>/Case/func/project/<{$Think.session.project}>">
+                        <span class="glyphicon glyphicon-globe"> 功能地图</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="__APP__/<{$Think.config.PRODUCT}>/Case/index/project/<{$Think.session.project}>">
+                        <span class="am-icon-th"> &nbsp; &nbsp; 测试用例</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="__APP__/<{$Think.config.PRODUCT}>/Overtime">
+                        <span class="glyphicon glyphicon-time"> 加班调休</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="__APP__/<{$Think.config.PRODUCT}>/Report/standard/">
+                        <span class="am-icon-file"> &nbsp; &nbsp;测试规范</span></a>
+                </li>
+            </in>
+
+
+        </ul>
+        <div class="am-panel am-panel-default admin-sidebar-panel">
+            <div class="am-panel-bd">
+                <p><span class="am-icon-bookmark"></span> 习惯</p>
+                <p>
+                    好的习惯也不是一蹴而就的，需要的是反复的积累。<br>
+                    --果农
+                </p>
+            </div>
+        </div>
+    </div>

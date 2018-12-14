@@ -1,0 +1,110 @@
+<layout name="layout"/>
+<div class="admin-content container" style="min-height: 500px">
+    <div class="panel panel-default">
+        <nav class="navbar navbar-inverse">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                            data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">迭代-需求&任务</a>
+                </div>
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-haspopup="true" aria-expanded="false">
+                                项目：<{$Think.session.project|getName='project',###,'pname'}>
+                                <span class="am-icon-caret-down"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <volist name='project' id='pro'>
+                                    <li>
+                                        <if condition="$pro['key'] eq '10006' ">
+                                            <a href="__URL__/started/type/assigned/project/<{$pro.key}>"><{$pro.value}></a>
+                                            <else />
+                                            <a href="__URL__/assigned/type/assigned/project/<{$pro.key}>"><{$pro.value}></a>
+                                        </if>
+                                    </li>
+                                </volist>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <form action="__URL__/started " method="post" class="navbar-form navbar-left" role="search">
+                            <div class="form-group input-group">
+                                <input type="text" class="form-control" name="search" value="<{$search}>"
+                                       placeholder="名称、关键字">
+                                <input type="hidden" class="form-control" name="project"
+                                       value="<{$Think.session.project}>">
+                                <input type="hidden" class="form-control" name="type"
+                                       value="<{$Think.session.type.index}>">
+                                <span class="input-group-btn">
+                                         <button type="submit" class="btn btn-default">
+                                             <span class="glyphicon glyphicon-search"></span>
+                                         </button>
+                                    </span>
+                            </div>
+                        </form>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <ul class="nav nav-pills" role="tablist">
+            <li role="presentation">
+                <a href="__URL__/index/project/<{$Think.session.project}>">进行中</a>
+            </li>
+            <if condition="$_SESSION['project'] eq 10006 ">
+                <li role="presentation">
+                    <a href="__URL__/pending">待分派</a>
+                </li>
+                <li role="presentation" class="active">
+                    <a href="__URL__/started/type/assigned/project/<{$Think.session.project}>">
+                        未开始<span class="badge"> <{$data|sizeof=###}></span>
+                    </a>
+                </li>
+                <else/>
+                <li role="presentation" class="active">
+                    <a href="__URL__/assigned/type/assigned/project/<{$Think.session.project}>">待处理</a>
+                </li>
+            </if>
+        </ul>
+        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+            <volist name='data' id='da' empty="没有数据">
+                <div class="panel panel-default" style="margin-bottom:0px;">
+                    <div class="panel-heading" role="tab" id="heading<{$da.id}>">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#<{$da.id}>" aria-expanded="true"
+                           aria-controls="<{$da.id}>">
+                            <small>
+                                <{$Think.session.pkey}>-<{$da.issuenum}>:
+                                【<{$da.issuetype|getName='issuetype',###,'pname'}>】<{$da.summary}>
+                                <if condition="$_SESSION['user'] eq 'ylh' ">
+                                    <a href="__URL__/jion/issueid/<{$da.id}>">【加入分派】</a>
+                                </if>
+                            </small>
+                            <span class="badge pull-right">
+                            <{$da.issuestatus|getName='issuestatus',###,'pname'}>
+                        </span>
+                        </a>
+                    </div>
+                    <div id="<{$da.id}>" class="panel-collapse collapse" role="tabpanel"
+                         aria-labelledby="heading<{$da.id}>">
+                        <div class="well well-sm">
+                            <empty name="da.description">
+                                暂无描述
+                                <else/>
+                                <{$da.description}>
+                            </empty>
+                        </div>
+                    </div>
+                </div>
+            </volist>
+        </div>
+    </div>
+</div>

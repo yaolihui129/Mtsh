@@ -1,0 +1,60 @@
+<layout name="layout"/>
+<!-- content start -->
+<div class="admin-content container" style="min-height: 500px">
+    <div class="panel panel-default">
+        <div class="panel-heading"><{$quarter}>
+            <div class="btn-group pull-right">
+                <a href="__URL__/index/quarter/<{$quarter}>" class=" btn btn-warning btn-xs">返回</a>
+            </div>
+        </div>
+        <div class="jumbotron">
+            <h1 style="text-align:center"><{$user|getJiraName=###}>的积分：<{$score}></h1>
+        </div>
+        <ul class="list-group">
+            <volist name='data' id='st'>
+                <li class="list-group-item" title="<{$st.id}>.【<{$st.ctime}>】<{$st.content}>">
+                    <switch name="st.status">
+                        <case value="0">
+                            <span class="label label-info">正常</span>
+                        </case>
+                        <case value="1">
+                            <span class="label label-danger">申诉中</span>
+                        </case>
+                        <case value="2">
+                            <span class="label label-success">申诉成功</span>
+                        </case>
+                        <case value="3">
+                            <span class="label label-warning">申诉驳回</span>
+                        </case>
+                    </switch>
+                    <small>
+                        <{$st.pname}>--<{$st.rules|getName='tp_score_rules',###,'cate'}>--<{$st.rules|getName='tp_score_rules',###}>:
+                        <if condition="$st.user eq $_SESSION['user'] ">
+                            <switch name="st.dissent">
+                                <case value="1">
+                                    <a href="__URL__/appeal/id/<{$st.id}>" class=" btn btn-danger btn-xs">
+                                        <span class="glyphicon glyphicon-exclamation-sign"> 申诉</span></a>
+                                </case>
+                                <case value="0">
+                                    <a href="#" class=" btn btn-warning btn-xs" disabled="disabled"> 不允许申诉</a>
+                                </case>
+                            </switch>
+                        </if>
+                        <{$st.remark}>
+                    </small>
+                    <switch name="st.type">
+                        <case value="1">
+                            <span class="label label-success pull-right"> +<{$st.score}></span>
+                        </case>
+                        <case value="2">
+                            <span class="label label-danger pull-right"> -<{$st.score}></span>
+                        </case>
+                    </switch>
+                </li>
+            </volist>
+        </ul>
+    </div>
+</div>
+
+
+

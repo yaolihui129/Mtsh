@@ -17,41 +17,38 @@ class ActivityController extends BaseController
     //首页
     public function index()
     {
-        //初始化
         $info = $this->init();
         $id=I('id');
-        $openid=cookie(C(appID).'_openid');
-        $userid=cookie(C(appID).'_isLogin');
-
-        if ($openid){
-            $this->openidLogin(C(appID),$openid);
-        }else{
-            $_SESSION['uri'] =C(WEBSITE). '/'.C(PRODUCT).'/Activity/index/id/'.$id;
-            //$scope='snsapi_base';
-            $scope='snsapi_userinfo';
-            $this->getBaseInfo($scope,$id);
-        }
-        $signPackage=$this->getSignPackage();
-        $this->assign("signPackage", $signPackage);
-
+        //计算PV
+        $this->countPV($id);
         $data=M($info['table_activity'])->find($id);
         $this->assign("data", $data);
-        $user=M($info['table_third'])->find($userid);
-        $this->assign("user", $user);
-        $where=array('activity_id'=>$id,'deleted'=>'0');
-        $uv=M($info['table_activity_uv'])->where($where)->order('access_date desc')->select();
-        $this->assign("uv", $uv);
-
-        $link='https://xiuliguanggao.com/Jinruihs/Activity/index/id/'.$id;
-        $this->assign("link", $link);
-        $imgUrl='https://xiuliguanggao.com/Upload'.$data['img'];
-        $this->assign("imgUrl", $imgUrl);
+        if(strpos($_SERVER['HTTP_USER_AGENT'], 'MicroMessenger')){
+            //微信浏览器
+            $openid=cookie(C(appID).'_openid');
+            if ($openid){
+                $this->openidLogin(C(appID),$openid);
+            }else{
+                $_SESSION['uri'] =C(WEBSITE). '/'.C(PRODUCT).'/Activity/index/id/'.$id;
+                //$scope='snsapi_base';
+                $scope='snsapi_userinfo';
+                $this->getBaseInfo($scope,$id);
+            }
+            $signPackage=$this->getSignPackage();
+            $this->assign("signPackage", $signPackage);
+            $link='https://xiuliguanggao.com/Jinruihs/Activity/index/id/'.$id;
+            $this->assign("link", $link);
+            $imgUrl='https://xiuliguanggao.com/Upload'.$data['img'];
+            $this->assign("imgUrl", $imgUrl);
+        }
+        $user=cookie(C(appID).'_isLogin');
+        $ip=GetIP();
+        $this->countUV($id,$ip,$user);
 
         $this->display();
     }
 
     function countPV($id){
-        //初始化
         $info = $this->init();
         $data=M($info['table_activity'])->find($id);
         $var['id']=$id;
@@ -60,7 +57,7 @@ class ActivityController extends BaseController
     }
 
     function countUV($id,$user){
-        //初始化
+
         $info = $this->init();
         if($user){
             $var['activity_id']=$id;
@@ -72,11 +69,5 @@ class ActivityController extends BaseController
             }
         }
     }
-
-
-
-
-
-
 
 }

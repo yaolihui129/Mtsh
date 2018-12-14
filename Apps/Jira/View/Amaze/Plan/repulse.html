@@ -1,0 +1,151 @@
+<layout name="layout"/>
+<div class="admin-content container" style="min-height: 500px">
+    <ul class="nav nav-pills" role="tablist">
+        <li role="presentation" class="active"><a href="__URL__/repulse/planid/<{$planid}>" class="">提测打回 </a></li>
+        <li role="presentation" ><a href="__URL__/unsubm/planid/<{$planid}>" class="">未按时提测 </a></li>
+        <li role="presentation"><a href="__URL__/warning/planid/<{$planid}>" class="">项目延期 </a></li>
+    </ul>
+    <div class="panel panel-info">
+        <empty name="data">
+            <form action="__URL__/insert" method="post" class="form-horizontal" role="form">
+                <input type="hidden" name="planid" value="<{$planid}>"/>
+                <input type="hidden" name="subject" value="<{$subject}>"/>
+                <input type="hidden" name="sn" value="1"/>
+                <input type="hidden" name="type" value="0"/>
+                <input type="hidden" name="priority" value="3"/>
+                <input type="hidden" name="table" value="tp_risk"/>
+                <div class="form-group">
+                    <label class="col-sm-1 control-label">发送给:</label>
+                    <div class="col-sm-11">
+                        <input type="text" class="form-control" name="mailto" value="<{$sendTo}>" placeholder="收件人邮件">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-1 control-label">抄送给:</label>
+                    <div class="col-sm-11">
+                        <input type="text" class="form-control" name="cc" value="<{$cc}>" placeholder="抄送人邮件">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-1 control-label">主题:</label>
+                    <div class="col-sm-11">
+                        <input type="text" class="form-control" value="<{$subject}>" placeholder="主题" readonly>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-1 control-label">正文:</label>
+                    <div class="col-sm-11">
+                        <{$body}>
+                        <span class="help-block">冒烟用例列表，不能自动添加到Foxmail中，需要自己手动复制</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="__URL__/index/tp/<{$planid}>" type="button" class="btn btn-default" >返回</a>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+            <else />
+            <switch name="data.mod">
+                <case value="1">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <form action="mailto:<{$sendTo}>" class="form-horizontal">
+                                <br />
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">发送给:</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" name="mailto" value="<{$data.mailto}>" placeholder="收件人邮件" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">抄送给:</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control"  name="cc" value="<{$data.cc}>" placeholder="抄送人邮件" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">主题:</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control"  name='subject' value="<{$data.subject}>" placeholder="主题" readonly >
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">正文:</label>
+                                    <div class="col-sm-10">
+                                        <{$body}>
+                                        <span class="help-block">冒烟用例列表，不能自动添加到Foxmail中，需要自己手动复制</span>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <a href="__URL__/index/tp/<{$planid}>" type="button" class="btn btn-default" >返 回</a>
+                                    <a href="__URL__/del/id/<{$data.id}>/table/tp_risk" type="button" class="btn btn-danger"
+                                       onclick="return confirm('当前保存的项目风险将会被覆盖，无法还原')">重 载</a>
+                                    <a href="__URL__/mod/id/<{$data.id}>" type="button" class="btn btn-primary" >编 辑</a>
+                                    <button type="submit" class="btn btn-success" onclick="return confirm('冒烟用例列表，不能自动添加到Foxmail中，需要自己手动复制')">发 送</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">冒烟用例测试结果(默认全部为未通过，根据实际情况维护一下)</div>
+                                <ul class="list-group">
+                                    <empty name="func">
+                                        <li class="list-group-item">没有查到冒烟用例</li>
+                                        <else />
+                                        <volist name="func" id="st" key="k" >
+                                            <li class="list-group-item">
+                                                <small>
+                                                    <span class="label label-danger">未通过</span>
+                                                    【<{$Think.cookie.Jira_pkey}>-<{$st.issuenum}>】<{$st.summary}>
+                                                </small>
+                                            </li>
+                                        </volist>
+                                    </empty>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </case>
+                <case value="2">
+                    <form action="__URL__/update" method="post" class="form-horizontal" role="form">
+                        <input type="hidden" name="id" value="<{$data.id}>"/>
+                        <input type="hidden" name="mod" value="1"/>
+                        <input type="hidden" name="table" value="tp_risk"/>
+                        <div class="form-group">
+                            <label class="col-sm-1 control-label">发送给:</label>
+                            <div class="col-sm-11">
+                                <input type="text" class="form-control" name="mailto" value="<{$sendTo}>" placeholder="收件人邮件">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-1 control-label">抄送给:</label>
+                            <div class="col-sm-11">
+                                <input type="text" class="form-control" name="cc" value="<{$cc}>" placeholder="抄送人邮件">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-1 control-label">主题:</label>
+                            <div class="col-sm-11">
+                                <input type="text" class="form-control" value="<{$subject}>" placeholder="主题" readonly>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-1 control-label">正文:</label>
+                            <div class="col-sm-11">
+                                <{$body}>
+                                <span class="help-block">冒烟用例列表，不能自动添加到Foxmail中，需要自己手动复制</span>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="__URL__/detail/tp/<{$planid}>" type="button" class="btn btn-default" >返回</a>
+                            <button type="submit" class="btn btn-primary">保存</button>
+                        </div>
+                    </form>
+                </case>
+            </switch>
+        </empty>
+
+    </div>
+</div>

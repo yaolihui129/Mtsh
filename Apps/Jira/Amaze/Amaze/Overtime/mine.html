@@ -1,0 +1,199 @@
+<layout name="layout"/>
+<!-- content start -->
+<div class="admin-content container" style="min-height: 500px">
+    <ul class="nav nav-pills" role="tablist">
+        <li role="presentation">
+            <a href="__URL__/index/">考勤统计</a>
+        </li>
+        <li role="presentation" class="active">
+            <a href="__URL__/mine">我的考勤</a>
+        </li>
+    </ul>
+    <div class="panel panel-default">
+        <div class="row">
+            <div class="col-md-12">
+                <table class="table table-striped table-bordered table-hover table-condensed ">
+                    <tr>
+                        <th width=25% align="center" bgcolor="#ccc">姓名</th>
+                        <th width=25% align="center" bgcolor="#ccc">加班工时</th>
+                        <th width=25% align="center" bgcolor="#ccc">可调休工时</th>
+                        <th width=25% align="center" bgcolor="#ccc">已调休工时</th>
+                    </tr>
+                    <tr>
+                        <td><{$Think.session.user|getJiraName=###}></td>
+                        <td><{$hour[0]}>小时</td>
+                        <td><{$hour[2]}>小时</td>
+                        <td><{$hour[1]}>小时</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="panel panel-success">
+                    <div class="panel-heading">加班
+                        <div class="btn-group pull-right">
+                            <a data-toggle="modal" href="#jiaban" class=" btn btn-info btn-xs">添加加班</a>
+                        </div>
+                    </div>
+                    <ul class="list-group">
+                        <volist name='arr' id='st'>
+                            <li class="list-group-item">
+                                <{$st.riqi}>
+                                <{$st.begin|substr=###,0,5}>-<{$st.end|substr=###,0,5}>,事由：<{$st.remark}>
+                                <span class="badge"><{$st.hourlong}>小时</span>
+                            </li>
+                        </volist>
+
+                        <gt name="hour.3" value="10">
+                            <li class="list-group-item ">
+                                <a href="__URL__/xiangq/type/1">查看更多</a>
+                            </li>
+                        </gt>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="panel panel-danger">
+                    <div class="panel-heading">调休
+                        <div class="btn-group pull-right">
+                            <a data-toggle="modal" href="#tiaoxiu" class=" btn btn-danger btn-xs">添加调休</a>
+                        </div>
+                    </div>
+                    <ul class="list-group">
+                        <volist name='tiaox' id='st'>
+                            <li class="list-group-item">
+                                <{$st.riqi}>
+                                <{$st.begin|substr=###,0,5}>-<{$st.end|substr=###,0,5}>,事由：<{$st.remark}>
+                                <span class="badge"><{$st.hourlong}>小时</span>
+                            </li>
+                        </volist>
+                        <gt name="hour.4" value="10">
+                            <li class="list-group-item ">
+                                <a href="__URL__/xiangq/type/2">查看更多</a>
+                            </li>
+                        </gt>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- 添加-模态框 -->
+<div class="modal fade " id="jiaban" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">加班</h4>
+            </div>
+            <div class="modal-body">
+                <form action="__URL__/add" method="post" class="form-horizontal" role="form">
+                    <input type="hidden" name="user" value="<{$Think.session.user}>"/>
+                    <input type="hidden" name="type" value="1"/>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">日期:</label>
+                        <div class="col-sm-10">
+                            <input type="date" class="form-control" name="riqi" value="<{$riqi}>" placeholder="日期">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">开始:</label>
+                        <div class="col-sm-10">
+                            <input type="time" class="form-control" name="begin" value="<{$begin}>" placeholder="开始">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">结束:</label>
+                        <div class="col-sm-10">
+                            <input type="time" class="form-control" name="end" value="<{$end}>" placeholder="结束">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">时长:</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="hourlong" value="2" placeholder="时长">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">是否报销-加班餐费:</label>
+                        <div class="col-sm-2"><{$meals}></div>
+                        <label class="col-sm-4 control-label">是否报销-加班打车费:</label>
+                        <div class="col-sm-2"><{$taxi}></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">备注:</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="remark" value="加班上线" placeholder="原因">
+                        </div>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="submit" class="btn btn-primary">提交</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade " id="tiaoxiu" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel2">调休</h4>
+            </div>
+            <div class="modal-body">
+                <form action="__URL__/add" method="post" class="form-horizontal" role="form">
+                    <input type="hidden" name="user" value="<{$Think.session.user}>"/>
+                    <input type="hidden" name="type" value="2"/>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">日期:</label>
+                        <div class="col-sm-10">
+                            <input type="date" class="form-control" name="riqi" value="<{$riqi}>" placeholder="日期">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">开始:</label>
+                        <div class="col-sm-10">
+                            <input type="time" class="form-control" name="begin" value="<{$tbegin}>" placeholder="开始">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">结束:</label>
+                        <div class="col-sm-10">
+                            <input type="time" class="form-control" name="end" value="<{$tend}>" placeholder="结束">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">时长:</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="hourlong" value="8" placeholder="时长">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">备注:</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="remark" value="调休" placeholder="原因">
+                        </div>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="submit" class="btn btn-primary">提交</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

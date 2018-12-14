@@ -1,0 +1,125 @@
+<layout name="layout"/>
+<div class="admin-content container" style="min-height: 500px">
+    <div class="panel panel-default">
+            <nav class="navbar navbar-inverse">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                                data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="#">迭代-需求&任务</a>
+                    </div>
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                        <ul class="nav navbar-nav">
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                   aria-haspopup="true" aria-expanded="false">
+                                    项目：<{$Think.cookie.Jira_pname}>
+                                    <span class="am-icon-caret-down"></span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <volist name='project' id='pro'>
+                                        <li><a href="__URL__/index/project/<{$pro.key}>"><{$pro.value}></a></li>
+                                    </volist>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                   aria-haspopup="true" aria-expanded="false">
+                                    <switch name="Think.cookie.Jira_type_index">
+                                        <case value="done">已完成</case>
+                                        <case value="doing">进行中</case>
+                                    </switch>
+                                    <span class="am-icon-caret-down"></span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="__URL__/index/type/doing/project/<{$Think.cookie.Jira_project}>">进行中</a></li>
+                                    <li><a href="__URL__/index/type/done/project/<{$Think.cookie.Jira_project}>">已完成</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            <form action="__URL__/index " method="post" class="navbar-form navbar-left" role="search">
+                                <div class="form-group input-group">
+                                    <input type="text" class="form-control" name="search" value="<{$search}>"
+                                           placeholder="名称、关键字">
+                                    <input type="hidden" class="form-control" name="project"
+                                           value="<{$Think.cookie.Jira_project}>">
+                                    <input type="hidden" class="form-control" name="type"
+                                           value="<{$Think.cookie.Jira_type_index}>">
+                                    <span class="input-group-btn">
+                                         <button type="submit" class="btn btn-default">
+                                             <span class="glyphicon glyphicon-search"></span>
+                                         </button>
+                                    </span>
+                                </div>
+                            </form>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+        <ul class="nav nav-pills" role="tablist">
+            <li role="presentation" class="active">
+                <a href="__URL__/index/project/<{$Think.cookie.Jira_project}>">
+                    <switch name="Think.cookie.Jira_type_index">
+                        <case value="done">已完成<span class="badge"><{$count}></span></case>
+                        <case value="doing">进行中<span class="badge"><{$count}></span></case>
+                    </switch>
+                </a>
+            </li>
+            <if condition="$_COOKIE['Jira_project'] eq 10006 ">
+                <li role="presentation"> <a href="__URL__/pending">分派</a> </li>
+                <li role="presentation" >
+                    <a href="__URL__/started/type/assigned/project/<{$Think.cookie.Jira_project}>">未开始</a>
+                </li>
+                <li role="presentation">
+                    <a href="__APP__/<{$Think.config.PRODUCT}>/Weekly/index">测试周报</a>
+                </li>
+                <else/>
+                <li role="presentation">
+                    <a href="__URL__/assigned/type/assigned/project/<{$Think.cookie.Jira_project}>">未开始</a>
+                </li>
+            </if>
+
+        </ul>
+        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+            <volist name='data' id='da' empty="没有数据">
+                <div class="panel panel-default" style="margin-bottom:0px;">
+                    <div class="panel-heading" role="tab" id="heading<{$da.id}>">
+                        <a href="http://jira.zhidaohulian.com/browse/<{$Think.cookie.Jira_pkey}>-<{$da.issuenum}>" target="_blank">
+                            <small><{$Think.cookie.Jira_pkey}>-<{$da.issuenum}>:</small>
+                        </a>
+                        <a data-toggle="collapse" data-parent="#accordion" href="#<{$da.id}>" aria-expanded="true"
+                           aria-controls="<{$da.id}>">
+                            <small>
+                                【<{$da.issuetype|getName='issuetype',###,'pname'}>】
+                                【经办人： <{$da.assignee|getJiraName=###}>】
+                                <{$da.summary}>
+                            </small>
+                            <span class="badge pull-right">
+                            <{$da.issuestatus|getName='issuestatus',###,'pname'}>
+                        </span>
+                        </a>
+                    </div>
+                    <div id="<{$da.id}>" class="panel-collapse collapse" role="tabpanel"
+                         aria-labelledby="heading<{$da.id}>">
+                        <div class="well well-sm">
+                            <empty name="da.description">
+                                暂无描述
+                                <else/>
+                                报告人：<{$da.reporter|getJiraName=###}><br />
+                                <{$da.description}>
+                            </empty>
+                        </div>
+                    </div>
+                </div>
+            </volist>
+        </div>
+    </div>
+</div>

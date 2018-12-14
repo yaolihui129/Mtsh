@@ -1,0 +1,81 @@
+<layout name="layout"/>
+<!-- content start -->
+<div class="admin-content container" style="min-height: 500px">
+    <switch name="type">
+        <case value="1">
+            <div class="panel panel-success">
+                <div class="panel-heading">加班详情列表
+                    <div class="btn-group pull-right">
+                        <a href="__URL__/index" class=" btn btn-warning btn-xs">
+                            <span class="glyphicon glyphicon-chevron-left"> 返回</span>
+                        </a>
+                    </div>
+                </div>
+                <table class="table table-striped table-bordered table-hover table-condensed ">
+                    <tr>
+                        <th width=10% align="center" bgcolor="#b00" style="color:#fff">中心</th>
+                        <th width=10% align="center" bgcolor="#b00" style="color:#fff">二级部门</th>
+                        <th width=5% align="center" bgcolor="#b00" style="color:#fff">工号</th>
+                        <th width=10% align="center" bgcolor="#b00" style="color:#fff">姓名</th>
+                        <th width=15% align="center" bgcolor="#b00" style="color:#fff">加班事由</th>
+                        <th width=15% align="center" bgcolor="#b00" style="color:#fff">起止时间</th>
+                        <th width=15% align="center" bgcolor="#b00" style="color:#fff">加班时长（小时）</th>
+                        <th width=10% align="center" bgcolor="#b00" style="color:#fff">日期</th>
+                    </tr>
+                    <volist name='data' id='st'>
+                        <tr>
+                            <td>后市场服务部</td>
+                            <td>产品研发部</td>
+                            <td></td>
+                            <td><{$user|getJiraName=###}></td>
+                            <td><{$st.remark}></td>
+                            <td><{$st.begin|substr=###,0,5}>-<{$st.end|substr=###,0,5}></td>
+                            <td><{$st['hourlong']}></td>
+                            <td><{$st.riqi}></td>
+                        </tr>
+
+                    </volist>
+
+                </table>
+            </div>
+        </case>
+        <case value="2">
+            <div class="panel panel-danger">
+                <div class="panel-heading">调休详情列表
+                    <div class="btn-group pull-right">
+                        <a href="__URL__/index" class=" btn btn-warning btn-xs">
+                            <span class="glyphicon glyphicon-chevron-left"> 返回</span>
+                        </a>
+                    </div>
+                </div>
+                <table class="table table-striped table-bordered table-hover table-condensed ">
+                    <tr>
+                        <th width=10% align="center" bgcolor="#b00" style="color:#fff">中心</th>
+                        <th width=10% align="center" bgcolor="#b00" style="color:#fff">二级部门</th>
+                        <th width=5% align="center" bgcolor="#b00" style="color:#fff">工号</th>
+                        <th width=10% align="center" bgcolor="#b00" style="color:#fff">姓名</th>
+                        <th width=15% align="center" bgcolor="#b00" style="color:#fff">调休事由</th>
+                        <th width=10% align="center" bgcolor="#b00" style="color:#fff">起止时间</th>
+                        <th width=10% align="center" bgcolor="#b00" style="color:#fff">日期</th>
+                        <th width=15% align="center" bgcolor="#b00" style="color:#fff">调休天数(天数)</th>
+                        <th width=15% align="center" bgcolor="#b00" style="color:#fff">调休时长（小时）</th>
+                    </tr>
+                    <volist name='data' id='st'>
+                        <tr>
+                            <td>后市场服务部</td>
+                            <td>产品研发部</td>
+                            <td></td>
+                            <td><{$user|getJiraName=###}></td>
+                            <td><{$st.remark}></td>
+                            <td><{$st.begin|substr=###,0,5}>-<{$st.end|substr=###,0,5}></td>
+                            <td><{$st.riqi}></td>
+                            <td><{$st['hourlong']/8|sprintf='%.1f',###}></td>
+                            <td><{$st.hourlong}></td>
+                        </tr>
+                    </volist>
+
+                </table>
+            </div>
+        </case>
+    </switch>
+</div>

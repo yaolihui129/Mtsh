@@ -1,0 +1,814 @@
+<layout name="layout"/>
+<div class="admin-content container" style="min-height: 500px">
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            测试计划：<{$Think.cookie.Jira_pkey}>-<{$plan.issuenum}>：<{$plan.summary}>
+            <div class="btn-group pull-right">
+                <notempty name="editable">
+                    <a href="__URL__/change_type/id/<{$plan.id}>" class=" btn am-btn-danger btn-xs ">
+                        <span class="glyphicon glyphicon-retweet">功能测试</span>
+                    </a>
+                    <a href="__URL__/change_type/id/<{$plan.id}>/ptype/1" class=" btn am-btn-primary btn-xs ">
+                        <span class="glyphicon glyphicon-retweet">Api测试</span>
+                    </a>
+                </notempty>
+                <a href="__URL__/index/project/<{$Think.cookie.Jira_project}>/type/<{$Think.cookie.Jira_type_plan}>"
+                   class=" btn btn-warning btn-xs ">返回</a>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="well">
+                <div class="row">
+                    <div class="col-md-3">
+                        经办人: <{$plan.assignee|getJiraName=###}>，
+                        状态:【<{$plan.issuestatus|getIssueStatus=###}>】
+                    </div>
+                    <div class="col-md-6"></div>
+                    <div class="col-md-3">
+                        <notempty name="editable">
+                            <a data-toggle="modal" href="#set_scheme" class="btn btn-warning">
+                                <span class="glyphicon glyphicon-edit"> 性能测试方案</span>
+                            </a>
+                        </notempty>
+                        <a href="__APP__/<{$Think.config.PRODUCT}>/Report/performance/id/<{$plan.id}>/status/<{$plan.issuestatus}>"
+                           class="btn btn-info pull-right">
+                            <span class="glyphicon glyphicon-edit"> 性能测试报告</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <ul class="nav nav-pills" role="tablist">
+                <li role="presentation" class="active">
+                    <a href="__URL__/index/tp/<{$tp}>">性能测试方案</a>
+                </li>
+                <li role="presentation">
+                    <a href="__APP__/<{$Think.config.PRODUCT}>/Report/performance/id/<{$plan.id}>/status/<{$plan.issuestatus}>">性能测试报告</a>
+                </li>
+            </ul>
+
+            <div class="panel panel-info">
+                <div class="panel am-panel-bd">
+                    <h1 class="am-lg-text-center"><{$plan.summary}><br \>性能测试方案</h1>
+                    <empty name="extend.status">
+                        <center>
+                            <empty name="editable">
+                                暂无性能测试方案
+                                <else />
+                                <a data-toggle="modal" href="#set_scheme" class="btn btn-warning">
+                                    <span class="glyphicon glyphicon-edit"> 性能测试方案</span>
+                                </a>
+                            </empty>
+
+                        </center>
+                        <else />
+                        <h2>1 项目简介</h2>
+                        <h3> &nbsp; &nbsp;1.1测试目标</h3><{$extend.target}>
+                        <h3> &nbsp; &nbsp;1.2测试范围</h3><{$extend.range}><br \>
+                        <p>
+                            <empty name="editable">
+                                <img class="img-responsive center-block" src="__UPLOAD__/<{$extend.range_image}>" height="600">
+                                <else />
+                                <a data-toggle="modal" href="#upload_range">
+                                    <img class="img-responsive center-block" src="__UPLOAD__/<{$extend.range_image}>" height="600">
+                                </a>
+                            </empty>
+
+                            <br \>
+                        </p>
+
+
+                        <h3>&nbsp; &nbsp;1.3性能测试指标要求</h3>
+                        <p>本次性能测试需要测试的性能指标包括：<br \></p>
+                        <ol>
+                            <li>	交易吞吐量：后台主机每秒能处理的交易笔数（TPS）</li>
+                            <li>	交易响应时间（<{$extend.response_time}>）</li>
+                            <li>	并发交易成功率<{$extend.success_rate}></li>
+                            <li>	资源使用指标：前置和核心系统各服务器CPU（<{$extend.resource_utilization_rate}>）、内存占用率（<{$extend.resource_utilization_rate}>）、mysql数据库；JMeter压力负载机CPU占用率、内存占用率</li>
+                        </ol>
+
+                        <h4>&nbsp; &nbsp;1.3.1 交易吞吐量</h4>
+                        <p>
+                            <empty name="extend.throughput">
+                                无
+                                <else />
+                                根据统计数据，XXX系统当前生产环境高峰日交易总量为【<{$extend.throughput}>】万笔。<br \>
+                                根据二八原则（80%的交易量发生在20%的时间段内），当前生产环境对主机的交易吞吐量指标要求为：<br \>
+                                TPS_1》=【<{$extend.throughput}>】*80%/（24*20%*3600）笔/秒<br \>
+                                为获取系统主机的最大处理能力，在本次性能测试 中可以通过不断加压，<br \>
+                                让数据系统主机CPU利用率达到【80】%，及记录此时的TPS值作为新主机处理能力的一个参考值。
+                            </empty>
+
+                        </p>
+                        <h4>&nbsp; &nbsp;1.3.2 交易响应时间</h4>
+                        <p>
+                            本次性能测试中的交易响应时间是指由性能测试工具记录和进行统计分析的、系统处理交易的响应时间，用一定时间内的平均值ART来表示。<br \>
+                            本次性能测试中，对所有交易的ART指标要求为：<br \>
+                            ART<=<{$extend.response_time}>
+                        </p>
+                        <h4>&nbsp; &nbsp;1.3.3 并发交易成功率</h4>
+                        <p>
+                            指测试结束时成功交易的数占总交易数的比率。交易成功率越高，系统约稳定。<br \>
+                            对典型交易的测试场景，要求其并发交易成功率>=<{$extend.success_rate}>。
+                        </p>
+                        <h4>&nbsp; &nbsp;1.3.4 资源使用指标</h4>
+                        <p>
+                            在正常的并发测试和批处理测试中，核心系统服务器主机的资源使用指标要求：<br \>
+                            CPU使用率 <= <{$extend.resource_utilization_rate}>； 内存使用率 <= <{$extend.resource_utilization_rate}>
+                        </p>
+                        <h2>2 测试环境</h2>
+                        <h3>&nbsp; &nbsp;2.1网络拓扑图</h3>
+
+                        <{$extend.topology}><br \>
+                        <p>
+                            <empty name="editable">
+                                <img class="img-responsive center-block" src="__UPLOAD__/<{$extend.topology_image}>" height="500">
+                                <else />
+                                <a data-toggle="modal" href="#upload_topology">
+                                    <img class="img-responsive center-block" src="__UPLOAD__/<{$extend.topology_image}>" height="500">
+                                </a>
+                            </empty>
+
+                            <br \>
+                        </p>
+
+                        <h3>&nbsp; &nbsp;2.2软硬件配置</h3>
+                        <p>
+                            性能测试环境的硬件和软件配置如下表所示：<br \>
+                        </p>
+                        <h2>3 测试方案</h2>
+                        <h3>&nbsp; &nbsp;3.1 交易选择</h3>
+                        <empty name="api">
+                            <notempty name="editable">
+                                <a href="__URL__/choice_api/tp/<{$tp}>" class=" btn btn-warning">选择交易接口</a>
+                            </notempty>
+                            <else />
+                            <p>通过业务数据统计和业务模型分析，最终选择典型的交易如下表所示：</p>
+                            <table class="table table-striped table-bordered table-hover table-condensed ">
+                                <tr>
+                                    <th width=5% align="center" bgcolor="#ccc">编号</th>
+                                    <th width=30% align="center" bgcolor="#ccc">
+                                        接口
+                                        <notempty name="editable">
+                                            <a href="__URL__/choice_api/tp/<{$tp}>" class=" btn btn-success btn-xs pull-right">
+                                                选择接口
+                                            </a>
+                                        </notempty>
+                                    </th>
+                                    <th width=10% align="center" bgcolor="#ccc">脚本名</th>
+                                    <th width=15% align="center" bgcolor="#ccc">业务名</th>
+                                    <th width=10% align="center" bgcolor="#ccc">业务占比</th>
+                                    <th width=10% align="center" bgcolor="#ccc">可参数化域</th>
+                                    <th width=20% align="center" bgcolor="#ccc">操作</th>
+                                </tr>
+                                <volist name='api' id='st'>
+                                    <tr>
+                                        <td><{$i}></td>
+                                        <td>
+                                            <empty name="editable">
+                                                <{$st.api|getName='eo_api',###,'apiuri'}>
+                                                <else />
+                                                <a href="__APP__/<{$Think.config.PRODUCT}>/Api/press/id/<{$st.api}>/project/<{$tp}>/scheme/<{$extend.per_scheme}>" target="_blank">
+                                                    <{$st.api|getName='eo_api',###,'apiuri'}>
+                                                </a>
+                                            </empty>
+                                        </td>
+                                        <td><{$st.name}></td>
+                                        <td><{$st.api|getName='eo_api',###,'apiname'}></td>
+                                        <td><{$st.ratio}></td>
+                                        <td><{$st.domain}></td>
+                                        <td>
+                                            <notempty name="editable">
+                                                <a href="__APP__/<{$Think.config.PRODUCT}>/Api/press/id/<{$st.api}>/project/<{$tp}>/scheme/<{$extend.per_scheme}>"
+                                                   class="btn btn-default btn-xs" target="_blank">测试</a>
+                                                <a href="__URL__/mod_api/id/<{$st.id}>" class="btn btn-primary btn-xs">编辑</a>
+                                                <a href="__URL__/chexiao/id/<{$st.id}>" class="btn btn-danger btn-xs" onclick="return confirm('你确定要从此测试方案中移除该Api吗？')">移除</a>
+                                            </notempty>
+                                        </td>
+                                    </tr>
+                                </volist>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </empty>
+
+                        <h3>&nbsp; &nbsp;3.2 资源监控指标</h3>
+                        <p>本次性能测试通过ServerAgent-2.2.1进行资源监控包括：操作系统Linux、AIX资源监控。</p>
+                        <h4>&nbsp; &nbsp;3.2.1 负载机</h4>
+                        <ul>
+                            <li>	系统CPU使用率<{$extend.resource_utilization_rate}></li>
+                            <li>	系统内存使用率<{$extend.resource_utilization_rate}></li>
+                            <li>	系统IO使用率<{$extend.resource_utilization_rate}></li>
+                        </ul>
+                        <h4>&nbsp; &nbsp;3.2.2 服务器</h4>
+                        <ul>
+                            <li>	系统CPU使用率<{$extend.resource_utilization_rate}></li>
+                            <li>	系统内存使用率<{$extend.resource_utilization_rate}></li>
+                            <li>	系统IO使用率<{$extend.resource_utilization_rate}></li>
+                        </ul>
+                        <h3>&nbsp; &nbsp;3.3 测试场景设计</h3>
+                        <if condition="$extend_scheme0">
+                            <h4>典型交易基准测试</h4>
+                            <p>
+                                典型交易基准测试是单交易单用户测试，
+                                目的是选择每个典型交易在无压力的情况下（无额外进程运行并占用系统资源）的情况下，
+                                获取系统处理单笔交易的耗时，为下一步模拟多个用户、混合交易的性能测试提供基本数据参考。<br \>
+                                基准测试要达到以下目标：
+                            </p>
+                            <ul>
+                                <li>	验证测试脚本及测试参数的正确性。</li>
+                                <li>	获取系统批处理单笔交易性能数据，主要是单笔交易的平均响应时间</li>
+                            </ul>
+                            <b>1) 测试方法</b>
+                            <p>
+                                使用一个Vuser，分别运行每个典型交易脚本，设置脚本的迭代次数1次，
+                                验证所有的脚本是否运行正确，所有交易事务是否成功返回，并获取每个典型交易的平均交易响应时间ART。
+                            </p>
+                            <b>2) 测试场景</b>
+                            <table class="table table-striped table-bordered table-hover table-condensed ">
+                                <tr>
+                                    <th width=10% align="center" bgcolor="#ccc">编号</th>
+                                    <th width=10% align="center" bgcolor="#ccc">场景名称</th>
+                                    <th width=10% align="center" bgcolor="#ccc">并发用户数</th>
+                                    <th width=10% align="center" bgcolor="#ccc">加压方式</th>
+                                    <th width=10% align="center" bgcolor="#ccc">持续时间</th>
+                                    <th width=10% align="center" bgcolor="#ccc">退出方式</th>
+                                    <th width=10% align="center" bgcolor="#ccc">思考时间</th>
+                                    <th width=10% align="center" bgcolor="#ccc">交易组合</th>
+                                    <th width=10% align="center" bgcolor="#ccc">负载生成器数量</th>
+                                    <th width=10% align="center" bgcolor="#ccc">备注</th>
+                                </tr>
+                                <volist name='scene0' id='vo' key="k">
+                                    <tr>
+                                        <td><{$k}></td>
+                                        <td><{$vo.name}></td>
+                                        <td><{$vo.users}></td>
+                                        <td><{$vo.compres}></td>
+                                        <td><{$vo.duration}></td>
+                                        <td>自动退出</td>
+                                        <td><{$vo.think_time}></td>
+                                        <td><{$vo.portfolios}></td>
+                                        <td><{$vo.jmter_num}></td>
+                                        <td><{$vo.remark}></td>
+                                    </tr>
+                                </volist>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </if>
+                        <if condition="$extend_scheme1">
+                            <h4>最优TPS测试</h4>
+                            <p>
+                                单交易多用户并发测试对每个典型交易通过多个用户多次迭代执行，
+                                获取该交易在并发用户情况下的平均响应时间以及每秒响应交易数，
+                                同时检验服务端对每个典型交易多个并发用户的处理能力。
+                            </p>
+                            <b>1) 测试方法</b>
+                            <p>
+                                对单交易多用户并发测试：使用手动场景，设置并发用户数500、600、700……，
+                                持续时间15分钟，无思考时间，无迭代延迟。
+                                测试每个交易在不同压力的响应时间以及每秒响应交易数量。
+                                从而发现交易的单点瓶颈，并针对问题进行优化
+                            </p>
+                            <b>2) 测试场景</b>
+                            <table class="table table-striped table-bordered table-hover table-condensed ">
+                                <tr>
+                                    <th width=10% align="center" bgcolor="#ccc">编号</th>
+                                    <th width=10% align="center" bgcolor="#ccc">场景名称</th>
+                                    <th width=10% align="center" bgcolor="#ccc">并发用户数</th>
+                                    <th width=10% align="center" bgcolor="#ccc">加压方式</th>
+                                    <th width=10% align="center" bgcolor="#ccc">持续时间</th>
+                                    <th width=10% align="center" bgcolor="#ccc">退出方式</th>
+                                    <th width=10% align="center" bgcolor="#ccc">思考时间</th>
+                                    <th width=10% align="center" bgcolor="#ccc">交易组合</th>
+                                    <th width=10% align="center" bgcolor="#ccc">负载生成器数量</th>
+                                    <th width=10% align="center" bgcolor="#ccc">备注</th>
+                                </tr>
+                                <volist name='scene1' id='vo' key="k">
+                                    <tr>
+                                        <td><{$k}></td>
+                                        <td><{$vo.name}></td>
+                                        <td><{$vo.users}></td>
+                                        <td><{$vo.compres}></td>
+                                        <td><{$vo.duration}></td>
+                                        <td>自动退出</td>
+                                        <td><{$vo.think_time}></td>
+                                        <td><{$vo.portfolios}></td>
+                                        <td><{$vo.jmter_num}></td>
+                                        <td><{$vo.remark}></td>
+                                    </tr>
+                                </volist>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </if>
+                        <if condition="$extend_scheme2">
+                            <h4>目标TPS测试</h4>
+                            <p>
+                                单交易多用户并发测试对每个典型交易通过多个用户多次迭代执行，
+                                获取该交易在并发用户情况下的平均响应时间以及每秒响应交易数，
+                                同时检验服务端对每个典型交易多个并发用户的处理能力。
+                            </p>
+                            <b>1) 测试方法</b>
+                            <p>
+                                对单交易多用户并发测试：使用手动场景，设置并发用户数500、600、700……，
+                                持续时间15分钟，无思考时间，无迭代延迟。
+                                测试每个交易在不同压力的响应时间以及每秒响应交易数量。
+                                从而发现交易的单点瓶颈，并针对问题进行优化
+                            </p>
+                            <b>2) 测试场景</b>
+                            <table class="table table-striped table-bordered table-hover table-condensed ">
+                                <tr>
+                                    <th width=10% align="center" bgcolor="#ccc">编号</th>
+                                    <th width=10% align="center" bgcolor="#ccc">场景名称</th>
+                                    <th width=10% align="center" bgcolor="#ccc">并发用户数</th>
+                                    <th width=10% align="center" bgcolor="#ccc">加压方式</th>
+                                    <th width=10% align="center" bgcolor="#ccc">持续时间</th>
+                                    <th width=10% align="center" bgcolor="#ccc">退出方式</th>
+                                    <th width=10% align="center" bgcolor="#ccc">思考时间</th>
+                                    <th width=10% align="center" bgcolor="#ccc">交易组合</th>
+                                    <th width=10% align="center" bgcolor="#ccc">负载生成器数量</th>
+                                    <th width=10% align="center" bgcolor="#ccc">备注</th>
+                                </tr>
+                                <volist name='scene2' id='vo' key="k">
+                                    <tr>
+                                        <td><{$k}></td>
+                                        <td><{$vo.name}></td>
+                                        <td><{$vo.users}></td>
+                                        <td><{$vo.compres}></td>
+                                        <td><{$vo.duration}></td>
+                                        <td>自动退出</td>
+                                        <td><{$vo.think_time}></td>
+                                        <td><{$vo.portfolios}></td>
+                                        <td><{$vo.jmter_num}></td>
+                                        <td><{$vo.remark}></td>
+                                    </tr>
+                                </volist>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </if>
+                        <if condition="$extend_scheme3">
+                            <h4> 极限并发测试</h4>
+                            <p>
+                                通过生产系统的总用户数，模拟生产环境，考察在模拟生产环境的情况下是否会出现宕机、
+                                响应时间变长、交易成功率下降、内存使用率持续上升等异常现象。
+                            </p>
+                            <b>1) 测试方法</b>
+                            <p>
+                                通过基准测试得出的交易响应时间，按照响应时间设置交易占比。然后不断施加压力。
+                                观测系统的CPU使用率。来判断系统所能承受的极限压力。
+                                再根据此压力的并发数量，让场景持续运行8小时，各交易无思考时间，无迭代延迟时间。
+                                获取核心主机TPS值、各典型交易的平均响应时间ART和性能监控数据
+                            </p>
+                            <b>2) 测试场景</b>
+                            <table class="table table-striped table-bordered table-hover table-condensed ">
+                                <tr>
+                                    <th width=10% align="center" bgcolor="#ccc">编号</th>
+                                    <th width=10% align="center" bgcolor="#ccc">场景名称</th>
+                                    <th width=10% align="center" bgcolor="#ccc">并发用户数</th>
+                                    <th width=10% align="center" bgcolor="#ccc">加压方式</th>
+                                    <th width=10% align="center" bgcolor="#ccc">持续时间</th>
+                                    <th width=10% align="center" bgcolor="#ccc">退出方式</th>
+                                    <th width=10% align="center" bgcolor="#ccc">思考时间</th>
+                                    <th width=10% align="center" bgcolor="#ccc">交易组合</th>
+                                    <th width=10% align="center" bgcolor="#ccc">负载生成器数量</th>
+                                    <th width=10% align="center" bgcolor="#ccc">备注</th>
+                                </tr>
+                                <volist name='scene3' id='vo' key="k">
+                                    <tr>
+                                        <td><{$k}></td>
+                                        <td><{$vo.name}></td>
+                                        <td><{$vo.users}></td>
+                                        <td><{$vo.compres}></td>
+                                        <td><{$vo.duration}></td>
+                                        <td>自动退出</td>
+                                        <td><{$vo.think_time}></td>
+                                        <td><{$vo.portfolios}></td>
+                                        <td><{$vo.jmter_num}></td>
+                                        <td><{$vo.remark}></td>
+                                    </tr>
+                                </volist>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </if>
+                        <if condition="$extend_scheme4">
+                            <h4>3.5.3 稳定性测试</h4>
+                            <p>
+                                通过生产系统的总用户数，模拟生产环境，考察在模拟生产环境的情况下是否会出现宕机、
+                                响应时间变长、交易成功率下降、内存使用率持续上升等异常现象。
+                            </p>
+                            <b>1) 测试方法</b>
+                            <p>
+                                通过基准测试得出的交易响应时间，按照响应时间设置交易占比。然后不断施加压力。
+                                观测系统的CPU使用率。来判断系统所能承受的极限压力。
+                                再根据此压力的并发数量，让场景持续运行8小时，各交易无思考时间，无迭代延迟时间。
+                                获取核心主机TPS值、各典型交易的平均响应时间ART和性能监控数据
+                            </p>
+                            <b>2) 测试场景</b>
+                            <table class="table table-striped table-bordered table-hover table-condensed ">
+                                <tr>
+                                    <th width=10% align="center" bgcolor="#ccc">编号</th>
+                                    <th width=10% align="center" bgcolor="#ccc">场景名称</th>
+                                    <th width=10% align="center" bgcolor="#ccc">并发用户数</th>
+                                    <th width=10% align="center" bgcolor="#ccc">加压方式</th>
+                                    <th width=10% align="center" bgcolor="#ccc">持续时间</th>
+                                    <th width=10% align="center" bgcolor="#ccc">退出方式</th>
+                                    <th width=10% align="center" bgcolor="#ccc">思考时间</th>
+                                    <th width=10% align="center" bgcolor="#ccc">交易组合</th>
+                                    <th width=10% align="center" bgcolor="#ccc">负载生成器数量</th>
+                                    <th width=10% align="center" bgcolor="#ccc">备注</th>
+                                </tr>
+                                <volist name='scene4' id='vo' key="k">
+                                    <tr>
+                                        <td><{$k}></td>
+                                        <td><{$vo.name}></td>
+                                        <td><{$vo.users}></td>
+                                        <td><{$vo.compres}></td>
+                                        <td><{$vo.duration}></td>
+                                        <td>自动退出</td>
+                                        <td><{$vo.think_time}></td>
+                                        <td><{$vo.portfolios}></td>
+                                        <td><{$vo.jmter_num}></td>
+                                        <td><{$vo.remark}></td>
+                                    </tr>
+                                </volist>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </if>
+
+                        <h2>4 测试实施情况</h2>
+                        <h3>&nbsp; &nbsp;4.1 计划测试时间</h3>
+                        <p>&nbsp; &nbsp;&nbsp; &nbsp;<b><{$extend.begin}>--<{$extend.end}></b></p>
+                        <h3>&nbsp; &nbsp;4.2 测试工具</h3>
+                        <table class="table table-striped table-bordered table-hover table-condensed ">
+                            <tr>
+                                <th width=10% align="center" bgcolor="#ccc">序号</th>
+                                <th width=40% align="center" bgcolor="#ccc">
+                                    工具名称
+                                    <notempty name="editable">
+                                        <a data-toggle="modal" href="#add_tools" class="btn-success btn-xs pull-right">添加</a>
+                                    </notempty>
+                                </th>
+                                <th width=40% align="center" bgcolor="#ccc">用途及说明</th>
+                                <th width=10% align="center" bgcolor="#ccc">版本 </th>
+                            </tr>
+                            <tr>
+                                <td>1</td>
+                                <td>JMeter</td>
+                                <td>负载生成</td>
+                                <td>4.0</td>
+                            </tr>
+                            <volist name='tools' id='vo' key="k">
+                                <tr>
+                                    <td><{$k+1}></td>
+                                    <td><{$vo.name}></td>
+                                    <td><{$vo.remark}></td>
+                                    <td><{$vo.version}></td>
+                                </tr>
+                            </volist>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </table>
+                        <h3>&nbsp; &nbsp;4.3 性能测试计划进度安排</h3>
+                        <div class="panel panel-info">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-md-9">进度安排</div>
+                                    <div class="col-md-3">状态</div>
+                                </div>
+                            </div>
+                            <ul class="list-group">
+                                <volist name='data' id='st' empty="没有数据">
+                                    <li class="list-group-item">
+                                        <div class="row">
+                                            <div class="col-md-9">
+                                                <{$st.name}>
+                                                <span class="badge pull-right">
+                                                <{$st.planned_start_time|substr=###,0,10}>--><{$st.planned_end_time|substr=###,0,10}>
+                                            </span>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <switch name="st.status">
+                                                    <case value="Draft">未开始</case>
+                                                    <case value="Completed">完成</case>
+                                                    <case value="Active">进行中</case>
+                                                </switch>
+                                            </div>
+                                        </div>
+
+                                    </li>
+                                </volist>
+                            </ul>
+                        </div>
+                        <h2>5 专业术语</h2>
+                        <table class="table table-striped table-bordered table-hover table-condensed ">
+                            <tr>
+                                <th width=10% align="center" bgcolor="#ccc">序号</th>
+                                <th width=40% align="center" bgcolor="#ccc">
+                                    全名名称
+                                    <notempty name="editable">
+                                        <button data-toggle="modal" href="#add_term" class="btn-success btn-xs pull-right">添加</button>
+                                    </notempty>
+                                </th>
+                                <th width=10% align="center" bgcolor="#ccc">简写</th>
+                                <th width=40% align="center" bgcolor="#ccc">描述</th>
+                            </tr>
+                            <tr>
+                                <td>1</td>
+                                <td>Running Vuser</td>
+                                <td>VUser</td>
+                                <td>用户总数</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Transaction per second</td>
+                                <td>TPS</td>
+                                <td>每秒通过事务数</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>His per Second</td>
+                                <td>HPS</td>
+                                <td>每秒事务点击数</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>AverageTransaction Response Time</td>
+                                <td>ART</td>
+                                <td>每秒事务响应时间</td>
+                            </tr>
+                            <volist name='term' id='vo' key="k">
+                                <tr>
+                                    <td><{$k+4}></td>
+                                    <td>
+                                        <{$vo.name}>
+                                        <button  href="#" class="btn-danger btn-xs pull-right">删除</button>
+                                    </td>
+                                    <td><{$vo.short}></td>
+                                    <td><{$vo.remark}></td>
+                                </tr>
+                            </volist>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+
+                        </table>
+                    </empty>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 替换-逻辑图 -->
+<div class="modal fade " id="upload_range" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form action="__URL__/upload_range" method="post" enctype='multipart/form-data'class="form-horizontal" role="form"   >
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title">替换-逻辑图</h4>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" value="<{$extend.id}>" />
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">测试范围：</label>
+                        <div class="col-sm-10">
+                            <textarea rows="3" class="form-control" name="range"><{$range}></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <img class="img-responsive center-block" src="__UPLOAD__/<{$extend.range_image}>" height="300" width="300">
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">逻辑图</label>
+                        <div class="col-sm-10">
+                            <input id="input-1" type="file" class="file form-control" name="range_image">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="submit" class="btn btn-primary">提交</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 替换-拓扑图 -->
+<div class="modal fade " id="upload_topology" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form action="__URL__/upload_topology" method="post" enctype='multipart/form-data'class="form-horizontal" role="form"   >
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title">替换-拓扑图</h4>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" value="<{$extend.id}>" />
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">拓扑图说明：</label>
+                        <div class="col-sm-10">
+                            <textarea rows="3" class="form-control" name="topology"><{$topology}></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <img class="img-responsive center-block" src="__UPLOAD__/<{$extend.topology_image}>" height="300" width="300">
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">拓扑图</label>
+                        <div class="col-sm-10">
+                            <input id="input-2" type="file" class="file form-control" name="topology_image">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="submit" class="btn btn-primary">提交</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- 配置-性能测试方案 -->
+<div class="modal fade " id="set_scheme" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form action="__URL__/set_scheme" method="post" enctype='multipart/form-data'class="form-horizontal" role="form"   >
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="myModalLabe3">配置-性能测试方案</h4>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" value="<{$extend.id}>" />
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">测试目标：</label>
+                        <div class="col-sm-10"><{$target}></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">测试方案：</label>
+                        <div class="col-sm-10"><{$per_scheme}></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">响应时间:</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" name="response_time" value="<{$response_time}>" placeholder="响应时间">
+                        </div>
+                        <label class="col-sm-2 control-label">成功率:</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" name="success_rate" value="<{$success_rate}>" placeholder="成功率">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">(目标)吞吐量:</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" name="throughput" value="<{$throughput}>" placeholder="(目标)吞吐量">
+                        </div>
+                        <label class="col-sm-2 control-label">资源使用率:</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" name="resource_utilization_rate" value="<{$resource_utilization_rate}>" placeholder="资源使用率">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">测试开始时间:</label>
+                        <div class="col-sm-4">
+                            <input type="date" class="form-control" name="begin" value="<{$begin}>" placeholder="计划开始时间">
+                        </div>
+                        <label class="col-sm-2 control-label">测试结束时间:</label>
+                        <div class="col-sm-4">
+                            <input type="date" class="form-control" name="end" value="<{$end}>" placeholder="计划结束时间">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="submit" class="btn btn-primary">提交</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 添加-测试工具-->
+<div class="modal fade " id="add_tools" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form action="__URL__/add_term" method="post" enctype='multipart/form-data'class="form-horizontal" role="form"   >
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title">添加-测试工具</h4>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="project" value="<{$extend.id}>" />
+                    <input type="hidden" name="type" value="1" />
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">工具名称</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" name="name" value="" placeholder="工具名称">
+                        </div>
+                        <div class="col-sm-2 control-label"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">用途及说明</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" name="remark" value="" placeholder="用途及说明">
+                        </div>
+                        <div class="col-sm-2 control-label"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">版本</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" name="version" value="" placeholder="版本">
+                        </div>
+                        <div class="col-sm-2 control-label"></div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="submit" class="btn btn-primary">提交</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- 添加-专业术语-->
+<div class="modal fade " id="add_term" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form action="__URL__/add_term" method="post" enctype='multipart/form-data'class="form-horizontal" role="form"   >
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title">添加-专业术语</h4>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="project" value="<{$extend.id}>" />
+                    <input type="hidden" name="type" value="0" />
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">全名名称</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" name="name" value="" placeholder="全名名称">
+                        </div>
+                        <div class="col-sm-2 control-label"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">简写</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" name="short" value="" placeholder="简写">
+                        </div>
+                        <div class="col-sm-2 control-label"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">描述</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" name="remark" value="" placeholder="描述">
+                        </div>
+                        <div class="col-sm-2 control-label"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="submit" class="btn btn-primary">提交</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

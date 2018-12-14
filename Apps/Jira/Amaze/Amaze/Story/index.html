@@ -1,0 +1,71 @@
+<layout name="layout"/>
+<div class="admin-content container" style="min-height: 500px">
+    <ul class="nav nav-pills" role="tablist">
+        <li role="presentation" class="active"><a href="__URL__/index/project/<{$Think.session.project}>">迭代&任务</a></li>
+        <li role="presentation"><a href="__URL__/test_plan/project/<{$Think.session.project}>">测试计划</a></li>
+    </ul>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                           aria-expanded="false">
+                            项目：<{$Think.session.project|getName='project',###,'pname'}>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <volist name='project' id='pro'>
+                                <li>
+                                    <a href="__URL__/<{$Think.session.story.ly}>/project/<{$pro.key}>"><{$pro.value}></a>
+                                </li>
+                            </volist>
+                        </ul>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <form action="__URL__/index " method="post" class="navbar-form navbar-left" role="search">
+                        <div class="form-group input-group">
+                            <input type="text" class="form-control" name="search" value="<{$search}>"
+                                   placeholder="名称、关键字">
+                            <input type="hidden" class="form-control" name="branch" value="<{$_SESSION['branch']}>">
+                            <span class="input-group-btn">
+                                 <button type="submit" class="btn btn-default"><span
+                                         class="glyphicon glyphicon-search"></span></button>
+                            </span>
+                        </div>
+                    </form>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+
+    <table class="am-table am-table-striped am-table-hover table-main table-bordered">
+        <thead>
+        <tr>
+            <th class="table-type" bgcolor="#ccc">KEY</th>
+            <th class="table-title" bgcolor="#ccc">需求&任务</th>
+            <th class="table-type" bgcolor="#ccc">报告人</th>
+            <th class="table-type" bgcolor="#ccc">经办人</th>
+            <th class="table-type" bgcolor="#ccc">开发负责人</th>
+            <th class="table-date" bgcolor="#ccc">提测时间</th>
+            <th class="table-type" bgcolor="#ccc">测试负责人</th>
+            <th class="table-date" bgcolor="#ccc">上线时间</th>
+        </tr>
+        </thead>
+        <tbody>
+        <volist name='data' id='da' empty="没有数据">
+            <tr>
+                <td>CX-<{$da.issuenum}></td>
+                <td>【<{$da.issuetype}>】<{$da.summary}>【<{$da.issuestatus}>】</td>
+                <td><{$da.reporter}></td>
+                <td><{$da.assignee}></td>
+                <td><{$da.id|getCustomFieldValue=###,'10302'}></td>
+                <td><{$da.id|getCustomFieldValue=###,'10110'}></td>
+                <td><{$da.id|getCustomFieldValue=###,'10303'}></td>
+                <td><{$da.resolutiondate}></td>
+            </tr>
+        </volist>
+        </tbody>
+    </table>
+</div>

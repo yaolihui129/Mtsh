@@ -1,0 +1,40 @@
+<layout name="layout"/>
+<!-- content start -->
+<div class="admin-content container" style="min-height: 500px">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">申诉列表
+                    <div class="btn-group pull-right">
+                        <a  href="__URL__/appraisal" class=" btn btn-warning btn-xs">返回</a>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li role="presentation" ><a href="__URL__/appeal">申诉中<span class="badge"><{$acount}></span></a></li>
+                        <li role="presentation"><a href="__URL__/done">已完成<span class="badge"><{$dcount}></span></a></li>
+                        <li role="presentation" class="active"><a href="__URL__/reject">已驳回 <span class="badge"><{$rcount}></span></a></li>
+                    </ul>
+                    <ul class="list-group">
+                        <volist name='data' id='st' >
+                            <li class="list-group-item" title="【<{$st.utime}>】<{$st.remark}>">
+                                <small>
+                                    <{$st.pname}>--<{$st.rules|getName='tp_score_rules',###,'cate'}>--<{$st.rules|getName='tp_score_rules',###}>:
+                                    【<{$st.user|getJiraName=###}>】<{$st.content}>
+                                </small>
+                                <switch name="st.type">
+                                    <case value="1">
+                                        <span class="label label-success pull-right"> +<{$st.score}></span>
+                                    </case>
+                                    <case value="2">
+                                        <span class="label label-danger pull-right"> -<{$st.score}></span>
+                                    </case>
+                                </switch>
+                            </li>
+                        </volist>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

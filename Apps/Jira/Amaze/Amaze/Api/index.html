@@ -1,0 +1,73 @@
+<layout name="layout"/>
+<div class="admin-content" style="min-height: 500px">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="am-g">
+                <div class="am-u-md-9 ">
+                    <a class="navbar-brand" href="#">eoLinker接口<span class="badge"><{$data|sizeof=###}></span></a>
+                </div>
+                <div class="am-u-md-3 ">
+                    <form action="__URL__/index " method="post" class="navbar-form navbar-left" role="search">
+                        <div class="form-group input-group pull-right">
+                            <input type="text" class="form-control" name="search" value="<{$search}>"
+                                   placeholder="平台、版本">
+                            <span class="input-group-btn">
+                                <button type="submit" class="btn btn-default">
+                                    <span class="glyphicon glyphicon-search"></span>
+                                </button>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                <volist name='data' id='st' empty="没有数据">
+                    <div class="panel am-panel-warning">
+                        <div class="panel-heading" role="tab" id="heading<{$st.apiid}>">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion" href="#<{$st.apiid}>"
+                                   aria-expanded="true" aria-controls="<{$st.apiid}>">
+                                    <div class="row">
+                                        <div class="col-md-2"><{$st.projectid|getName='eo_project',###,'projectname'}>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <small><{$st.apiname}>(<{$st.apiid}>)</small>
+                                            <switch name="st.pressure">
+                                                <case value="1">
+                                                    <a href="__URL__/pressure/apiID/<{$st.apiid}>/pressure/<{$st.pressure}>">
+                                                        <span class="label label-warning pull-right">
+                                                               性能
+                                                        </span>
+                                                    </a>
+                                                </case>
+                                                <case value="0">
+                                                    <a href="__URL__/pressure/apiID/<{$st.apiid}>/pressure/<{$st.pressure}>">
+                                                        <span class="label label-success pull-right">
+                                                             不做性能
+                                                        </span>
+                                                    </a>
+                                                </case>
+                                            </switch>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <small>
+                                                <a href="__URL__/details/id/<{$st.apiid}>"><{$st.apiuri}></a>
+                                            </small>
+                                        </div>
+                                        <div class="col-md-1"><span class="pull-right"><{$st.apistatus}></span></div>
+                                    </div>
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="<{$st.apiid}>" class="panel-collapse collapse" role="tabpanel"
+                             aria-labelledby="heading<{$st.apiid}>">
+                            <div class="panel-body">
+                                <{$st.updateuserid|getELUser=###}>&nbsp;更新于:<{$st.apiupdatetime}><br>
+                            </div>
+                        </div>
+                    </div>
+                </volist>
+            </div>
+        </div>
+    </div>
+</div>

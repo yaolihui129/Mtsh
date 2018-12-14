@@ -8,8 +8,12 @@ class TestController extends BaseController
         dump('appID:'.$appID);
         $ticket=S($appID.'ticket');
         dump('ticket:'.$ticket);
-        $access_token= S($appID.'access_token');
+        $access_token= $this->getAccessToken();
         dump('access_token:'.$access_token);
+        $ip=GetIP();
+        dump('IP:'.$ip);
+
+        dump($_SERVER);
 
         $this->display();
     }

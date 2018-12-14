@@ -1,0 +1,223 @@
+<layout name="layout"/>
+<!-- content start -->
+<div class="admin-content container" style="min-height: 700px">
+    <div class="row">
+        <div class="col-md-9">
+            <nav class="navbar navbar-default">
+                <div class="container-fluid">
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                        <ul class="nav navbar-nav">
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                    <{$_SESSION['Appraisal']['project']}>
+                                    <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a href="__URL__/appraisal/tester/<{$_SESSION['Appraisal']['tester']}>/project/0">
+                                            【未关联】迭代或项目
+                                        </a>
+                                    </li>
+                                    <volist name='project' id='pro'>
+                                        <li>
+                                            <a href="__URL__/appraisal/tester/<{$_SESSION['Appraisal']['tester']}>/project/<{$pro.key}>">
+                                                <{$pro.value}>
+                                            </a>
+                                        </li>
+                                    </volist>
+                                </ul>
+                            </li>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li><a data-toggle="modal" href="#tianj"><span class="glyphicon glyphicon-plus"> 加分</span></a></li>
+                            <li><a data-toggle="modal" href="#jianf"><span class="glyphicon glyphicon-minus"> 减分</span></a></li>
+                            <li><a  href="__URL__/appeal"> 申诉列表 <span class="badge"><{$count}></span> </a></li>
+                        </ul>
+                    </div><!-- /.navbar-collapse -->
+                </div><!-- /.container-fluid -->
+            </nav>
+            <div class="panel panel-info" style="min-height:450px; height:auto!important; height:450px;">
+                <div class="panel-heading">
+                    <{$_SESSION['Appraisal']['tester']|getJiraName=###}>
+                    <span class="badge pull-right">
+                        <{$Think.config.KH_QUARTER}>: <{$score}>
+                    </span>
+                </div>
+                <ul class="list-group">
+                    <volist name='data' id='st' >
+                        <li class="list-group-item" title="【<{$st.utime}>】<{$st.remark}>">
+                            <switch name="st.status">
+                                <case value="0">
+                                    <span class="label label-info">正常</span>
+                                </case>
+                                <case value="1">
+                                    <span class="label label-danger">申诉中</span>
+                                </case>
+                                <case value="2">
+                                    <span class="label label-success">申诉成功</span>
+                                </case>
+                                <case value="3">
+                                    <span class="label label-warning">申诉驳回</span>
+                                </case>
+                            </switch>
+                            <small>
+                                <{$st.pname}>--<{$st.rules|getName='tp_score_rules',###,'cate'}>--<{$st.rules|getName='tp_score_rules',###}>:
+                                <{$st.content}>
+                            </small>
+                            <switch name="st.type">
+                                <case value="1">
+                                    <span class="label label-success pull-right"> +<{$st.score}></span>
+                                </case>
+                                <case value="2">
+                                    <span class="label label-danger pull-right"> -<{$st.score}></span>
+                                </case>
+                            </switch>
+                        </li>
+                    </volist>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="panel panel-default">
+                <div class="panel-heading"><h3 class="panel-title">选择人员</h3></div>
+                <ul class="list-group">
+                    <volist name='tester' id='ts' >
+                        <eq name="ts" value="$_SESSION['Appraisal']['tester']">
+                            <li class="list-group-item list-group-item-warning">
+                                <else/>
+                            <li class="list-group-item ">
+                        </eq>
+                        <a href="__URL__/appraisal/tester/<{$ts}>/project/<{$p}>">
+                            <small><{$ts|getJiraName=###}></small>
+                            <span class="badge pull-right"><{$ts|sumScore=###,$quarter}></span>
+                        </a>
+                        </li>
+                    </volist>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- 添加-模态框 -->
+<div class="modal fade " id="tianj" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">迭代积分考核-加分</h4>
+            </div>
+            <div class="modal-body">
+                <form action="__URL__/charu" method="post" class="form-horizontal" role="form">
+                    <input type="hidden" name="project" value="<{$Think.session.project}>"/>
+                    <input type="hidden" name="issueid" value="<{$p}>"/>
+                    <input type="hidden" name="pname" value="<{$Think.session.Appraisal.project}>"/>
+                    <input type="hidden" name="user" value="<{$Think.session.Appraisal.tester}>"/>
+                    <input type="hidden" name="quarter" value="<{$Think.config.KH_QUARTER}>"/>
+                    <input type="hidden" name="type" value="1"/>
+                    <div class="form-group">
+                        <label  class="col-sm-2 control-label">迭代:</label>
+                        <div class="col-sm-6">
+                            <if condition="$p eq 0 ">
+                                <input type="text" class="form-control" value="不关联迭代" readonly>
+                                <else />
+                                <input type="text" class="form-control" value="<{$Think.session.Appraisal.project}>" readonly>
+                            </if>
+                        </div>
+                        <label  class="col-sm-2 control-label">人员:</label>
+                        <div class="col-sm-2">
+                            <input type="text" class="form-control" value="<{$Think.session.Appraisal.tester|getJiraName=###}>" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label  class="col-sm-2 control-label">类别:</label>
+                        <div class="col-sm-6"><{$jiaFen}></div>
+                        <label  class="col-sm-2 control-label">积分:</label>
+                        <div class="col-sm-2">
+                            <input type="text" class="form-control" name="score" value="" placeholder="非必填"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label  class="col-sm-2 control-label">申诉:</label>
+                        <div class="col-sm-10"><{$dissent}> </div>
+                    </div>
+                    <div class="form-group">
+                        <label  class="col-sm-2 control-label">备注:</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="remark" value="" placeholder="备注信息"/>
+                        </div>
+                    </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="submit" class="btn btn-primary">提交</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade " id="jianf" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabe2">迭代积分考核-减分</h4>
+            </div>
+            <div class="modal-body">
+                <form action="__URL__/charu" method="post" class="form-horizontal" role="form">
+                    <input type="hidden" name="project" value="<{$Think.session.project}>"/>
+                    <input type="hidden" name="issueid" value="<{$p}>"/>
+                    <input type="hidden" name="pname" value="<{$Think.session.Appraisal.project}>"/>
+                    <input type="hidden" name="user" value="<{$Think.session.Appraisal.tester}>"/>
+                    <input type="hidden" name="quarter" value="<{$Think.config.KH_QUARTER}>"/>
+                    <input type="hidden" name="type" value="2"/>
+                    <div class="form-group">
+                        <label  class="col-sm-2 control-label">迭代:</label>
+                        <div class="col-sm-6">
+                            <if condition="$p eq 0 ">
+                                <input type="text" class="form-control" value="不关联迭代" readonly>
+                                <else />
+                                <input type="text" class="form-control" value="<{$Think.session.Appraisal.project|getPro=###}>" readonly>
+                            </if>
+                        </div>
+                        <label  class="col-sm-2 control-label">人员:</label>
+                        <div class="col-sm-2">
+                            <input type="text" class="form-control" value="<{$Think.session.Appraisal.tester|getJiraName=###}>" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label  class="col-sm-2 control-label">类别:</label>
+                        <div class="col-sm-6"><{$jianFen}></div>
+                        <label  class="col-sm-2 control-label">积分:</label>
+                        <div class="col-sm-2">
+                            <input type="text" class="form-control" name="score" value="" placeholder="非必填"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label  class="col-sm-2 control-label">申诉:</label>
+                        <div class="col-sm-10"><{$dissent}> </div>
+                    </div>
+                    <div class="form-group">
+                        <label  class="col-sm-2 control-label">备注:</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="remark" value="" placeholder="备注信息"/>
+                        </div>
+                    </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="submit" class="btn btn-primary">提交</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

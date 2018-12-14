@@ -1,0 +1,50 @@
+<layout name="layout"/>
+<div class="admin-content container" style="min-height: 500px">
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active">
+            <a href="__URL__/bug">指派给我的Bug<span class="badge"><{$data|sizeof=###}></span></a>
+        </li>
+        <li role="presentation">
+            <a href="__URL__/created">我提交的Bug<span class="badge"><{$arr.id}></span></a>
+        </li>
+        <li role="presentation">
+            <a href="__URL__/task">指派给我的任务<span class="badge"><{$arr.id}></span></a>
+        </li>
+    </ul>
+
+    <empty name="data">
+        <br><br>
+        <img src="__IMG__/wao.jpg" class="img-responsive center-block" alt="error">
+        <h1 class="text-center">暂时没有分派给的Bug</h1>
+        <else/>
+        <volist name='data' id='da' empty="没有数据">
+            <div class="panel panel-default" style="margin-bottom:0px;">
+                <div class="panel-heading" role="tab" id="heading<{$da.id}>">
+                    <a href="http://jira.zhidaohulian.com/browse/<{$Think.cookie.Jira_pkey}>-<{$da.issuenum}>" target="_blank">
+                        <small><{$Think.cookie.Jira_pkey}>-<{$da.issuenum}>:</small>
+                    </a>
+                    <a data-toggle="collapse" data-parent="#accordion" href="#<{$da.id}>" aria-expanded="true"
+                       aria-controls="<{$da.id}>">
+                        <small>
+                            【报告人： <{$da.reporter|getJiraName=###}>】<{$da.summary}>
+                        </small>
+                        <span class="badge pull-right">
+                            <{$da.issuestatus|getName='issuestatus',###,'pname'}>
+                        </span>
+                    </a>
+                </div>
+                <div id="<{$da.id}>" class="panel-collapse collapse" role="tabpanel"
+                     aria-labelledby="heading<{$da.id}>">
+                    <div class="well well-sm">
+                        <empty name="da.description">
+                            暂无描述
+                            <else/>
+                            报告人：<{$da.reporter|getJiraName=###}><br />
+                            <{$da.description}>
+                        </empty>
+                    </div>
+                </div>
+            </div>
+        </volist>
+    </empty>
+</div>

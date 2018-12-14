@@ -1,0 +1,171 @@
+<layout name="layout"/>
+<div class="admin-content container" style="min-height: 500px">
+    <ul class="nav nav-pills" role="tablist">
+        <li role="presentation">
+            <a href="__URL__/index/project/<{$Think.cookie.Jira_project}>">进行中</a>
+        </li>
+        <if condition="$_SESSION['project'] eq 10006 ">
+            <li role="presentation" class="active">
+                <a href="__URL__/pending">分派 &nbsp;<span class="badge"><{$data|sizeof=###}></span></a>
+            </li>
+            <li role="presentation">
+                <a href="__URL__/started/type/assigned/project/<{$Think.cookie.Jira_project}>">未开始</a>
+            </li>
+            <notempty name="editable2">
+                <li role="presentation" >
+                    <a href="__URL__/add">添加</a>
+                </li>
+            </notempty>
+
+            <li role="presentation" >
+                <a href="__APP__/<{$Think.config.PRODUCT}>/Weekly/index">测试周报</a>
+            </li>
+            <else/>
+            <li role="presentation">
+                <a href="__URL__/assigned/type/assigned/project/<{$Think.cookie.Jira_project}>">待处理</a>
+            </li>
+        </if>
+    </ul>
+    <div class="panel panel-default" style="min-height: 350px">
+        <div class="row">
+            <div class="col-md-9">
+                <empty name="data">
+                    <br><br>
+                        <img src="__IMG__/wao.jpg" class="img-responsive center-block" alt="error">
+                        <h1 class="text-center">暂时没有可分派的任务</h1>
+                    <else/>
+                        <volist name='data' id='da' empty="没有数据">
+                            <switch name="da.status">
+                                <case value="0"><div class="panel panel-info"></case>
+                                <case value="1"><div class="panel panel-success"></case>
+                                <case value="2"><div class="panel panel-warning"></case>
+                            </switch>
+                            <div class="panel-heading">
+                                <a href="http://jira.zhidaohulian.com/browse/<{$da.pkey}>" target="_blank">【<{$da.pkey}>】:</a>
+                                <span class="badge"><{$da.issuestatus|getName='issuestatus',###,'pname'}></span>
+                                <small>
+                                    【<{$da.issuetype|getName='issuetype',###,'pname'}>】<{$da.pname}>
+                                    (<{$da.pgroup|getDictValue='test_group',###}>)
+                                </small>
+
+                                【<empty name="da.draw">待分派<else />
+                                    <{$da.draw|getJiraName=###}>
+                                    <notempty name="editable2">
+                                        <span class="dropdown">
+                                            <button class="btn btn-link btn-xs dropdown-toggle" type="button"
+                                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                                <small>更换</small>
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                                <volist name='user' id='vo' empty="没有数据">
+                                                     <li><a href="__URL__/huanren/id/<{$da.id}>/user/<{$vo}>"><{$vo|getJiraName=###}></a></li>
+                                                </volist>
+                                            </ul>
+                                        </span>
+                                    </notempty>
+                                </empty>】
+
+                                <if condition="$da.status eq 0">
+                                        <notempty name="editable2">
+                                            <a href="__URL__/done/project/<{$da.id}>/pkey/<{$da.pkey}>" class="btn btn-success btn-xs">完成</a>
+                                            <a href="__URL__/chehui/project/<{$da.id}>" class="btn btn-danger btn-xs">撤回</a>
+                                        </notempty>
+                                        <empty name="da.draw">
+                                                <notempty name="editable2">
+                                                &nbsp;&nbsp;<b>指派给：</b><{$da.id|zhipai=###}>
+                                                </notempty>
+                                            <else />
+                                                <notempty name="editable2">
+                                                    <a href="__URL__/add_member/project/<{$da.id}>" class="btn btn-primary btn-xs">添加</a>
+                                                </notempty>
+                                        </empty>
+                                    <else />
+                                        <notempty name="editable2">
+                                            <a href="__URL__/jieshu/project/<{$da.id}>" class="btn btn-info btn-xs">结束</a>
+                                        </notempty>
+                                </if>
+
+
+                                <span class="badge pull-right">
+                                <switch name="da.status">
+                                    <case value="0">进行中</case>
+                                    <case value="1">已完成</case>
+                                    <case value="2">待考核</case>
+                                </switch>
+                            </span>
+                            </div>
+                            <div class="panel-body">
+                                <notempty name="da.description">
+                                    <div class="well well-sm"><{$da.description}></div>
+                                </notempty>
+                                <{$da.id|drawInfo=###}>
+                            </div>
+                    </div>
+                        </volist>
+                </empty>
+            </div>
+            <div class="col-md-3">
+                <ul class="list-group">
+                    <eq name="draw" value="">
+                        <li class="list-group-item list-group-item-warning">
+                            <else/>
+                        <li class="list-group-item ">
+                    </eq>
+                        <a href="__URL__/pending">全部</a>
+                    </li>
+                    <volist name="user" id="vo">
+                        <eq name="vo" value="$draw">
+                            <li class="list-group-item list-group-item-warning">
+                                <a href="__URL__/pending/draw/<{$vo}>">
+                                    <{$vo|getJiraName=###}>
+                                    <span class="badge pull-right"><{$data|sizeof=###}></span>
+                                </a>
+                                <else/>
+                            <li class="list-group-item ">
+                            <a href="__URL__/pending/draw/<{$vo}>">
+                                <{$vo|getJiraName=###}>
+                                <!--<span class="badge pull-right">1</span>-->
+                            </a>
+                        </eq>
+
+                            </li>
+                    </volist>
+                </ul>
+                <div class="panel panel-primary">
+                    <div class="panel-heading">测试分组</div>
+                    <ul class="list-group">
+                        <volist name='group' id='vo' empty="没有数据">
+                            <switch name="vo.test_group">
+                                <case value="0">
+                                    <li class="list-group-item list-group-item-warning">
+                                </case>
+                                <case value="1">
+                                    <li class="list-group-item list-group-item-info">
+                                </case>
+                                <case value="2">
+                                    <li class="list-group-item">
+                                </case>
+                                <case value="3">
+                                    <li class="list-group-item list-group-item-warning">
+                                </case>
+                                <case value="4">
+                                    <li class="list-group-item list-group-item-info">
+                                </case>
+                                <case value="5">
+                                    <li class="list-group-item ">
+                                </case>
+                            </switch>
+                                <small>
+                                    【<{$vo.test_group|getDictValue='test_group',###}>】
+                                    <span class="pull-right"><{$vo.name|getJiraName=###}></span>
+                                </small>
+                            </li>
+                        </volist>
+
+
+                    </ul>
+                </div>
+
+            </div>
+    </div>
+</div>

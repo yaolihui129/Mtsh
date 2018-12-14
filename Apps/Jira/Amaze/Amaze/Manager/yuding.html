@@ -1,0 +1,83 @@
+<layout name="layout"/>
+<div class="admin-content container" style="min-height: 500px">
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" >
+            <a href="__URL__/index">手机管理<span class="badge"><{$arr.id}></span></a>
+        </li>
+        <li role="presentation">
+            <a href="__URL__/books">图书管理<span class="badge"><{$arr.id}></span></a>
+        </li>
+        <li role="presentation" class="active">
+            <a href="__URL__/yuding">今日预订<span class="badge"><{$arr.id}></span></a>
+        </li>
+        <li role="presentation">
+            <a href="__URL__/guihuan">已借出<span class="badge"><{$arr.id}></span></a>
+        </li>
+    </ul>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="panel panel-warning">
+                <div class="panel-heading">
+                    <h3 class="panel-title">待处理的预订<span class="badge pull-right"><{$riqi}></span></h3>
+                </div>
+                <ul class="list-group">
+                    <empty name="data">
+                        <li class="list-group-item">今天没有设备被预订</li>
+                        <else />
+                        <volist name='data' id='st'>
+                            <li class="list-group-item">
+                                <span class="label label-default" title="预订提交时间：<{$st.ctime|date='Y-m-d H:i:s',###}>">
+                                    <{$st.borrower|getJiraName=###}>
+                                </span>&nbsp;
+                                <small>
+                                    <{$st.device|getName='tp_device',###,'brand'}>-
+                                    <{$st.device|getName='tp_device',###,'ts'}><{$st.device|getName='tp_device',###,'name'}>
+                                    (<{$st.device|getName='tp_device',###,'sys_version'}>)<br>
+                                    用途：<{$st.remark}>
+                                </small>
+                                <div class="btn-group btn-group-xs pull-right" role="group" aria-label="">
+                                    <a  href="__URL__/lend/id/<{$st.id}>" class="btn btn-primary "
+                                        onclick="return confirm('你确定已经把设备&图书交给<{$st.borrower|getJiraName=###}>了吗？')">借出</a>
+                                    <a  href="__URL__/reject/id/<{$st.id}>" class="btn btn-danger"
+                                        onclick="return confirm('你确定驳回<{$st.borrower|getJiraName=###}>预约吗？')">驳回</a>
+                                </div>
+                            </li>
+                        </volist>
+                    </empty>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="panel panel-danger">
+                <div class="panel-heading">
+                    <h3 class="panel-title">今天失效的预订<span class="badge pull-right">失效时间</span></h3>
+                </div>
+                <ul class="list-group">
+                    <empty name="data1">
+                        <li class="list-group-item">没有已失效的预约</li>
+                        <else />
+                        <volist name='data1' id='st'>
+                            <li class="list-group-item">
+                                <span class="label label-default" title="预订提交时间：<{$st.ctime|date='Y-m-d H:i:s',###}>">
+                                    <{$st.borrower|getJiraName=###}>
+                                </span>&nbsp;
+                                <small>
+                                    <{$st.device|getName='tp_device',###,'brand'}>-
+                                    <{$st.device|getName='tp_device',###,'ts'}><{$st.device|getName='tp_device',###,'name'}>
+                                    (<{$st.device|getName='tp_device',###,'sys_version'}>)<br>
+                                    用途：<{$st.remark}>
+                                </small>
+                                <span class="badge"><{$st.utime}></span>
+                            </li>
+                        </volist>
+                    </empty>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+
+
+</div>

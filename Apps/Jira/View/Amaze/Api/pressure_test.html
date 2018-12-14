@@ -1,0 +1,210 @@
+<layout name="layout"/>
+<!-- content start -->
+<div class="admin-content container">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            性能测试记录
+            <span class="pull-right">
+                <empty name="project">
+                <a href="__URL__/press/id/<{$arr.api}>">返回</a>
+                <else />
+                <a href="__URL__/press/id/<{$arr.api}>/project/<{$project}>/scheme/<{$scheme}>">返回</a>
+                </empty>
+            </span>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <table class="am-table am-table-striped am-table-hover table-main table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="table-type" bgcolor="#ccc">API</th>
+                            <th class="table-type" bgcolor="#ccc">场景类型</th>
+                            <th class="table-type" bgcolor="#ccc">线程数</th>
+                            <th class="table-type" bgcolor="#ccc">预热时间</th>
+                            <th class="table-type" bgcolor="#ccc">持续时间</th>
+                            <th class="table-type" bgcolor="#ccc">延时启动</th>
+                            <th class="table-type" bgcolor="#ccc">TPM限制</th>
+                            <th class="table-type" bgcolor="#ccc">说明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td ><{$arr.api|getName='eo_api',###,'apiname'}></td>
+                            <td ><{$arr.press_type|getDictValue='press_type',###}></td>
+                            <td ><{$arr.users}></td>
+                            <td ><{$arr.in_seconds}></td>
+                            <td ><{$arr.duration}></td>
+                            <td ><{$arr.startup_delay}></td>
+                            <td ><{$arr.tpm}></td>
+                            <td ><{$arr.name}></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3>测试结果</h3>
+                <table class="am-table am-table-striped am-table-hover table-main table-bordered">
+                    <thead>
+                    <tr>
+                        <th class="table-type" bgcolor="#ccc">Samples</th>
+                        <th class="table-type" bgcolor="#ccc">Average</th>
+                        <th class="table-type" bgcolor="#ccc">Median</th>
+                        <th class="table-type" bgcolor="#ccc">90/95/99</th>
+                        <th class="table-type" bgcolor="#ccc">Min</th>
+                        <th class="table-type" bgcolor="#ccc">Max</th>
+                        <th class="table-type" bgcolor="#ccc">Error</th>
+                        <th class="table-type" bgcolor="#ccc">TPS</th>
+                        <th class="table-type" bgcolor="#ccc">执行者</th>
+                        <th class="table-type" bgcolor="#ccc">测试时间</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td >
+                            <notempty name="arr.samples"><{$arr.samples}></notempty>
+                        </td>
+                        <td>
+                            <empty name="arr.average">0ms<else /> <{$arr.average}>ms</empty>
+                        </td>
+                        <td>
+                            <empty name="arr.median">0ms<else /><{$arr.median}>ms</empty>
+                        </td>
+                        <td>
+                            <notempty name="arr.line90">
+                                <{$arr.line90}>/<{$arr.line95}>/<{$arr.line99}>ms
+                            </notempty>
+                        </td>
+                        <td>
+                            <empty name="arr.min">0ms<else /><{$arr.min}>ms</empty>
+                        </td>
+                        <td>
+                            <notempty name="arr.max"><{$arr.max}>ms</notempty>
+                        </td>
+                        <td>
+                            <notempty name="arr.error"><{$arr.error}>%</notempty>
+                        </td>
+                        <td><{$arr.tps}></td>
+                        <td><{$arr.tester}></td>
+                        <td><{$arr.t_time}></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="panel-body">
+                    <form action="__URL__/insert" method="post" class="form-horizontal" role="form">
+                        <input type="hidden" name="api" value="<{$arr.api}>"/>
+                        <input type="hidden" name="scene" value="<{$arr.id}>"/>
+                        <input type="hidden" name="tester" value="<{$user|getJiraName=###}>"/>
+                        <input type="hidden" name="t_time" value="<{$t_time}>"/>
+                        <input type="hidden" name="table" value="tp_api_scene_pressure_test"/>
+
+                        <div class="form-group">
+                            <label  class="col-sm-2 control-label">Samples:</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" name="samples" value="" placeholder="请求数">
+                            </div>
+                            <label  class="col-sm-2 control-label">Average:</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" name="average" value="" placeholder="平均响应（ms）">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label  class="col-sm-2 control-label">Median:</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" name="median" value="" placeholder="中值（ms）">
+                            </div>
+                            <label  class="col-sm-2 control-label">90%line:</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" name="line90" value="" placeholder="90%在（ms）">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label  class="col-sm-2 control-label">95%line:</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" name="line95" value="" placeholder="95%在（ms）">
+                            </div>
+                            <label  class="col-sm-2 control-label">99%line:</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" name="line99" value="" placeholder="99%在（ms）">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label  class="col-sm-2 control-label">Min:</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" name="min" value="" placeholder="最小响应（ms）">
+                            </div>
+                            <label  class="col-sm-2 control-label">Max:</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" name="max" value="" placeholder="最大响应（ms）">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label  class="col-sm-2 control-label">Error:</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" name="error" value="" placeholder="错误率（%）">
+                            </div>
+                            <label  class="col-sm-2 control-label" title="Transactions Per Second">TPS:</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" name="tps" value="" placeholder="每秒传输的事物处理个数">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label  class="col-sm-2 control-label">备注:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="desc" value="" placeholder="记录服务器及负载机的资源使用情况">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"></label>
+                            <div class="col-sm-10"></div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"></label>
+                            <div class="col-sm-10">
+                                <button type="submit" class="btn btn-info btn-block ">提 交</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h3>测试记录</h3>
+                <table class="am-table am-table-striped am-table-hover table-main table-bordered">
+                    <thead>
+                    <tr>
+                        <th class="table-type" bgcolor="#ccc">Samples</th>
+                        <th class="table-type" bgcolor="#ccc">Average</th>
+                        <th class="table-type" bgcolor="#ccc">Median</th>
+                        <th class="table-type" bgcolor="#ccc">Min</th>
+                        <th class="table-type" bgcolor="#ccc">Max</th>
+                        <th class="table-type" bgcolor="#ccc">Error</th>
+                        <th class="table-type" bgcolor="#ccc">TPS</th>
+                        <th class="table-type" bgcolor="#ccc">执行者</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <volist name='data' id='da' empty="没有数据">
+                        <switch name="da.id">
+                            <case value="$arr.test_id">
+                                <tr class="am-warning">
+                            </case>
+                            <default /><tr>
+                        </switch>
+                            <td title="<{$da.desc}>"><{$da.samples}></td>
+                            <td><{$da.average}>ms</td>
+                            <td><{$da.median}>ms</td>
+                            <td><{$da.min}>ms</td>
+                            <td><{$da.max}>ms</td>
+                            <td><{$da.error}>%</td>
+                            <td><a href="__URL__/record_result/id/<{$da.id}>/scene/<{$id}>"><{$da.tps}></a></td>
+                            <td title="<{$da.t_time}>"><{$da.tester}></td>
+                        </tr>
+                    </volist>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,223 @@
+<layout name="layout"/>
+<div class="admin-content container">
+    <div class="starter-template">
+        <table class="am-table am-table-striped am-table-hover table-main table-bordered">
+            <thead>
+            <tr>
+                <th class="table-type" bgcolor="#ccc">平台-业务端</th>
+                <th class="table-title" bgcolor="#ccc">接口名称</th>
+                <th class="table-type" bgcolor="#ccc">线上版本</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td><{$data.projectid|getName='eo_project',###,'projectname'}></td>
+                <td><{$data.apiname}>【<{$data.apirequesttype}>】<{$data.apiuri}></td>
+                <td><{$data.online}></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="panel panel-info">
+        <ul class="nav nav-tabs" role="tablist">
+            <empty name="project">
+                <li role="presentation"><a href="__URL__/details/id/<{$data.apiid}>">参数信息</a></li>
+            </empty>
+            <switch name="data.pressure">
+                <case value="1">
+                    <li role="presentation" class="active"><a href="__URL__/press/id/<{$data.apiid}>">性能场景  <span class="badge"><{$scene|sizeof=###}></span></a></li>
+                </case>
+            </switch>
+        </ul>
+
+        <div class="starter-template">
+            <table class="am-table am-table-striped am-table-hover table-main table-bordered">
+                <thead>
+                <tr>
+                    <th class="table-type" bgcolor="#ccc">顺序</th>
+                    <th class="table-type" bgcolor="#ccc">方案ID</th>
+                    <th class="table-type" bgcolor="#ccc">类型
+                        <span class="label-success pull-right">选中</span>
+                    </th>
+                    <th class="table-title" bgcolor="#ccc">压测场景
+                        <span class="badge">测试次数</span>
+                        <span class="badge pull-right">作者</span>
+                    </th>
+                    <th class="table-title" bgcolor="#ccc">说明</th>
+                    <th class="table-title" bgcolor="#ccc">测试结果(并发/响应时间/TPS)</th>
+                    <th class="table-type" bgcolor="#ccc">操作:
+                        <notempty name="project">
+                            <a data-toggle="modal" href="#tianjchangj">添加</a>
+                        </notempty>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <empty name="scene">
+                    <tr><td colspan="7">还没有规划测试场景</td></tr>
+                    <else/>
+                    <form action="__URL__/order" method="post">
+                        <input type="hidden" name="table" value="tp_api_scene_pressure"/>
+                        <volist name='scene' id='sc'>
+                            <tr>
+                                <td><input type="text" name="sn[<{$sc.id}>]" value="<{$sc.sn}>" class="input40"/></td>
+                                <td><{$sc.project}></td>
+                                <td>
+                                    <a href="__URL__/selected/id/<{$sc.id}>/press_type/<{$sc.press_type}>/project/<{$project}>">
+                                        <{$sc.press_type|getDictValue='press_type',###}>
+                                    </a>
+                                    <switch name="sc.selected">
+                                        <case value="1"><span class="label-success pull-right">选中</span></case>
+                                    </switch>
+                                </td>
+                                <td>
+                                    <{$sc.users}>并发,
+                                    <switch name="sc.in_seconds">
+                                        <case value="0">不预热,</case>
+                                        <default />预热<{$sc.in_seconds}>秒,
+                                    </switch>
+
+                                    <switch name="sc.tpm">
+                                        <case value="0"></case>
+                                        <default />TMP限制<{$sc.tpm}>,
+                                    </switch>
+
+                                    <switch name="sc.startup_delay">
+                                        <case value="0"></case>
+                                        <default />延时<{$sc.startup_delay}>秒启动,
+                                    </switch>
+                                    持续跑<{$sc.duration}>秒
+                                    <span class="badge"><{$sc.id|countId='tp_api_scene_pressure_test','scene',###}></span>
+                                    <span class="badge pull-right"><{$sc.author}></span>
+                                </td>
+                                <td><{$sc.name}></td>
+                                <td>
+                                    <empty name="sc.samples">
+                                        测试未完成
+                                        <else />
+                                        <{$sc.users}>/<{$sc.average}>/<{$sc.tps}>
+                                    </empty>
+                                </td>
+                                <td>
+                                    <empty name="project">
+                                        <a href="__URL__/pressure_test/id/<{$sc.id}>">测试</a>
+                                        <else />
+                                        <a href="__URL__/pressure_test/id/<{$sc.id}>/project/<{$project}>/scheme/<{$scheme}>">测试</a>
+                                        <a href="__URL__/mod_pressure/id/<{$sc.id}>/project/<{$project}>/scheme/<{$scheme}>">
+                                            <span class="glyphicon glyphicon-pencil"></span>
+                                        </a>
+                                        <a href="__URL__/del/id/<{$sc.id}>/table/tp_api_scene_pressure"
+                                           onclick="return confirm('你确定要删除场景：<{$sc.scene}>？')">
+                                            <span class="glyphicon glyphicon-trash"></span>
+                                        </a>
+                                    </empty>
+                                </td>
+                            </tr>
+                        </volist>
+                        <tr>
+                            <td colspan="10"><input type="submit" name="do_submit" value="批量排序" class="btn"></td>
+                        </tr>
+                    </form>
+                </empty>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- 添加-场景 -->
+<div class="modal fade " id="tianjchangj" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form action="__URL__/insert" method="post" class="form-horizontal" role="form">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h4 class="modal-title" id="changjModalLabel">压测场景-添加</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="api" value="<{$data.apiid}>"/>
+                <input type="hidden" name="project" value="<{$project}>"/>
+                <input type="hidden" name="table" value="tp_api_scene_pressure"/>
+                <div class="form-group">
+                    <label  class="col-sm-2 control-label">顺序:</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" name="sn" value="<{$c+1}>" placeholder="顺序">
+                    </div>
+                    <label  class="col-sm-2 control-label">作者:</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" name="author"  value="<{$_SESSION['user']|getJiraName=###}>" placeholder="作者" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label  class="col-sm-2 control-label">并发:</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" name="users" value="1"  placeholder="并发用户数">
+                    </div>
+                    <label  class="col-sm-2 control-label">预热:</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" name="in_seconds" value="10"  placeholder="预热时间">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label  class="col-sm-2 control-label">持续时间:</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" name="duration" value="130" placeholder="持续时间（秒）">
+                    </div>
+                    <label  class="col-sm-2 control-label">延时启动:</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" name="startup_delay" value="0" placeholder="延时启动（秒）">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label  class="col-sm-2 control-label">TPM控制:</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" name="tpm" value="0"  placeholder="0即不做控制">
+                    </div>
+                    <label  class="col-sm-2 control-label">响应时间:</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" name="assertion_time" value="0"  placeholder="断言_相应时间">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label  class="col-sm-2 control-label">加压方式:</label>
+                    <div class="col-sm-4"><{$compres}> </div>
+                    <label  class="col-sm-2 control-label">思考时间:</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" name="think_time" value="0"  placeholder="思考时间">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label  class="col-sm-2 control-label">交易组合:</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" name="portfolios" value="无"  placeholder="交易组合">
+                    </div>
+                    <label  class="col-sm-2 control-label">负载生成器数量:</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" name="jmter_num" value="0"  placeholder="负载生成器数量">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label  class="col-sm-2 control-label">场景类型:</label>
+                    <div class="col-sm-10"><{$press_type}></div>
+                </div>
+                <div class="form-group">
+                    <label  class="col-sm-2 control-label">说明:</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="name" value=""  placeholder="场景说明">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="submit" class="btn btn-primary">提交</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>

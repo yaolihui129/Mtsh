@@ -1,0 +1,10 @@
+<layout name="layout"/>
+<div class="admin-content container" style="min-height: 500px">
+
+    <form name='sendmail' action='mailto:<{$str[0]}>'>
+        <input name='cc' type='hidden' value='<{$str[1]}>'>
+        <input name='subject' type='hidden' value='<{$str[2]}>'>
+        <input name='body' type='hidden' value='<{$str[3]}>'>
+        <input name="faxin" type="submit" value="发信">
+    </form>
+</div>

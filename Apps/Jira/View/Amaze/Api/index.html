@@ -1,0 +1,131 @@
+<layout name="layout"/>
+<div class="admin-content" style="min-height: 500px">
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                           aria-expanded="false">
+                            eoLinker接口文档 <span class="badge"> <{$data|sizeof=###}></span>
+                        </a>
+                    </li>
+                    <li role="presentation">
+                        <a href="__URL__/apicase/branch/<{$branch}>">Api用例</a>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <form action="__URL__/index " method="post" class="navbar-form navbar-left" role="search">
+                        <div class="form-group input-group pull-right">
+                            <input type="text" class="form-control" name="search" value="<{$search}>"
+                                   placeholder="接口名称、接口URI">
+                            <input type="hidden" name="branch" value="<{$branch}>"/>
+                            <span class="input-group-btn">
+                                <button type="submit" class="btn btn-default">
+                                    <span class="glyphicon glyphicon-search"></span>
+                                </button>
+                            </span>
+                        </div>
+                    </form>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="row">
+        <div class="col-md-10">
+            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                <div class="row">
+                    <div class="col-md-2">平台-分组</div>
+                    <div class="col-md-4">接口名称
+                        <span class="pull-right">性能(Y/N)</span>
+                    </div>
+                    <div class="col-md-5">接口URL</div>
+                    <div class="col-md-1"><span class="pull-right">状态</span></div>
+                </div>
+                <volist name='data' id='st' empty="没有数据">
+                    <div class="panel am-panel-warning">
+                        <div class="panel-heading" role="tab" id="heading<{$st.apiid}>">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion" href="#<{$st.apiid}>"
+                                   aria-expanded="true" aria-controls="<{$st.apiid}>">
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <small>
+                                                <{$st.projectid|getName='eo_project',###,'projectname'}>-
+                                                <{$st.groupid|getName='eo_api_group',###,'groupname'}>
+                                            </small>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <small><{$st.apiname}>(<{$st.apiid}>)</small>
+                                            <switch name="st.pressure">
+                                                <case value="1">
+                                                    <a href="__URL__/pressure/apiID/<{$st.apiid}>/pressure/<{$st.pressure}>">
+                                                        <span class="label label-success pull-right">性能(Y)</span>
+                                                    </a>
+                                                </case>
+                                                <case value="0">
+                                                    <a href="__URL__/pressure/apiID/<{$st.apiid}>/pressure/<{$st.pressure}>">
+                                                        <span class="label label-warning pull-right">性能(N)</span>
+                                                    </a>
+                                                </case>
+                                            </switch>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <small>
+                                                <a href="__URL__/details/id/<{$st.apiid}>" target="_blank"><{$st.apiuri}></a>
+                                            </small>
+                                        </div>
+                                        <div class="col-md-1">
+                                                <switch name="st.apistatus">
+                                                    <case value="0">
+                                                        <span class="label label-success pull-right">正常</span>
+                                                    </case>
+                                                    <case value="1">
+                                                        <span class="label label-warning pull-right">维护</span>
+                                                    </case>
+                                                    <case value="2">
+                                                        <span class="label label-danger pull-right">弃用</span>
+                                                    </case>
+                                                </switch>
+                                        </div>
+                                    </div>
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="<{$st.apiid}>" class="panel-collapse collapse" role="tabpanel"
+                             aria-labelledby="heading<{$st.apiid}>">
+                            <div class="panel-body">
+                                <{$st.updateuserid|getELUser=###}>&nbsp;更新于:<{$st.apiupdatetime}><br>
+                            </div>
+                        </div>
+                    </div>
+                </volist>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <ul class="list-group">
+                <volist name="project" id="vo">
+                    <eq name="vo" value="$branch">
+                        <li class="list-group-item list-group-item-warning">
+                            <else/>
+                        <li class="list-group-item ">
+                    </eq>
+                    <a href="__URL__/index/branch/<{$vo}>">
+                        <small>
+                            <{$vo|getName='eo_project',###,'projectname'}>
+                            <span class="badge pull-right"><{$vo|countRId='eo_api','projectID',###}></span>
+                        </small>
+                    </a>
+                    </li>
+                </volist>
+                <eq name="branch" value="">
+                    <li class="list-group-item list-group-item-warning">
+                        <else/>
+                    <li class="list-group-item ">
+                </eq>
+                <a href="__URL__/index"><small>全部</small></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

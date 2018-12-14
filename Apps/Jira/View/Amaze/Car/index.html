@@ -1,0 +1,211 @@
+<layout name="layout"/>
+<div class="admin-content container-fluid" style="min-height: 500px">
+    <br />
+    <nav class="navbar navbar-inverse">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">车辆信息（Car）</a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                       aria-haspopup="true" aria-expanded="false">
+                        地区：<{$type}> <i class="am-badge"> <{$count}></i>
+                        <span class="am-icon-caret-down"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <volist name='typeList' id='vo'>
+                            <li><a href="__URL__/index/type/<{$vo}>"><{$vo}></a></li>
+                        </volist>
+                    </ul>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <form action="__URL__/index " method="post" class="navbar-form navbar-left" role="search">
+                    <div class="form-group input-group">
+                        <input type="text" class="form-control" name="search" value="<{$search}>"
+                               placeholder="名称、关键字">
+                        <span class="input-group-btn">
+                             <button type="submit" class="btn btn-default">
+                                 <span class="glyphicon glyphicon-search"></span>
+                             </button>
+                            <a type="button" data-toggle="modal" href="#add" class="btn btn-success"> 添加 </a>
+                            <a href="__URL__/offence_all" class="btn btn-danger">批量查违章</a>
+                        </span>
+                    </div>
+                </form>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-9">
+            <table class="am-table am-table-striped am-table-hover table-main table-bordered">
+                <thead>
+                <tr>
+                    <th class="table-type" bgcolor="#ccc">车牌号</th>
+                    <th class="table-title" bgcolor="#ccc">车架号</th>
+                    <th class="table-title" bgcolor="#ccc">发动机号</th>
+                    <th class="table-title" bgcolor="#ccc">违章信息</th>
+                    <th class="table-title" bgcolor="#ccc">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <volist name='data' id='vo' empty="没有数据">
+                    <tr>
+                        <td><{$vo.car_number}></td>
+                        <td><{$vo.vin}></td>
+                        <td><{$vo.engine_code}></td>
+                        <td>
+                            <empty name="vo.offence">
+                                <a href="__URL__/noOffence/id/<{$vo.id}>">没违章</a>
+                                <else />
+                                <{$vo.offence}>
+                            </empty>
+                        </td>
+                        <td>
+                            <a data-toggle="modal" href="#mod" id="<{$vo.id}>" onclick="mod(this.id)">修改</a>
+                            <a href="__URL__/offence/id/<{$vo.id}>">查违章</a>
+                        </td>
+                    </tr>
+                </volist>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-3">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">选择分类</h3>
+                </div>
+                <div class="list-group">
+                    <volist name='typeList' id='vo'>
+                        <eq name="type" value="$vo">
+                            <a href="__URL__/index/type/<{$vo}>" class="list-group-item list-group-item-warning"><{$vo}></a>
+                            <else/>
+                            <a href="__URL__/index/type/<{$vo}>" class="list-group-item"><{$vo}></a>
+                        </eq>
+                    </volist>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+<script>
+    function mod(id) {
+        // alert(id)
+        $.ajax({
+            type: "GET",
+            url: "__URL__/car_info",
+            data: {id: id},
+            dataType: "json",
+            success: function (ss) {
+                $("#mod_id").val(ss.result.id);
+                $("#mod_car_number").val(ss.result.car_number);
+                $("#mod_vin").val(ss.result.vin);
+                $("#mod_engine_code").val(ss.result.engine_code);
+            }
+        })
+    }
+</script>
+
+
+<!-- 添加-->
+<div class="modal fade" id="add" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form action="__URL__/car_update" method="post" enctype='multipart/form-data' class="form-horizontal" role="form"   >
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title">添加-车辆信息</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">车牌号</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" name="car_number" value="<{$type}>" placeholder="车牌号">
+                        </div>
+                        <div class="col-sm-2 control-label"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">车架号（VIN）</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" name="vin" value="" placeholder="车架号">
+                        </div>
+                        <div class="col-sm-2 control-label"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">发动机号</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" name="engine_code" value="" placeholder="发动机号">
+                        </div>
+                        <div class="col-sm-2 control-label"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="submit" class="btn btn-primary">提交</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 修改-->
+<div class="modal fade" id="mod" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form action="__URL__/dict_update" method="post" enctype='multipart/form-data' class="form-horizontal" role="form"   >
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title" id="title1">修改-车辆信息</h4>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="mod_id" value="" />
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">车牌号</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" name="car_number" id="mod_car_number" value="<{$type}>" placeholder="车牌号">
+                        </div>
+                        <div class="col-sm-2 control-label"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">车架号（VIN）</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" name="vin" id="mod_vin" value="" placeholder="车架号">
+                        </div>
+                        <div class="col-sm-2 control-label"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">发动机号</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" name="engine_code" id="mod_engine_code" value="" placeholder="发动机号">
+                        </div>
+                        <div class="col-sm-2 control-label"></div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="submit" class="btn btn-primary">提交</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

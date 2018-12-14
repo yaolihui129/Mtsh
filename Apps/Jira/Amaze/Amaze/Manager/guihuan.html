@@ -1,0 +1,37 @@
+<layout name="layout"/>
+<div class="admin-content container" style="min-height: 500px">
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" >
+            <a href="__URL__/index">手机管理<span class="badge"><{$arr.id}></span></a>
+        </li>
+        <li role="presentation">
+            <a href="__URL__/books">图书管理<span class="badge"><{$arr.id}></span></a>
+        </li>
+        <li role="presentation">
+            <a href="__URL__/yuding">今日预订<span class="badge"><{$arr.id}></span></a>
+        </li>
+        <li role="presentation" class="active">
+            <a href="__URL__/guihuan">已借出<span class="badge"><{$arr.id}></span></a>
+        </li>
+    </ul>
+
+    <ul class="list-group">
+        <empty name="data">
+            <li class="list-group-item">当前，没有已借出的设备&图书</li>
+            <else />
+            <volist name='data' id='st'>
+                <li class="list-group-item">
+                    <span class="label label-default"><{$st.borrower|getJiraName=###}>-<{$st.end_time}></span>
+                    <{$st.device|getName='tp_device',###,'brand'}>-
+                    <{$st.device|getName='tp_device',###,'ts'}>
+                    (<{$st.device|getName='tp_device',###,'sys_version'}>)
+                    用途：<{$st.remark}>
+                    <a  href="__URL__/take_back/id/<{$st.id}>" class="btn btn-primary btn-xs pull-right"
+                        onclick="return confirm('你确定已经把设备收回吗？')">收回</a>
+                </li>
+            </volist>
+        </empty>
+    </ul>
+
+
+</div>

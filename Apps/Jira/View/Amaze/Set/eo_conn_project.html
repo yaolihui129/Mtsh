@@ -1,0 +1,113 @@
+<layout name="layout"/>
+<div class="admin-content container" style="min-height: 500px">
+    <div class="panel panel-default">
+        <nav class="navbar navbar-inverse">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                            data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">设置-eoLinker权限</a>
+                </div>
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-haspopup="true" aria-expanded="false">
+                                项目：<{$branch|getName='eo_project',###,'projectname'}>
+                                <span class="am-icon-caret-down"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <volist name='project' id='pro'>
+                                    <li><a href="__URL__/eo_conn_project/branch/<{$pro.key}>"><{$pro.value}></a></li>
+                                </volist>
+                            </ul>
+                        </li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <form action="__URL__/eo_conn_project " method="post" class="navbar-form navbar-left" role="search">
+                            <div class="form-group input-group">
+                                <input type="text" class="form-control" name="search" value="<{$search}>" placeholder="名称、关键字">
+                                <input type="hidden" class="form-control" name="branch" value="<{$branch}>">
+                                <span class="input-group-btn">
+                                     <button type="submit" class="btn btn-default">
+                                         <span class="glyphicon glyphicon-search"></span>
+                                     </button>
+                                </span>
+                            </div>
+                        </form>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="row">
+            <div class="col-md-1"></div>
+            <div class="col-md-5">
+                <table class="am-table am-table-striped am-table-hover table-main table-bordered">
+                    <thead>
+                    <tr>
+                        <th width=50% align="center" bgcolor="#ccc">姓名</th>
+                        <th width=25% align="center" bgcolor="#ccc">角色</th>
+                        <th width=25% align="center" bgcolor="#ccc">操作 </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <volist name='data' id='vo'>
+                            <tr>
+                                <td>
+                                    <{$vo.userid|getName='eo_user',###,'usernickname'}>
+                                    （<{$vo.userid|getName='eo_user',###,'username'}>）
+                                </td>
+                                <td>
+                                    <switch name="vo.usertype">
+                                        <case value="0">创建者</case>
+                                        <case value="1">管理员</case>
+                                        <case value="2">读写权限</case>
+                                        <case value="3">只读权限</case>
+                                    </switch>
+                                </td>
+                                <td>
+                                    <switch name="vo.usertype">
+                                        <case value="0"></case>
+                                        <case value="1"></case>
+                                        <case value="2">
+                                            <a href="__URL__/conn_project_change/connID/<{$vo.connid}>/userType/<{$vo.usertype}>">更改权限</a>
+                                            <a href="__URL__/conn_project_remove/connID/<{$vo.connid}>">移除</a>
+                                        </case>
+                                        <case value="3">
+                                            <a href="__URL__/conn_project_change/connID/<{$vo.connid}>/userType/<{$vo.usertype}>">更改权限</a>
+                                            <a href="__URL__/conn_project_remove/connID/<{$vo.connid}>">移除</a>
+                                        </case>
+                                    </switch>
+                                </td>
+                            </tr>
+                        </volist>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-2"></div>
+            <div class="col-md-3">
+                <ul class="list-group">
+                    <volist name='user' id='vo'>
+                        <li class="list-group-item">
+                            <small>
+                                <{$vo.usernickname}>
+                                <span class="pull-right">
+                                    <a href="__URL__/conn_project_add/userID/<{$vo.userid}>/projectID/<{$branch}>/userType/2">读写|</a>
+                                    <a href="__URL__/conn_project_add/userID/<{$vo.userid}>/projectID/<{$branch}>/userType/3">|只读</a>
+                                </span>
+                            </small>
+                        </li>
+                    </volist>
+
+                </ul>
+            </div>
+            <div class="col-md-1"></div>
+        </div>
+    </div>
+</div>
