@@ -1,5 +1,4 @@
 <?php
-
 namespace Jirapi\Controller;
 class RunstepController extends BasicController
 {
@@ -21,19 +20,19 @@ class RunstepController extends BasicController
     public function run()
     {
         switch ($this->_method) {
-            case 'get': // get请求处理代码
+            case 'get':
                 $this->get();
                 break;
-            case 'put': // put请求处理代码
+            case 'put':
                 $this->put();
                 break;
-            case 'post': // post请求处理代码
+            case 'post':
                 $this->post();
                 break;
-            case 'delete': // delete请求处理代码
+            case 'delete':
                 $this->delete();
                 break;
-            case 'head': // head请求处理代码
+            case 'head':
                 $this->head();
                 break;
         }

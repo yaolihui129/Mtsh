@@ -9,8 +9,7 @@ return array(
     ),
     'DEFAULT_THEME'         => 'Amaze',
     'PRODUCT'               => 'Admin',
-    'TMPL_ACTION_ERROR'     => 'Public:error',
-    'TMPL_ACTION_SUCCESS'   => 'Public:success',
+    'maxPageNum'            => 10,
     //数据库相关
     'DB_HOST'               => '127.0.0.1',
     'DB_NAME'               => 'xiuli',

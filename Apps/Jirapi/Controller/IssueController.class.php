@@ -1,5 +1,4 @@
 <?php
-
 namespace Jirapi\Controller;
 class IssueController extends BasicController
 {
@@ -19,6 +18,7 @@ class IssueController extends BasicController
 
     function put()
     {
+        $var=$this->init();
         $data = getJsonToArray();
         if ($data['ID']) {
             //重新封装数组
@@ -46,15 +46,13 @@ class IssueController extends BasicController
             }
             $var['UPDATED'] = date('Y-m-d H:i:s', time());
             //更新数据
-            $data = $this->update($data, 'jiraissue');
-
-
+            $res = update($data, 'jiraissue');
         } else {
             $var = $this->query('jiraissue', "", "ID desc");
             //查询按issuenum排序,获取最大的issuenum
             $where = array('PROJECT' => $data['PROJECT']);
             $order = 'issuenum desc';
-            $arr = $this->query('jiraissue', $where, $order);
+            $arr = getList($var['table'], $where, $order);
             //封装插入的数组
             $data['ID'] = intval($var[0]['id']) + 1;
             $data['issuestatus'] = 1;
@@ -67,21 +65,21 @@ class IssueController extends BasicController
             $data['UPDATED'] = $data['CREATED'];
             $data['WORKFLOW_ID'] = intval($var[0]['workflow_id']) + 1;
             //写库操作
-            $data = $this->insert($data, 'jiraissue');
+            $res = insert($var['table'],$data);
         }
-        $this->ajaxReturn($data);
+        $this->ajaxReturn($res);
     }
 
     public function issuenum()
     {
         switch ($this->_method) {
-            case 'get': // get请求处理代码
+            case 'get':
                 $this->issuenum_get_list();
                 break;
-            case 'put': // put请求处理代码
+            case 'put':
                 $this->put();
                 break;
-            case 'post': // post请求处理代码
+            case 'post':
                 $this->post();
                 break;
         }
@@ -93,9 +91,9 @@ class IssueController extends BasicController
         if ($_GET) {
             $arr = explode('-', $_GET['issuenum']);
             $where = array('pkey' => $arr[0]);
-            $data = $this->find_one('project', $where);
+            $data = findone('project', $where);
             $where = array('issuenum' => $arr[1], 'PROJECT' => $data['id']);
-            $data = $this->find_one($var['table'], $where);
+            $data = findone($var['table'], $where);
         } else {
             $data = array('暂不提供该功能');
         }

@@ -1,5 +1,4 @@
 <?php
-
 namespace Jirapi\Controller;
 class IssuetypeController extends BasicController
 {

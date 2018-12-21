@@ -79,6 +79,7 @@
     }
     function getList($table,$where,$order = 'id', $field = '',$page='',$size=''){
         $where['deleted'] = '0';
+        $where['removed'] = '0';
         if($page){
             $data = M($table)->where($where)->order($order)->field($field)->page($page,$size)->select();
         }else{
@@ -92,13 +93,30 @@
     }
     function findOne($table, $where, $order = 'id desc', $field = ''){
         $where['deleted'] = '0';
+        $where['removed'] = '0';
         $data = M($table)->where($where)->order($order)->field($field)->find();
         return $data;
     }
     function countId($table,$where){
-        $where['deleted']='0';
+        $where['deleted'] = '0';
+        $where['removed'] = '0';
         $count=M($table)->where($where)->count();
         return $count;
+    }
+    function countWithParent($table,$field,$parentId){
+        $where=array($field=>$parentId);
+        $count=countId($table,$where);
+        return $count;
+    }
+    function sum($table,$where,$field){
+        $where['deleted'] = '0';
+        $where['removed'] = '0';
+        $sum=M($table)->where($where)->sum($field);
+        if ($sum){
+            return $sum;
+        }else{
+            return 0;
+        }
     }
     function getId($table, $where)
     {
@@ -160,6 +178,24 @@
         $this->ajaxReturn($res);
     }
 
+    /**
+     **格式化输出
+     */
+    function resFormat($data,$code='0',$message='ok'){
+        if($data){
+            $res=array(
+                'errorcode'=>$code,
+                'message'=>$message,
+                'result'=>$data
+            );
+        }else{
+            $res=array(
+                'errorcode'=>$code,
+                'message'=>$message
+            );
+        }
+        return $res;
+    }
 
     /**
      ** 加解密操作
@@ -300,7 +336,19 @@
 
 
 
-
+    function getWebsite(){
+        if($_SERVER['SERVER_PORT']=='80'){
+            $website='http://'.$_SERVER['SERVER_NAME'];
+        }elseif ($_SERVER['SERVER_PORT']=='80'){
+            $website='https://'.$_SERVER['SERVER_NAME'];
+        }else{
+            $website='https://'.$_SERVER['SERVER_NAME'];
+        }
+        if(!C(ONLINE)){
+            $website=$website.'/Demo';
+        }
+        return $website;
+    }
 
     //获取页面信息
     function getWebInfo($qz){
@@ -564,7 +612,6 @@
     /**
      ** 字符串操作
      */
-
     //获取随机码
     function getRandCode($length){
         $array = array(
@@ -711,8 +758,6 @@
     }
 
 
-
-
     // CURL_GET操作
     function httpGet($url){
         $ch=curl_init(); //1.获取初始化URL
@@ -729,7 +774,7 @@
         }
         return $res;
     }
-    function httpAuthGet($url, $user = 'ylh', $password = '123456')
+    function httpAuthGet($url, $user, $password)
     {
         $ch = curl_init(); //1.获取初始化URL
         //2.设置curl的参数
@@ -802,7 +847,7 @@
         }
         return $res;
     }
-    function httpAuthPost($url, $postJson, $user = 'ylh', $password = '123456')
+    function httpAuthPost($url, $postJson,$user,$password)
     {
         //1.获取初始化URL
         $ch = curl_init();
@@ -845,7 +890,6 @@
         }
         return $data;
     }
-
 
 
     //根据日期获取星期
@@ -920,11 +964,13 @@
         return $fdate;
     }
 
-
-
     //获取登录用户
     function getLoginUser(){
-        $user=jie_mi(cookie(C(PRODUCT).'_user'));
+        if($_SESSION['user']){
+            $user= $_SESSION['user'];
+        }else{
+            $user=jie_mi(cookie(C(PRODUCT).'_user'));
+        }
         return $user;
     }
     function getLoginUserID(){

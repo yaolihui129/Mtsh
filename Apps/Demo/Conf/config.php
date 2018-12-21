@@ -1,7 +1,6 @@
 <?php
 return array(
     //'配置项'=>'配置值'
-    //网站配置
     'TMPL_PARSE_STRING'     => array(
         '__CSS__'           => 'https://xiuliguanggao.com/Public/css',
         '__JS__'            => 'https://xiuliguanggao.com/Public/js',
@@ -10,14 +9,13 @@ return array(
     ),
     'DEFAULT_THEME'         => 'Amaze',
     'DB_PREFIX'             => 'tp_',
-    'TMPL_ACTION_ERROR'     => 'Public:error',
-    'TMPL_ACTION_SUCCESS'   => 'Public:success',
     'PRODUCT'               => 'Demo',
+    'maxPageNum'        => 10,
     'MERCHANTID'            => '6', //商户ID
     'WEBSITE'               => 'https://xiuliguanggao.com',
     //公众号配置
     'appID'                 =>'wx3090bf31097834ac',
     'appsecret'             =>'0f05798e9e7f2740706846aeba86308d',
-    'TOKEN'                 => 'yaolihui',
+
 
 );

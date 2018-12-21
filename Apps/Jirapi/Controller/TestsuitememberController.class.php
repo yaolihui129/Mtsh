@@ -1,5 +1,4 @@
 <?php
-
 namespace Jirapi\Controller;
 class TestsuitememberController extends BasicController
 {

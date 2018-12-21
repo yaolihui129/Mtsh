@@ -10,6 +10,7 @@ return array(
     ),
     'DEFAULT_THEME'     => 'Amaze',
     'PRODUCT'           => 'Jira',
+    'maxPageNum'        => 10,
     'JIRAPI'            => 'http://qc.zhidaoauto.com',
     'JIRAURL'           => 'http://jira.zhidaohulian.com',
     'QA_TESTER'         => array('ylh', 'fj', 'mhh', 'wcz', 'lixiaomei'),
@@ -19,6 +20,5 @@ return array(
     'DB_USER'           => 'root',
     'DB_PWD'            => 'root',
     'DB_PORT'           => '3306',
-    'DB_PREFIX'         => '',
     'DRAW'              => array('2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A', 'JOKER'),
 );

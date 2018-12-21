@@ -9,9 +9,7 @@ return array(
     ),
     'DEFAULT_THEME'         => 'Amaze',
     'PRODUCT'               => 'Back',
-    'TMPL_ACTION_ERROR'     => 'Public:error',
-    'TMPL_ACTION_SUCCESS'   => 'Public:success',
-
+    'maxPageNum'            => 10,
     'DB_HOST'               => '127.0.0.1',
     'DB_NAME'               => 'xiuli',
     'DB_USER'               => 'root',

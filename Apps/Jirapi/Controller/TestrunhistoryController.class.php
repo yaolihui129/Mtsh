@@ -1,5 +1,4 @@
 <?php
-
 namespace Jirapi\Controller;
 class TestrunhistoryController extends BasicController
 {

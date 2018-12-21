@@ -1,5 +1,4 @@
 <?php
-
 namespace Jirapi\Controller;
 class TestrunbugController extends BasicController
 {
@@ -24,7 +23,6 @@ class TestrunbugController extends BasicController
                 $data['where'] = array('TEST_RUN_STEP_ID' => $_GET['step_id']);
             }
         }
-//        dump($data);
         return $data;
     }
 

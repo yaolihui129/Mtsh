@@ -412,7 +412,7 @@ class PlanController extends WebInfoController
         //1.获取测试计划详情
         $tp = I('tp');
         //获取计划详情
-        $this->getPlanInfo($tp);
+        $plan=$this->getPlanInfo($tp);
         //获取计划周期
         $this->getPlanCycle($tp);
         //2.获取测试关联的测试用例

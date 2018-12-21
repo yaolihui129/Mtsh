@@ -1,5 +1,4 @@
 <?php
-
 namespace Jirapi\Controller;
 class CustomfieldvalueController extends BasicController
 {
@@ -33,7 +32,7 @@ class CustomfieldvalueController extends BasicController
     function issue_get(){
         $var = $this->init();
         $map = array('ISSUE' => I('issue'), 'CUSTOMFIELD' => I('customfield'));
-        $data = $this->find_one($var['table'],$map,$var['order'],$var['field']);
+        $data = findOne($var['table'],$map,$var['order'],$var['field']);
         if($data['stringvalue']){
             echo $data['stringvalue'];
         }else{
@@ -47,20 +46,16 @@ class CustomfieldvalueController extends BasicController
         $var = $this->init();
         $where = getJsonToArray();
         if($where['ID']){
-            //更新
             $data = array($where,'更新');
         }else{
             $map = array('ISSUE' => $where['ISSUE'], 'CUSTOMFIELD' => $where['CUSTOMFIELD']);
-            $id = M('customfieldvalue')->where($map)->find();
+            $id = findOne($var['table'],$map,$var['order'],$var['field']);;
             if($id){
-                //更新
                 $data = array($where,'更新');
             }else{
-                //写入
                 $data = array($where,'写入');
             }
         }
-
         $this->response($data, 'json');
     }
 

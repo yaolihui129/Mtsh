@@ -1,8 +1,5 @@
 <?php
 namespace Jirapi\Controller;
-/*
- * 测试计划关联的测试用例
- */
 class TestplanmemberController extends BasicController
 {
     //初始化信息
@@ -16,7 +13,6 @@ class TestplanmemberController extends BasicController
             'field' => '',
             'page'  => ''
         );
-//        print_r($data);
         return $data;
     }
 

@@ -45,27 +45,14 @@ class AppController extends BaseController
     }
     //废弃APP
     function shan_chu_app(){
-        //初始化
         $info = $this->init();
         $this->delete($info['table_app'],I('id'));
     }
     //获取APP
     function app_info(){
-        //初始化
         $info = $this->init();
         $data=find($info['table_app'],I('id'));
-        if($data){
-            $res=array(
-                'errorcode'=>'0',
-                'message'=>'ok',
-                'result'=>$data
-            );
-        }else{
-            $res=array(
-                'errorcode'=>'0',
-                'message'=>'ok'
-            );
-        }
+        $res=resFormat($data);
         $this->ajaxReturn($res);
     }
 

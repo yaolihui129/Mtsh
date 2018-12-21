@@ -13,12 +13,10 @@ class LoginController extends WebInfoController
         $user = I('username');
         $password = I('password');
         $time=7*24*3600;
-        S($user, $password);
         $arr = $this->jiraLogin($user,$password);
         if ($arr['session']) {
             setCookieKey('user',jia_mi($user),$time);
             setCookieKey('isLogin',C(PRODUCT),$time);
-            $url=cookie(C(PRODUCT).'_url');
             $url=getCookieKey('url');
             if (!$url) {
                 $url = '/' . C(PRODUCT) . '/Index/index';

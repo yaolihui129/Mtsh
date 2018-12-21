@@ -1,5 +1,4 @@
 <?php
-
 namespace Jirapi\Controller;
 class TestrunController extends BasicController
 {
@@ -15,14 +14,6 @@ class TestrunController extends BasicController
             'page'  => ''
         );
         return $data;
-    }
-
-    function post()
-    {
-        $var = $this->init();
-        $where = getJsonToArray();
-        $data = M($var['table'])->where($where)->select();
-        $this->ajaxReturn($data);
     }
 
 }
