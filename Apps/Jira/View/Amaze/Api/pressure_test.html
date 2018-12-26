@@ -62,10 +62,18 @@
                             <notempty name="arr.samples"><{$arr.samples}></notempty>
                         </td>
                         <td>
-                            <empty name="arr.average">0ms<else /> <{$arr.average}>ms</empty>
+                            <empty name="arr.average">
+                                0ms
+                                <else />
+                                <{$arr.average}>ms
+                            </empty>
                         </td>
                         <td>
-                            <empty name="arr.median">0ms<else /><{$arr.median}>ms</empty>
+                            <empty name="arr.median">
+                                0ms
+                                <else />
+                                <{$arr.median}>ms
+                            </empty>
                         </td>
                         <td>
                             <notempty name="arr.line90">
@@ -73,13 +81,22 @@
                             </notempty>
                         </td>
                         <td>
-                            <empty name="arr.min">0ms<else /><{$arr.min}>ms</empty>
+                            <empty name="arr.min">
+                                0ms
+                                <else />
+                                <{$arr.min}>ms
+                            </empty>
                         </td>
                         <td>
-                            <notempty name="arr.max"><{$arr.max}>ms</notempty>
+                            <notempty name="arr.max">
+                                <{$arr.max}>ms
+                            </notempty>
                         </td>
                         <td>
-                            <notempty name="arr.error"><{$arr.error}>%</notempty>
+                            <notempty name="arr.error">
+                                <{$arr.error}>%
+                            </notempty>
+
                         </td>
                         <td><{$arr.tps}></td>
                         <td><{$arr.tester}></td>
@@ -96,7 +113,7 @@
                     <form action="__URL__/insert" method="post" class="form-horizontal" role="form">
                         <input type="hidden" name="api" value="<{$arr.api}>"/>
                         <input type="hidden" name="scene" value="<{$arr.id}>"/>
-                        <input type="hidden" name="tester" value="<{$user|getJiraName=###}>"/>
+                        <input type="hidden" name="tester" value="<{$Think.session.user|getJiraName=###}>"/>
                         <input type="hidden" name="t_time" value="<{$t_time}>"/>
                         <input type="hidden" name="table" value="tp_api_scene_pressure_test"/>
 
@@ -198,7 +215,7 @@
                             <td><{$da.min}>ms</td>
                             <td><{$da.max}>ms</td>
                             <td><{$da.error}>%</td>
-                            <td><a href="__URL__/record_result/id/<{$da.id}>/scene/<{$id}>"><{$da.tps}></a></td>
+                            <td><a href="__URL__/record_result/id/<{$da.id}>"><{$da.tps}></a></td>
                             <td title="<{$da.t_time}>"><{$da.tester}></td>
                         </tr>
                     </volist>

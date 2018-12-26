@@ -23,7 +23,7 @@ class ActivityController extends BaseController
         $info = $this->init();
         $where=$info['where'];
         //处理查询条件
-        $typeList=get_dict_list('activity_type','admin_dict');
+        $typeList=getDictList('activity_type','admin_dict');
         $this->assign("typeList", $typeList);
         $type=I('type',$typeList[0]['key']);
         $this->assign("type", $type);
@@ -54,7 +54,7 @@ class ActivityController extends BaseController
     function imgUP(){
         //初始化
         $info = $this->init();
-        $_POST['url']='/' . C(PRODUCT) . '/Activity';
+        $_POST['url']='/' . C('PRODUCT') . '/Activity';
         $this->update($info['table_activity'],$_POST,'img');
     }
     //活动详情
@@ -114,19 +114,8 @@ class ActivityController extends BaseController
     function activity_info(){
         //初始化
         $info = $this->init();
-        $data=find($info['table_activity'],I('id'));
-        if($data){
-            $res=array(
-                'errorcode'=>'0',
-                'message'=>'ok',
-                'result'=>$data
-            );
-        }else{
-            $res=array(
-                'errorcode'=>'0',
-                'message'=>'ok'
-            );
-        }
+        $res=find($info['table_activity'],I('id'));
+        $res=resFormat($res);
         $this->ajaxReturn($res);
     }
     //投放渠道

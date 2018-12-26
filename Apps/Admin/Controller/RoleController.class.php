@@ -20,7 +20,7 @@ class RoleController extends BaseController
         $info = $this->init();
         $where=$info['where'];
 
-        $appList=get_list($info['table_app'],$where,'name');
+        $appList=getKVList($info['table_app'],$where,'name');
         $this->assign("appList", $appList);
         $type=I('type',$appList[0]['key']);
         $this->assign("type", $type);
@@ -58,19 +58,8 @@ class RoleController extends BaseController
     function role_info(){
         //初始化
         $info = $this->init();
-        $data=find($info['table_role'],I('id'));
-        if($data){
-            $res=array(
-                'errorcode'=>'0',
-                'message'=>'ok',
-                'result'=>$data
-            );
-        }else{
-            $res=array(
-                'errorcode'=>'0',
-                'message'=>'ok'
-            );
-        }
+        $res=find($info['table_role'],I('id'));
+        $res=resFormat($res);
         $this->ajaxReturn($res);
     }
 

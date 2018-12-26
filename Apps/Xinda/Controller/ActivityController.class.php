@@ -11,18 +11,14 @@ class ActivityController extends BaseController {
     public function index(){
         $info=$this->init();
         getWebInfo(C('PRODUCT'));//获取网页信息
-        $this->changeMuban(I('muban'));//更换模板
-        if(I('wxAppId')){
-            $this->weiXinLogin(I('wxAppId'), I('wxOpenId'));
-        }
-        $this->details($info['table'],I('id'));               
+
         $this->display();
     }
     
     public function activityList(){ 
         $info=$this->init();
         $map['type']=$info['name'];
-        $this->dataChaxun($info['table'], $info['name'], $map,C('maxPageNum'),I('p'));
+        getList($info['table'], $map,C('maxPageNum'),I('p'));
         $this->display();      
     }
     

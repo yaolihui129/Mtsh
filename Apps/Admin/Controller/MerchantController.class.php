@@ -22,7 +22,7 @@ class MerchantController extends BaseController
         $info = $this->init();
         $where=$info['where'];
         //处理查询条件
-        $typeList=get_dict_list('merchant_type','dict');
+        $typeList=getDictList('merchant_type','dict');
         $this->assign("typeList", $typeList);
         $type=I('type',$typeList[0]['key']);
         $this->assign("type", $type);
@@ -67,19 +67,8 @@ class MerchantController extends BaseController
     function merchant_info(){
         //初始化
         $info = $this->init();
-        $data=find($info['table_merchant'],I('id'));
-        if($data){
-            $res=array(
-                'errorcode'=>'0',
-                'message'=>'ok',
-                'result'=>$data
-            );
-        }else{
-            $res=array(
-                'errorcode'=>'0',
-                'message'=>'ok'
-            );
-        }
+        $res=find($info['table_merchant'],I('id'));
+        $res=resFormat($res);
         $this->ajaxReturn($res);
     }
 

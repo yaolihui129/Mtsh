@@ -6,37 +6,38 @@ class ApiController extends WebInfoController
     //接口文档
     public function index()
     {
-
         $search = I('search');
         $this->assign('search', $search);
 
-        $where = array('removed' => '0');
+        $where = array();
         $where['apiName|apiURI'] = array('like', '%' . $search . '%');
         $where['apiName'] = array('neq', '示例接口');
         $project = $this->projectID();
         $this->assign('project', $project);
+
         $branch=I('branch');
         $this->assign('branch', $branch);
+
         if($branch){
             $where['projectID']=$branch;
         }else{
             $where['projectID'] = array('in', $project);
         }
-        $data = M('eo_api')->where($where)->order('projectID')->select();
+        $data = getList('eo_api',$where,'projectID');
         $this->assign('data', $data);
 
         $this->display();
     }
-
     //接口用例
     public function apicase(){
         $search = I('search');
         $this->assign('search', $search);
 
-        $where = array('removed' => '0');
+        $where = array();
         $where['caseName|caseDesc'] = array('like', '%' . $search . '%');
         $project = $this->projectID();
         $this->assign('project', $project);
+
         $branch=I('branch');
         $this->assign('branch', $branch);
         if($branch){
@@ -44,15 +45,14 @@ class ApiController extends WebInfoController
         }else{
             $where['projectID'] = array('in', $project);
         }
-        $data = M('eo_project_test_case')->where($where)->order('projectID')->select();
+        $data = getList('eo_project_test_case',$where,'projectID');
         $this->assign('data', $data);
 
         $this->display();
     }
-
     //标记性能
     function pressure(){
-        $_SESSION['url'] = '/' . C(PRODUCT) . '/Api/index';
+        $_SESSION['url'] = '/' . C('PRODUCT') . '/Api/index';
         $this->isLogin();
         $_GET['table']='eo_api';
         if($_GET['pressure']=='0'){
@@ -66,12 +66,11 @@ class ApiController extends WebInfoController
         }
 
     }
-
     //API详情
     public function details()
     {
-        $id = I(id);
-        $data = M('eo_api')->find($id);
+        $id = I('id');
+        $data = find('eo_api',$id);
         $this->assign('data', $data);
 
         $this->assign("apinote", PublicController::editor("apinote", $data['apinote']));
@@ -79,7 +78,7 @@ class ApiController extends WebInfoController
         $this->assign("apirequestraw", PublicController::editor("apirequestraw", $data['apirequestraw']));
 
         $where=array('apiID'=>$id);
-        $parameter = M('eo_api_request_param')->where($where)->select();
+        $parameter = getList('eo_api_request_param',$where,'paramID');
         $this->assign('parameter', $parameter);
         $this->assign('count', sizeof($parameter));
 
@@ -87,10 +86,10 @@ class ApiController extends WebInfoController
     }
     //API性能测试场景
     public function press(){
-        $id = I(id);
-        $_SESSION['url'] = '/' . C(PRODUCT) . '/Api/press/id/'.$id;
+        $id = I('id');
+        $_SESSION['url'] = '/' . C('PRODUCT') . '/Api/press/id/'.$id;
         $this->isLogin();
-        $data = M('eo_api')->find($id);
+        $data = find('eo_api',$id);
         $this->assign('data', $data);
 
         $project=I('project');
@@ -103,8 +102,9 @@ class ApiController extends WebInfoController
         }else{
             $where = array('api' => $id, 'deleted' => '0');
         }
-        $scene = M('tp_api_scene_pressure')->where($where)->order('project,sn,id')->select();
+        $scene = getList('tp_api_scene_pressure',$where,'project,sn,id');
         $this->assign('scene', $scene);
+        $this->assign('c', sizeof($scene));
 
         $this->display();
     }
@@ -112,9 +112,9 @@ class ApiController extends WebInfoController
     function selected(){
         $id=I('id');
         $table='tp_api_scene_pressure';
-        $where=array('press_type'=>I('press_type'),'project'=>I('project'),'deleted'=>'0');
+        $where=array('press_type'=>I('press_type'),'project'=>I('project'));
         $where['id']=array('not in',[$id]);
-        $data=M($table)->where($where)->select();
+        $data =getList($table,$where);
         if($data){//取消选中状态
             foreach ($data as $da){
                 $_GET['id']=$da['id'];
@@ -137,29 +137,21 @@ class ApiController extends WebInfoController
         $_POST['table']='tp_api_scene_pressure';
         $this->update();
     }
-
     //API压测记录
     public function pressure_test(){
+        $this->isLogin();
         $id = I('id');
         $this->assign('id', $id);
-        $url = '/' . C(PRODUCT) . '/Api/pressure_test/id/'.$id;
-        cookie('url',$url,array('prefix'=>C(PRODUCT).'_'));
-        $this->isLogin();
-
-        $arr = M('tp_api_scene_pressure')->find($id);
+        $arr = find('tp_api_scene_pressure',$id);
         $this->assign('arr', $arr);
-
-        $user=jie_mi(cookie(C(PRODUCT).'_user'));
-        $this->assign('user', $user);
 
         $project=I('project');
         $this->assign('project', $project);
-
         $scheme=I('scheme');
         $this->assign('scheme', $scheme);
 
-        $where = array('scene' => $id, 'deleted' => '0');
-        $data = M('tp_api_scene_pressure_test')->where($where)->order('id')->select();
+        $where = array('scene' => $id);
+        $data = getList('tp_api_scene_pressure_test',$where);
         $this->assign('data', $data);
 
         $this->assign('t_time', date('Y-m-d H:i:s',time()));
@@ -168,12 +160,9 @@ class ApiController extends WebInfoController
     }
     //标记结果
     function record_result(){
-        $scene=I('scene');
-        $url = '/' . C(PRODUCT) . '/Api/pressure_test/id/'.$scene;
-        cookie('url',$url,array('prefix'=>C(PRODUCT).'_'));
         $this->isLogin();
-        $arr =M('tp_api_scene_pressure_test')->find(I('id'));
-        $_GET['id']=$scene;
+        $arr =find('tp_api_scene_pressure_test',I('id'));
+        $_GET['id']=$arr['scene'];
         $_GET['samples']=$arr['samples'];
         $_GET['average']=$arr['average'];
         $_GET['median']=$arr['median'];

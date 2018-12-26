@@ -26,10 +26,10 @@ class LoginController extends Controller
         if ($data) {
             setCookieKey('user',jia_mi($user),$time);
             setCookieKey('user_id',jia_mi($data['id']),$time);
-            setCookieKey('isLogin',C(PRODUCT),$time);
+            setCookieKey('isLogin',C('PRODUCT'),$time);
             $url=getCookieKey('url');
             if(!$url){
-                $url = '/' . C(PRODUCT) . '/Index/index';
+                $url = '/' . C('PRODUCT') . '/Index/index';
             }
             $this->redirect($url);
         } else {
@@ -44,7 +44,7 @@ class LoginController extends Controller
         $username=getLoginUserID();
         $username = getName('user',$username,'real_name');
         clearCookie();
-        $this->success($username . ",再见!", U(C(PRODUCT) . '/Login/index'));
+        $this->success($username . ",再见!", U(C('PRODUCT') . '/Login/index'));
 
     }
 

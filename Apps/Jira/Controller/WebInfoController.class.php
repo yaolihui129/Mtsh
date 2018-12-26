@@ -2,17 +2,237 @@
 namespace Jira\Controller;
 class WebInfoController extends BaseController
 {
-    //判定登录状态
+    public function _initialize()
+    {
+        if (ismobile()) {//设置默认默认主题为 Amaze
+            C('DEFAULT_V_LAYER', 'Amaze');
+        }
+    }
+    function _empty()
+    {
+        $this->display('index');
+    }
     function isLogin()
     {
-        //判定登录态
-        $isLogin=cookie(C(PRODUCT).'_isLogin');
-        $user=cookie(C(PRODUCT).'_user');
-        if($isLogin==''||$user==''){
+        if (!getLoginUser()) {
             $this->redirect('Jira/Login/index');
         }
     }
-    //设备规则
+
+    function iusserDiect(){
+        $where['issuestatus'] = array('in', '3,10002,6');
+        $where['PROJECT'] = intval($_SESSION['project']);
+        $where['issuetype'] = '10102';//测试计划
+        $datum = date("Y-m-d H:i:s", time() - 7*24* 3600);
+        $where['UPDATED']  = array('gt', $datum);;//更新时间两周以内
+        $data=postIssue($where);
+        $project = array();
+        foreach ($data as $k => $v) {
+            $project[$k]['key'] = $v['id'];
+            $project[$k]['value'] = $v['summary'] . '(' . $v['issuenum'] . ')';
+        }
+        return $project;
+    }
+    function iusserStatus($STATUSCATEGORY=4){
+        $where=array('STATUSCATEGORY'=>$STATUSCATEGORY);
+        $data=getList('issuestatus',$where,'SEQUENCE');
+        $status = array();
+        foreach ($data as $k => $v) {
+            $status[$k]['key'] = $v['id'];
+            $status[$k]['value'] = $v['pname'] . '(' . $v['id'] . ')';
+        }
+        return $status;
+    }
+    function statusDiect($name,$value,$STATUSCATEGORY=4){
+        $data=$this->iusserStatus($STATUSCATEGORY);
+        $html=select($data,$name,$value);
+        return $html;
+    }
+    function projectDict()
+    {
+        $data = getList('project',array());
+        $project = array();
+        foreach ($data as $k => $v) {
+            $project[$k]['key'] = $v['id'];
+            $project[$k]['value'] = $v['pname'] . '(' . $v['pkey'] . ')';
+        }
+        return $project;
+    }
+    function projectList($where = array())
+    {
+        $arr = array('eolinker示例', 'eoinker示例','微信', '测试管理', 'Jira');
+        $where['projectName'] = array('not in', $arr);
+        $data =getList('eo_project',$where,'projectID');
+        return $data;
+    }
+    function projectID()
+    {
+        $project = $this->projectList();
+        $pro = '';
+        foreach ($project as $p) {
+            $pro[] = $p['projectid'];
+        }
+        return $pro;
+    }
+
+    function order()
+    {
+        $num = 0;
+        foreach ($_POST['sn'] as $id => $sn) {
+            $num += D(I('table'))->save(array("id" => $id, "sn" => $sn));
+        }
+        if ($num) {
+            $this->success("排序成功!");
+        } else {
+            $this->error("排序失败...");
+        }
+    }
+    function insert()
+    {
+        $m = D(I('table'));
+        if (IS_GET) {
+            $_GET['adder'] = $_SESSION['user'];
+            $_GET['moder'] = $_SESSION['user'];
+            $_GET['ctime'] = time();
+            if (!$m->create($_GET)) {
+                $this->error($m->getError());
+            }
+            if ($m->add($_GET)) {
+                if ($_GET['url']) {
+                    $this->success("成功", U($_GET['url']));
+                } else {
+                    $this->success("成功");
+                }
+            } else {
+                $this->error("失败");
+            }
+        } else {
+            $_POST['adder'] = $_SESSION['user'];
+            $_POST['moder'] = $_SESSION['user'];
+            $_POST['ctime'] = time();
+            if (!$m->create()) {
+                $this->error($m->getError());
+            }
+            if ($m->add()) {
+                if ($_POST['url']) {
+                    $this->success("成功", U($_POST['url']));
+                } else {
+                    $this->success("成功");
+                }
+            } else {
+                $this->error("失败");
+            }
+        }
+    }
+    function update()
+    {
+        if (IS_GET) {
+            $_GET['moder'] = $_SESSION['user'];
+            if (D(I('table'))->save($_GET)) {
+                if ($_GET['url']) {
+                    $this->success("成功", U($_GET['url']));
+                } else {
+                    $this->success("成功");
+                }
+            } else {
+                $this->error("失败！");
+            }
+        } else {
+            $_POST['moder'] = $_SESSION['user'];
+            if (D(I('table'))->save($_POST)) {
+                if ($_POST['url']) {
+                    $this->success("成功", U($_POST['url']));
+                } else {
+                    $this->success("成功");
+                }
+            } else {
+                $this->error("失败！");
+            }
+        }
+    }
+    function del($msg='成功')
+    {
+        $_POST['id'] = I('id');
+        $_POST['moder'] = $_SESSION['user'];
+        $_POST['deleted'] = 1;
+        if (D(I('table'))->save($_POST)) {
+            $this->success($msg);
+        } else {
+            $this->error("失败！");
+        }
+    }
+    function realdel($id)
+    {
+        $count = D(I('table'))->delete($id);
+        if ($count > 0) {
+            $this->success('成功');
+        } else {
+            $this->error('失败');
+        }
+    }
+    function dataUpdate($table,$savePath,$data,$img='img',$url=''){
+        $_POST=$data;
+        $_POST['moder']=$_SESSION['realname'];
+        //处理上传图片
+        $upload = new \Think\Upload();// 实例化上传类
+        $upload->maxSize  =     7145728 ;// 设置附件上传大小
+        $upload->exts     =     array('jpg', 'gif', 'png', 'jpeg');// 设置附件上传类型
+        $upload->rootPath =  './Upload';// 设置附件上传目录
+        $upload->savePath = '/'.$savePath.'/'; // 设置附件上传目录
+        $info  =   $upload->upload();
+        if(!$info) {// 上传错误提示错误信息或没有上传图片
+            if (D($table)->save($_POST)){
+                if($url){
+                    $this->success("修改成功！",U($_POST['url']));
+                }else{
+                    $this->success("修改成功！");
+                }
+            }else{
+                $this->error("失败");
+            }
+        }else {
+            $_POST[$img]=$info[$img]['savepath'].$info[$img]['savename'];
+            if (D($table)->save($_POST)){
+                $image = new \Think\Image();
+                $image->open('./Upload/'.$info[$img]['savepath'].$info[$img]['savename']);
+                $image->thumb(600, 400)->save('./Upload/'.$info[$img]['savepath'].$info[$img]['savename']);
+                if($url){
+                    $this->success("修改成功！",U($_POST['url']));
+                }else{
+                    $this->success("修改成功！");
+                }
+            }else{
+                $this->error("修改失败！");
+            }
+        }
+    }
+
+
+    //获取字典列表
+    function getDictList($type,$lim=''){
+        $table='tp_dict';
+        $order='sn';
+        $where=array('type'=>$type);
+        if($lim){
+            $where['key']=array('in',$lim);
+        }
+        $data=getList($table,$where,$order);
+        return $data;
+    }
+    //获取字典值
+    function getDictInfo($type,$key){
+        $table='tp_dict';
+        $where=array('type'=>$type,'key'=>$key);
+        $data=findOne($table,$where);
+        return $data;
+    }
+    function dictList($type,$field,$default='0',$lim=''){
+        $data=$this->getDictList($type,$lim);
+        $res=select($data,$field,$default);
+        return $res;
+    }
+
+    //规则
     function book_rules(){
         $data='<div style="font-family: &quot;Microsoft YaHei UI&quot;; font-size: 14px; font-variant-numeric: normal; font-variant-east-asian: normal; line-height: 21px; white-space: normal; widows: 1; background-color: rgb(255, 255, 255);">
         <h2 id="id-移动设备管理规范-1.规范目的" style="margin: 30px 0px 0px; padding: 0px; color: rgb(51, 51, 51); font-size: 20px; font-weight: normal; line-height: 1.5; border-bottom-color: rgb(204, 204, 204); font-family: Arial, sans-serif; widows: 2;">
@@ -69,51 +289,20 @@ class WebInfoController extends BaseController
         return $data;
     }
 
-    //发送企业微信消息
-    function sendMessage($who,$content){
-        //消息样例
-        //        {
-        //            "type": 1,
-        //            "data": {
-        //                  "msgtype": "text",
-        //                  "touser": "yyj",
-        //                  "usertype": 2,
-        //                  "text": {
-        //                  "content": "Test TextMessage2, Test TextMessage1"
-        //                  }
-        //             }
-        //        }
-        $str='';
-        foreach ($who as $w){
-            $str.= $w.'||';
-        }
-        $data=array(
-            "type"=>1,
-            "data"=>array(
-                'msgtype' => 'text',
-                'touser'  => $str,
-                'usertype'=> 2,
-                'text'=>array(
-                    'content'=> $content
-                )
-            )
-        );
-        $data=json_encode($data);
-        $url = "http://open.yxyongche.cn/jcfw/message/send/corpwechat";
-        $msg = httpJsonPost($url, $data);
-        return $msg;
-    }
+    /**
+     **发送企业微信文本消息
+     */
     //预约消息
     function msgYuDing($borrower,$manager,$device,$start_time,$remark){
         $who=['ylh',$borrower,$manager];
-        //去除重复的收信人
-        $who=array_unique($who);
-        //$who=[$borrow];
+        $who=array_unique($who);//去除重复的收信人
+//                $who=[$borrow];
         $msg='【预约 - 图书设备管理】'.'
 【'.getName('tp_device',$device,'brand').'-'.getName('tp_device',$device,'ts').'】('.getName('tp_device',$device,'serial').')
 '.'被【'.getJiraName($borrower).'】预约了
 时间：'.$start_time.',用途：'.$remark;
-        $this->sendMessage($who,$msg);
+        $msg=$this->sendMessage($who,$msg);
+//                print_r($msg);
     }
     //管理员驳回
     function msgBoHui($id){
@@ -123,8 +312,8 @@ class WebInfoController extends BaseController
         $device=$arr['device'];
         $start_time=$arr['start_time'];
         $who=['ylh',$borrower,$manager];
-        //去除重复的收信人
-        $who=array_unique($who);
+        $who=array_unique($who);//去除重复的收信人
+//                $who=[$borrow];
         $msg='【预订驳回 -图书设备管理】'.'
 【'.getName('tp_device',$device,'brand').'-'.getName('tp_device',$device,'ts').'】('.getName('tp_device',$device,'serial').')
 【'.getJiraName($borrower).'】【'.$start_time.'】的预订被管理员：【'.getJiraName($manager).'】驳回了！
@@ -139,8 +328,7 @@ class WebInfoController extends BaseController
         $device=$arr['device'];
         $start_time=$arr['start_time'];
         $who=['ylh',$borrower,$manager];
-        //去除重复的收信人
-        $who=array_unique($who);
+        $who=array_unique($who);//去除重复的收信人
         $msg='【取消预约 - 图书设备管理】'.'
 【'.getName('tp_device',$device,'brand').'-'.getName('tp_device',$device,'ts').'】('.getName('tp_device',$device,'serial').')
 【' .$start_time.'】的预约了被预订人：【'.getJiraName($borrower).'】主动取消了';
@@ -149,203 +337,93 @@ class WebInfoController extends BaseController
     //借出消息
     function msgJieChu($borrower,$manager,$device,$end_time,$remark){
         $who=['ylh',$borrower,$manager];
-        //去除重复的收信人
-        $who=array_unique($who);
+        $who=array_unique($who);//去除重复的收信人
+//                $who=[$borrow];
         $msg='【借出 -图书设备管理】'.'
 【'.getName('tp_device',$device,'brand').'-'.getName('tp_device',$device,'ts').'】('.getName('tp_device',$device,'serial').')
 已经被【'.getJiraName($borrower).'】借出，用于：'.$remark.'，
 暂定：【'.$end_time.'】之前归还。
 备注：'.getName('tp_device',$device,'remark');
         $this->sendMessage($who,$msg);
+//
     }
     //申请延期成功
     function msgYanQi($borrower,$manager,$device,$end_time){
         $who=['ylh',$borrower,$manager];
         $who=array_unique($who);//去除重复的收信人
+//                $who=[$borrow];
         $msg='【申请延期 - 图书设备管理】'.'
 【'.getName('tp_device',$device,'brand').'-'.getName('tp_device',$device,'ts').'】('.getName('tp_device',$device,'serial').')
 ' .'被借用人：【'.getJiraName($borrower).'】申请延期到：【'.$end_time.'】归还!
 这是最后的归还时间，不得再次延期！';
         $this->sendMessage($who,$msg);
+//
     }
     //归还消息
     function msgGuiHuan($borrower,$manager,$device){
         $who=['ylh',$borrower,$manager];
-        //去除重复的收信人
-        $who=array_unique($who);
+        $who=array_unique($who);//去除重复的收信人
+//                $who=[$borrow];
         $msg='【归还 -图书设备管理】'.'
 【'.getName('tp_device',$device,'brand').'-'.getName('tp_device',$device,'ts').'】('.getName('tp_device',$device,'serial').')
 '.'被借用人：【'.getJiraName($borrower).'】归还';
         $this->sendMessage($who,$msg);
-    }
 
-    //todo
-    //以整合待删除
-    function dataUpdate($table,$savePath,$data,$img='img',$url=''){
-        $user=jie_mi(cookie(C(PRODUCT).'_user'));
-        $_POST=$data;
-        $_POST['moder']=$user;
-        //处理上传图片
-        $upload = new \Think\Upload();// 实例化上传类
-        $upload->maxSize  =     7145728 ;// 设置附件上传大小
-        $upload->exts     =     array('jpg', 'gif', 'png', 'jpeg');// 设置附件上传类型
-        $upload->rootPath =  './Upload';// 设置附件上传目录
-        $upload->savePath = '/'.$savePath.'/'; // 设置附件上传目录
-        $info  =   $upload->upload();
-        if(!$info) {// 上传错误提示错误信息或没有上传图片
-            if (D($table)->save($_POST)){
-                if($url){
-                    $this->success("修改成功！",U($_POST['url']));
-                }else{
-                    $this->success("修改成功！");
-                }
-            }else{
-                $this->error("失败");
-            }
-        }else {
-            $_POST[$img]=$info[$img]['savepath'].$info[$img]['savename'];
-            if (D($table)->save($_POST)){
-                $image = new \Think\Image();
-                $image->open('./Upload/'.$info[$img]['savepath'].$info[$img]['savename']);
-                $image->thumb(600, 400)->save('./Upload/'.$info[$img]['savepath'].$info[$img]['savename']);
-                if($url){
-                    $this->success("修改成功！",U($_POST['url']));
-                }else{
-                    $this->success("修改成功！");
-                }
-            }else{
-                $this->error("修改失败！");
-            }
-        }
+    }
+    //测试任务指派
+    function msgZhiPai($who,$arr,$draw){
+        $who=array_unique($who);//去除重复的收信人
+        $msg='【测试任务安排 - QC平台】
+《【'.$arr['pkey'].'】'.$arr['pname'].'》
+已安排给【'.getJiraName($draw).'】 负责测试';
+        $msg=$this->sendMessage($who,$msg);
+        return $msg;
+    }
+    //测试任务换人
+    function msgHuanRen($who,$pending,$user){
+        $who=array_unique($who);//去除重复的收信人
+        $msg='【测试任务安排 - QC平台】
+《【'.$pending['pkey'].'】'.$pending['pname'].'》任务的测试负责人由【'.getJiraName($pending['draw']).'】更换为【'.getJiraName($user).'】 ';
+        $msg=$this->sendMessage($who,$msg);
+        return $msg;
     }
 
     //获取任务状态并更新同步
     function synch_issuestatus($id){
-        $url=C(JIRAPI) . "/Jirapi/issue/".$id;
-        $data=requestApi($url);
+        $data=getIssue($id);
         if($data){
             $var['id']=$id;
             $var['issuestatus']=$data['issuestatus'];
-            D('tp_project_pending')->save($var);
-        }else{
-            print_r($id.'已经查不到了');
+            update('tp_project_pending',$var);
         }
     }
 
-    function synch_Jira_issue($issue){
+
+
+    function synchJiraIssue($issue){
         $issue=json_decode(trim($issue, "\xEF\xBB\xBF"), true);
-        $m = D('tp_jira_issue');
+        $table = 'tp_jira_issue';
         foreach ($issue as $iss){
-            $arr=$m->find($iss['id']);
+            $data = find($table,$iss['id']);
             $iss['pkey']=cookie('Jira_pkey').'-'.$iss['issuenum'];
-            if($arr){//更新操作
-                $m->save($iss);
-            }else{//插入操作
-                $m->create($iss);
-                $m->add($iss);
+            if($data){
+                update($table,$iss);
+            }else{
+                insert($table,$iss);
             }
         }
     }
 
-    function iusserDiect(){
-        $where['issuestatus'] = array('in', '3,10002,6');
-        $where['PROJECT'] = intval($_SESSION['project']);
-        $where['issuetype'] = '10102';//测试计划
-        $datum = date("Y-m-d H:i:s", time() - 7*24* 3600);
-        $where['UPDATED']  = array('gt', $datum);;//更新时间两周以内
-        $url = C(JIRAPI) . "/Jirapi/issue";
-        $data = httpJsonPost($url, json_encode($where));
-        $data = json_decode(trim($data, "\xEF\xBB\xBF"), true);
-        $project = array();
-        foreach ($data as $k => $v) {
-            $project[$k]['key'] = $v['id'];
-            $project[$k]['value'] = $v['summary'] . '(' . $v['issuenum'] . ')';
-        }
-        return $project;
-    }
 
-    function iusserStatus($STATUSCATEGORY=4){
-        $where=array('STATUSCATEGORY'=>$STATUSCATEGORY);
-        $data=M('issuestatus')->where($where)->order('SEQUENCE')->select();
-        $status = array();
-        foreach ($data as $k => $v) {
-            $status[$k]['key'] = $v['id'];
-            $status[$k]['value'] = $v['pname'] . '(' . $v['id'] . ')';
-        }
-        return $status;
-    }
 
-    function statusDiect($name,$value,$STATUSCATEGORY=4){
-        $data=$this->iusserStatus($STATUSCATEGORY);
-        $html=select($data,$name,$value);
-        return $html;
-    }
 
-    function projectDict()
-    {
-        $data = M('project')->cache('cache_project',3600*24)->select();
-        $project = array();
-        foreach ($data as $k => $v) {
-            $project[$k]['key'] = $v['id'];
-            $project[$k]['value'] = $v['pname'] . '(' . $v['pkey'] . ')';
-        }
-        return $project;
-    }
-
-    function projectList($where = array())
-    {
-        $arr = array('eolinker示例', 'eoinker示例','微信', '测试管理', 'Jira');
-        $where['projectName'] = array('not in', $arr);
-        $data = M('eo_project')->where($where)->select();
-        return $data;
-    }
-
-    function projectID()
-    {
-        $project = $this->projectList();
-        $pro = '';
-        foreach ($project as $p) {
-            $pro[] = $p['projectid'];
-        }
-        return $pro;
-    }
-
-    //获取字典列表
-    function get_dict_list($type,$lim=''){
-        $where=array('type'=>$type,'deleted'=>'0');
-        if($lim){
-            $where['key']=array('in',$lim);
-        }
-        $data=M('tp_dict')->where($where)->order('sn')->select();
-        return $data;
-    }
-    //获取字典值
-    function get_dict_info($type,$key){
-        $where=array('type'=>$type,'k'=>$key,'deleted'=>'0');
-        $data=M('tp_dict')->where($where)->find();
-        return $data;
-    }
-    //封装字典为下拉菜单
-    function dict_list($type,$field,$default='0',$lim=''){
-        $data=$this->get_dict_list($type,$lim);
-        $var=select($data,$field,$default);
-        return $var;
-    }
-
-    function jiraLogin($user,$password){
-        $url = C(JIRAURL) . '/rest/auth/1/session';
-        $json = json_encode(array('username' => $user, 'password' => $password));
-        $json = httpJsonPost($url, $json);
-        $arr = json_decode($json, true);
-        return $arr;
-    }
     //获取测试计划信息
     function getPlanInfo($tp){
-        $plan=M('tp_jira_issue')->find($tp);
-        $this->assign('plan', $plan);
+        $table='tp_jira_issue';
+        $plan=find($table,$tp);
+        $this->assign('plan',$plan );
 
-        $user=jie_mi(cookie(C(PRODUCT).'_user'));
-        if($plan['assignee']==$user){
+        if($plan['assignee']==getLoginUser()){
             $editable=1;
         }else{
             $editable=0;
@@ -353,51 +431,6 @@ class WebInfoController extends BaseController
         $this->assign('editable', $editable);
         return $plan;
     }
-    //获取测试周期信息
-    function getPlanCycle($tp){
-        $url = C(JIRAPI) . "/Jirapi/cycle/" . $tp . "/plan";
-        $cycle = httpGet($url);
-        $cycle = json_decode(trim($cycle, "\xEF\xBB\xBF"), true);
-        $this->assign('cycle', $cycle);
-    }
-    //获取计划扩展信息
-    function getExtendInfo(){
-        $tp=I('tp');
-        $extend=M()->find($tp);
-        if($extend){
-            $res=array(
-                'errorcode'=>'0',
-                'message'=>'ok',
-                'result'=>$extend
-            );
-        }else{
-            $res=array(
-                'errorcode'=>'0',
-                'message'=>'ok'
-            );
-        }
-        $this->ajaxReturn($res);
-    }
-    //获取JiraIssue列表
-    function getIssueList($where){
-        $url = C(JIRAPI) . "/Jirapi/issue";
-        $data = httpJsonPost($url, json_encode($where));
-        $data = json_decode(trim($data, "\xEF\xBB\xBF"), true);
-        return $data;
-    }
-    //获取JiraIssue信息
-    function getIssueInfo($id){
-        $url = C(JIRAPI) . "/Jirapi/issue/" . $id;
-        $data = httpGet($url);
-        $data = json_decode(trim($data, "\xEF\xBB\xBF"), true);
-        return $data;
-    }
-    //根据pkey获取JiraIssue信息
-    function getIssueWithPkey($pkey){
-        $url = C(JIRAPI) . "/Jirapi/issue/".$pkey."/issuenum";
-        $data = httpGet($url);
-        $data = json_decode(trim($data, "\xEF\xBB\xBF"), true);
-        return $data;
-    }
+
 
 }

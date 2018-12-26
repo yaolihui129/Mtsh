@@ -39,7 +39,7 @@ class ChannelController extends BaseController
                 'value' => '【' . $channel['code'] . '】' . $channel['name']
             );
         }
-        $parent = select($parent, 'parent');
+        $parent = select($parent, 'parent',0);
         $this->assign("parent", $parent);
 
         $this->display();
@@ -64,19 +64,8 @@ class ChannelController extends BaseController
     function channel_info(){
         //初始化
         $info = $this->init();
-        $data=find($info['table_channel'],I('id'));
-        if($data){
-            $res=array(
-                'errorcode'=>'0',
-                'message'=>'ok',
-                'result'=>$data
-            );
-        }else{
-            $res=array(
-                'errorcode'=>'0',
-                'message'=>'ok'
-            );
-        }
+        $res=find($info['table_channel'],I('id'));
+        $res=resFormat($res);
         $this->ajaxReturn($res);
     }
 

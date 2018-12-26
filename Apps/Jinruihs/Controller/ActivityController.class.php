@@ -17,21 +17,20 @@ class ActivityController extends BaseController
     //首页
     public function index()
     {
-        //初始化
         $info = $this->init();
+        $table=$info['table_activity'];
         $id=I('id');
         //计算PV
         $this->countPV($id);
-        $data=M($info['table_activity'])->find($id);
+        $data = find($table,$id);
         $this->assign("data", $data);
 
-        if(strpos($_SERVER['HTTP_USER_AGENT'], 'MicroMessenger')){
-            //微信浏览器
-            $openid=cookie(C(appID).'_openid');
+        if(isWeiXin()){
+            $openid=cookie(C('appID').'_openid');
             if ($openid){
-                $this->openidLogin(C(appID),$openid);
+                $this->openidLogin(C('appID'),$openid);
             }else{
-                $_SESSION['uri'] =C(WEBSITE). '/'.C(PRODUCT).'/Activity/index/id/'.$id;
+                $_SESSION['uri'] =C('WEBSITE'). '/'.C('PRODUCT').'/Activity/index/id/'.$id;
                 //$scope='snsapi_base';
                 $scope='snsapi_userinfo';
                 $this->getBaseInfo($scope,$id);
@@ -43,51 +42,35 @@ class ActivityController extends BaseController
             $imgUrl='https://xiuliguanggao.com/Upload'.$data['img'];
             $this->assign("imgUrl", $imgUrl);
         }
-        $user=cookie(C(appID).'_isLogin');
-        $ip=GetIP();
+        $user=cookie(C('appID').'_isLogin');
+        $ip = GetIP();
         $this->countUV($id,$ip,$user);
 
         $this->display();
     }
 
     function countPV($id){
-        //初始化
         $info = $this->init();
-        $data=M($info['table_activity'])->find($id);
+        $table = $info['table_activity'];
+        $data = find($table,$id);
         $var['id']=$id;
         $var['clicknum']=$data['clicknum']+1;
-        update($info['table_activity'],$var);
+        update($table,$var);
     }
 
     function countUV($id,$ip,$user){
-        //初始化
         $info = $this->init();
+        $table=$info['table_activity_uv'];
         $var['activity_id']=$id;
         $var['access_date']=date('Y-m-d',time());
         $var['customer_ip']=$ip;
         if($user){
             $var['customer_third_id']=$user;
         }
-        $data=M($info['table_activity_uv'])->where($var)->find();
-        if (!$data){
-            insert($info['table_activity_uv'],$var);
+        if (!findOne($table,$var)){
+            insert($table,$var);
         }
     }
-
-    function countIPUV($id,$ip){
-        //初始化
-        $info = $this->init();
-        if($ip){
-            $var['activity_id']=$id;
-            $var['ip']=$ip;
-            $var['access_date']=date('Y-m-d',time());
-            $data=M($info['table_activity_uv'])->where($var)->find();
-            if (!$data){
-                insert($info['table_activity_uv'],$var);
-            }
-        }
-    }
-
 
 
 

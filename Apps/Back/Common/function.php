@@ -1,7 +1,7 @@
 <?php
 
     function dictInfo($type,$key){
-        $res=get_dict_info($type,$key,'admin_dict');
+        $res=getDictInfo($type,$key,'admin_dict');
         return $res;
     }
 

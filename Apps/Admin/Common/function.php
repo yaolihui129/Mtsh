@@ -1,6 +1,6 @@
 <?php
     function dictInfo($type,$key){
-        $res=get_dict_info($type,$key,'dict');
+        $res=getDictInfo($type,$key,'dict');
         return $res;
     }
     function getJieMiName($user_id){

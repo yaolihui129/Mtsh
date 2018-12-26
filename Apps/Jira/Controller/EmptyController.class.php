@@ -1,7 +1,6 @@
 <?php
 namespace Jira\Controller;
-use Think\Controller;
-class EmptyController extends Controller
+class EmptyController extends BaseController
 {
     public function index()
     {

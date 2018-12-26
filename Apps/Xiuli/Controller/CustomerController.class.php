@@ -96,7 +96,7 @@ class CustomerController extends WebInfoController {
     
     public function yuyue() {
         $arr=M('tp_customer')->find($_SESSION['userid']);
-        $map=array(['phone']=>$arr['creditid']);
+        $map=array('phone'=>$arr['creditid']);
         $data=M('tp_serviccar')->where($map)->select();
         $this->assign('data',$data);
     

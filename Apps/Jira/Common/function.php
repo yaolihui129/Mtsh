@@ -1,14 +1,131 @@
 <?php
+    function getJiraUrl($type='api'){
+        if($type=='api'){
+            $str='http://qc.zhidaoauto.com';
+        }elseif ($type=='url'){
+            $str='http://jira.zhidaohulian.com';
+        }else{
+            $str='http://qc.zhidaoauto.com';
+        }
+        return $str;
+    }
+    function getSession($key){
+
+    }
+    /**
+     * 获取接口数据
+     */
+    function doJiraLogin($user,$password){
+        $url = getJiraUrl('url') . '/rest/auth/1/session';
+        $json = json_encode(array('username' => $user, 'password' => $password));
+        $json = httpJsonPost($url, $json);
+        $res = json_decode($json, true);
+        return $res;
+    }
+    function getIssue($id){
+        $url  = getJiraUrl(). "/Jirapi/issue/".$id;
+        $res = requestApi($url);
+        return $res['result'];
+    }
+    function postIssue($where){
+        $url = getJiraUrl() . "/Jirapi/issue";
+        $res = httpJsonPost($url, json_encode($where));
+        $res = json_decode(trim($res, "\xEF\xBB\xBF"), true);
+        return $res['result'];
+    }
+    function getJiraUser($name){
+        $url = getJiraUrl() . "/Jirapi/user?method=find&USER_KEY=" . $name;
+        $res = requestApi($url);
+        return $res['result'];
+    }
+    function getJiraPriority($id){
+        $url = getJiraUrl() . "/Jirapi/priority/" . $id;
+        $res = requestApi($url);
+        return $res['result'];
+    }
+    function getJiraIssueType($id){
+        //请求接口拉取数据
+        $url = getJiraUrl() . "/Jirapi/issuetype/" . $id;
+        $res = requestApi($url);
+        return $res['result'];
+    }
+    function getJiraIssueStatus($id){
+        $url = getJiraUrl() . "/Jirapi/issuestatus/" . $id;
+        $res = requestApi($url);
+        return $res['result'];
+    }
+    function getJiraTestRunStep($id){
+        $url = getJiraUrl(). "/Jirapi/testrunsetp/" . $id . '/run';
+        $res = requestApi($url);
+        return $res['result'];
+    }
+    function getJiraTestStep($id){
+        $url = getJiraUrl() . "/Jirapi/testsetp/".$id ;
+        $res = requestApi($url);
+        return $res['result'];
+    }
+    function postJiraCaseRun($where){
+        $url = getJiraUrl() . "/Jirapi/testrun";
+        $res = httpJsonPost($url, $where);
+        $res = json_decode(trim($res, "\xEF\xBB\xBF"), true);
+        return $res['result'];
+    }
+    function getIssueNum($pkey){
+        $url = getJiraUrl() . "/Jirapi/issue/".$pkey."/issuenum";
+        $res = requestApi($url);
+        return $res['result'];
+    }
+    function getPlanCase($tp){
+        $url = getJiraUrl() . "/Jirapi/plancase/" . $tp . "/plan";
+        $res = requestApi($url);
+        return $res['result'];
+    }
+    function getPlanBug($tp){
+        $url = getJiraUrl(). "/Jirapi/Plan/" . $tp . "/bug";
+        $res = requestApi($url);
+        return $res['result'];
+    }
+    function postPlanBug($where){
+        $url = getJiraUrl() . "/Jirapi/Plan/" . $where['tp'] . "/bug";
+        $res = httpJsonPost($url, json_encode($where));
+        $res = json_decode(trim($res, "\xEF\xBB\xBF"), true);
+        return $res['result'];
+    }
+    function getCycle($cyc){
+        $url = getJiraUrl() . "/Jirapi/cycle/" . $cyc;
+        $res = requestApi($url);
+        return $res['result'];
+    }
+    function getCycleRun($cyc){
+        $url = getJiraUrl() . "/Jirapi/testrun?cycle=" . $cyc;
+        $res = requestApi($url);
+        return $res['result'];
+    }
+    function getCyclePlan($tp){
+        $url = getJiraUrl() . "/Jirapi/cycle/" . $tp. "/plan";
+        $res = requestApi($url);
+        return $res['result'];
+    }
+    function getCycleTestRun($cycleId){
+        $url = getJiraUrl() . "/Jirapi/testrun?cycle=" . $cycleId;
+        $res = requestApi($url);
+        return $res['result'];
+    }
+    //获取测试周期BUG
+    function getTestRunBug($run_id, $step_id = '')
+    {
+        $url = getJiraUrl() . "/Jirapi/testrunbug?run_id=" . $run_id . '&step_id=' . $step_id;
+        $res = httpGet($url);
+        $res = json_decode(trim($res, "\xEF\xBB\xBF"), true);
+        return $res['data'];
+    }
     //获取自定义字段值
     function getCustomFieldValue($ISSUE, $CUSTOMFIELD)
     {
-        $url = C(JIRAPI) . "/Jirapi/customfieldvalue/".$ISSUE."/".$CUSTOMFIELD;
-        $data = httpGet($url);
-        if($data){
-            return $data;
-        }else{
-            return 'Null';
-        }
+        $url =getJiraUrl() . "/Jirapi/customfieldvalue/".$ISSUE."/".$CUSTOMFIELD;
+        $res = httpGet($url);
+        $res = json_decode(trim($res, "\xEF\xBB\xBF"), true);
+        return $res['result'];
     }
 
     //获取Jira用户名
@@ -169,14 +286,7 @@
         }
         return $str;
     }
-    //获取测试周期BUG
-    function getTestRunBug($run_id, $step_id = '')
-    {
-        $url = C(JIRAPI) . "/Jirapi/testrunbug?run_id=" . $run_id . '&step_id=' . $step_id;
-        $data = httpGet($url);
-        $data = json_decode(trim($data, "\xEF\xBB\xBF"), true);
-        return $data;
-    }
+
     //获取测试步骤
     function getTestRunStep($id)
     {

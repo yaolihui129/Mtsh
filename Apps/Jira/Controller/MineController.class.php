@@ -1,107 +1,78 @@
 <?php
-
 namespace Jira\Controller;
 class MineController extends WebInfoController
 {
     public function index()
     {
-        $m=M('tp_device_loaning_record');
-        $riqi = date("Y-m-d", time());
+        $table='tp_device_loaning_record';
         //预约中
-        $user=$project=cookie(C(PRODUCT).'_user');
-        $user=jie_mi($user);
-        $where=array('borrower'=>$user,'type'=>'1');
+        $where=array('borrower'=>getLoginUser(),'type'=>'1');
+        $riqi = date("Y-m-d", time());
         $where['start_time']=array('egt',$riqi);
-        $data=$m->where($where)->order('start_time desc')->select();
-        $this->assign('data1', $data);
+        $this->assign('data1', getList($table,$where,'start_time desc'));
         //借用历史
-        $where['deleted']='0';
+        $where=array();
         $where['start_time']=array('lt',$riqi);
         $where['type']='2';
-        $data=$m->where($where)->order('start_time desc')->select();
-        $this->assign('data2', $data);
+        $this->assign('data2', getList($table,$where,'start_time desc'));
         //借用中
-        $where=array('borrower'=>$user,'type'=>'0');
-        $data=$m->where($where)->order('start_time desc')->select();
-        $this->assign('data0', $data);
-
-        $data=M("tp_device_overdue")->where(array('borrower'=>$user,"deleted"=>"0"))->order('end_time desc')->select();
-        $this->assign('data3', $data);
+        $where=array('borrower'=>getLoginUser(),'type'=>'0');
+        $this->assign('data0', getList($table,$where,'start_time desc'));
+        $where=array('borrower'=>getLoginUser());
+        $table='tp_device_overdue';
+        $this->assign('data3', getList($table,$where,'end_time desc'));
 
         $this->display();
     }
 
     public function books(){
-        $m=M('tp_device_loaning_record');
-        $riqi = date("Y-m-d", time());
-        $user=$project=cookie(C(PRODUCT).'_user');
-        $user=jie_mi($user);
+        $table='tp_device_loaning_record';
         //预约中
-        $where=array('borrower'=>$user,'leibie'=>'3','type'=>'1');
+        $where=array('borrower'=>getLoginUser(),'leibie'=>'3','type'=>'1');
+        $riqi = date("Y-m-d", time());
         $where['start_time']=array('egt',$riqi);
-        $data=$m->where($where)->order('start_time desc')->select();
-        $this->assign('data1', $data);
-        //借用历史,'deleted'=>'0'
+        $this->assign('data1', getList($table,$where,'start_time desc'));
+        //借用历史
         $where['deleted']='0';
         $where['start_time']=array('lt',$riqi);
         $where['type']='2';
-        $data=$m->where($where)->order('start_time desc')->select();
-        $this->assign('data2', $data);
+        $this->assign('data2', getList($table,$where,'start_time desc'));
         //借用中
-        $where=array('borrower'=>$user,'leibie'=>'3','type'=>'0');
-        $data=$m->where($where)->order('start_time desc')->select();
-        $this->assign('data0', $data);
+        $where=array('borrower'=>getLoginUser(),'leibie'=>'3','type'=>'0');
+        $this->assign('data0', getList($table,$where,'start_time desc'));
 
         $this->display();
     }
     //指派给我的任务
     public function task(){
-        $url= '/' . C(PRODUCT) . '/Mine/task/';
-        cookie('url',$url,array('prefix'=>C(PRODUCT).'_'));
+        $_SESSION['url'] = '/' . C('PRODUCT') . '/Mine/task/';
         $this->isLogin();
-        $user=$project=cookie(C(PRODUCT).'_user');
-        $user=jie_mi($user);
         $where['issuetype'] = array('in','10005,10006,10007');
         $where['issuestatus'] = array('not in', '10011,6,10002');
-        $where['ASSIGNEE'] = $user;
-        $url = C(JIRAPI) . "/Jirapi/issue";
-        $data = httpJsonPost($url, json_encode($where));
-        $data = json_decode(trim($data, "\xEF\xBB\xBF"), true);
-        $this->assign('data', $data);
+        $where['ASSIGNEE'] = getLoginUser();
+        $this->assign('data', postIssue($where));
 
         $this->display();
     }
     //指派给我的Bug
     public function bug(){
-        $url= '/' . C(PRODUCT) . '/Mine/bug/';
-        cookie('url',$url,array('prefix'=>C(PRODUCT).'_'));
+        $_SESSION['url'] = '/' . C('PRODUCT') . '/Mine/bug/';
         $this->isLogin();
-        $user=$project=cookie(C(PRODUCT).'_user');
-        $user=jie_mi($user);
         $where['issuetype'] = '10008';
         $where['issuestatus'] = array('not in', '10011,6');
-        $where['ASSIGNEE'] = $user;
-        $url = C(JIRAPI) . "/Jirapi/issue";
-        $data = httpJsonPost($url, json_encode($where));
-        $data = json_decode(trim($data, "\xEF\xBB\xBF"), true);
-        $this->assign('data', $data);
+        $where['ASSIGNEE'] = getLoginUser();
+        $this->assign('data', postIssue($where));
 
         $this->display();
     }
     //我创建的Bug
     public function created(){
-        $url = '/' . C(PRODUCT) . '/Bug/created/';
-        cookie('url',$url,array('prefix'=>C(PRODUCT).'_'));
+        $_SESSION['url'] = '/' . C('PRODUCT') . '/Bug/created/';
         $this->isLogin();
-        $user=$project=cookie(C(PRODUCT).'_user');
-        $user=jie_mi($user);
         $where['issuetype'] = '10008';
         $where['issuestatus'] = array('not in', '10011,6');
-        $where['REPORTER'] = $user;
-        $url = C(JIRAPI) . "/Jirapi/issue";
-        $data = httpJsonPost($url, json_encode($where));
-        $data = json_decode(trim($data, "\xEF\xBB\xBF"), true);
-        $this->assign('data', $data);
+        $where['REPORTER'] =getLoginUser();
+        $this->assign('data', postIssue($where));
 
         $this->display();
     }
@@ -117,8 +88,7 @@ class MineController extends WebInfoController
     function renewal(){
         $table='tp_device_loaning_record';
         $_GET['renewal']='1';
-        $m=M($table);
-        $arr=$m->find(I('id'));
+        $arr=find($table,I('id'));
         $time = strtotime($arr['end_time']);
         $start_time=date('Y-m-d', $time);
         $week = date('w', $time);
@@ -132,10 +102,10 @@ class MineController extends WebInfoController
         }
         $_GET['end_time']=date('Y-m-d H:i:s', $time);
         //当前日期有预约不可以续期
-        $where=array('start_time'=>$start_time,'device'=>$arr['device'],'deleted'=>'0');
-        $var=$m->where($where)->select();
+        $where=array('start_time'=>$start_time,'device'=>$arr['device']);
+        $var=getList($table,$where);
         if($var){
-            $this->error($start_time.'有'.getZTUserName($var[0]['borrower']).'的预订,不能续期');
+            $this->error($start_time.'有'.getJiraName($var[0]['borrower']).'的预订,不能续期');
         }else{
             $_GET['table']=$table;
             $this->update();

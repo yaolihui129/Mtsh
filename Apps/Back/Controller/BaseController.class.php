@@ -5,10 +5,10 @@ class BaseController extends WechatController
     public function _initialize()
     {
         //判定登录态
-        $isLogin=cookie(C(PRODUCT).'_isLogin');
-        $user=cookie(C(PRODUCT).'_user');
+        $isLogin=cookie(C('PRODUCT').'_isLogin');
+        $user=cookie(C('PRODUCT').'_user');
         if($isLogin==''||$user==''){
-            $this->redirect(C(PRODUCT).'/Login/index');
+            $this->redirect(C('PRODUCT').'/Login/index');
         }
         //判定是否是手机模式
         if (ismobile()) {//设置默认默认主题为 Amaze
@@ -48,7 +48,7 @@ class BaseController extends WechatController
     {
         $_POST=$data;
         if($_POST[$file]){
-            $info=$this->uploadFile(C(PRODUCT),'img');
+            $info=$this->uploadFile(C('PRODUCT'),'img');
             $_POST[$file]=$info[$file]['savepath'].$info[$file]['savename'];
             $this->tailoringImg($info,$file);
         }
@@ -123,7 +123,7 @@ class BaseController extends WechatController
     }
 
     function imgUpdate($table,$savePath,$data,$img='img',$url='',$msg='成功',$eMsg='失败'){
-        $user=jie_mi(cookie(C(PRODUCT).'_user'));
+        $user=jie_mi(cookie(C('PRODUCT').'_user'));
         $_POST=$data;
         $_POST['moder']=$user;
         //处理上传图片
@@ -136,12 +136,12 @@ class BaseController extends WechatController
         if(!$info) {// 上传错误提示错误信息或没有上传图片
             if (D($table)->save($_POST)){
                 if($url){
-                    $this->success("修改成功！",U($_POST['url']));
+                    $this->success($msg,U($_POST['url']));
                 }else{
-                    $this->success("修改成功！");
+                    $this->success($msg);
                 }
             }else{
-                $this->error("失败");
+                $this->error($eMsg);
             }
         }else {
             $_POST[$img]=$info[$img]['savepath'].$info[$img]['savename'];
@@ -150,17 +150,17 @@ class BaseController extends WechatController
                 $image->open('./Upload/'.$info[$img]['savepath'].$info[$img]['savename']);
                 $image->thumb(600, 400)->save('./Upload/'.$info[$img]['savepath'].$info[$img]['savename']);
                 if($url){
-                    $this->success("修改成功！",U($_POST['url']));
+                    $this->success($msg,U($_POST['url']));
                 }else{
-                    $this->success("修改成功！");
+                    $this->success($msg);
                 }
             }else{
-                $this->error("修改失败！");
+                $this->error($eMsg);
             }
         }
     }
     function imgInsert($table,$savePath,$data,$img='img',$url='',$msg='成功',$eMsg='失败'){
-        $user=jie_mi(cookie(C(PRODUCT).'_user'));
+        $user=jie_mi(cookie(C('PRODUCT').'_user'));
         $_POST=$data;
         $_POST['moder']=$user;
         //处理上传图片
@@ -179,10 +179,10 @@ class BaseController extends WechatController
                 if($url){
                     $this->success($msg,U($url));
                 }else{
-                    $this->success("修改成功！");
+                    $this->success($msg);
                 }
             }else{
-                $this->error("失败");
+                $this->error($eMsg);
             }
         }else {
             $_POST[$img]=$info[$img]['savepath'].$info[$img]['savename'];
@@ -191,12 +191,12 @@ class BaseController extends WechatController
                 $image->open('./Upload/'.$info[$img]['savepath'].$info[$img]['savename']);
                 $image->thumb(600, 400)->save('./Upload/'.$info[$img]['savepath'].$info[$img]['savename']);
                 if($url){
-                    $this->success("修改成功！",U($url));
+                    $this->success($msg,U($url));
                 }else{
-                    $this->success("修改成功！");
+                    $this->success($msg);
                 }
             }else{
-                $this->error("修改失败！");
+                $this->error($eMsg);
             }
         }
     }

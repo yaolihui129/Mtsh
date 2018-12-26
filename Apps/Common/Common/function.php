@@ -72,7 +72,7 @@
         }
         return $info;
     }
-    function realDelete($table,$arrId)
+    function realDel($table,$arrId)
     {
         $count = D($table)->delete($arrId);
         return $count;
@@ -236,14 +236,14 @@
 
     function jia_mi($data,$key='',$type='1'){
         if(!$key){
-            $key=C(PRODUCT);
+            $key=C('PRODUCT');
         }
         $data=lock_url($data,$key,$type);
         return $data;
     }
     function jie_mi($data,$key=''){
         if(!$key){
-            $key=C(PRODUCT);
+            $key=C('PRODUCT');
         }
         $data=unlock_url($data,$key);
         return $data;
@@ -262,7 +262,7 @@
         $mdKey = substr($mdKey,$nh%8, $nh%8+7);
         $txt = base64_encode($txt);
         $tmp = '';
-        $i=0;$j=0;$k = 0;
+        $k = 0;
         for ($i=0; $i<strlen($txt); $i++) {
             $k = $k == strlen($mdKey) ? 0 : $k;
             $j = ($nh+strpos($chars,$txt[$i])+ord($mdKey[$k++]))%64;
@@ -281,7 +281,7 @@
         $mdKey = substr($mdKey,$nh%8, $nh%8+7);
         $txt = substr($txt,1);
         $tmp = '';
-        $i=0;$j=0; $k = 0;
+        $k = 0;
         for ($i=0; $i<strlen($txt); $i++) {
             $k = $k == strlen($mdKey) ? 0 : $k;
             $j = strpos($chars,$txt[$i])-$nh - ord($mdKey[$k++]);
@@ -298,7 +298,6 @@
         $data=M('tp_cate')->where($where)->count();
         return $data;
     }
-    //根据ModuleId获取功能信息
     function getParentModule($id){
         $data=M("module")->find($id);
         if($data['parent']){
@@ -308,7 +307,6 @@
         }
         return $str;
     }
-    //根据$pathid获取模块名
     function getModuleName($pathid){
         $data=M('module')->find($pathid);
         if ($data['parent']){
@@ -318,8 +316,7 @@
         }
         return $str;
     }
-    //获取分类名字
-    function getCatname($cateid){
+    function getCatName($cateid){
         if ($cateid){
             $data=M('tp_cate')->find($cateid);
             $str=getCatname($data['pidcateid'])."-".$data['catname'];
@@ -328,7 +325,6 @@
             return "|-";
         }
     }
-    //获取父级分类ID
     function getCatePid($cateId){
         $data=M('tp_cate')->find($cateId);
         return $data['pidcateid'];
@@ -344,7 +340,7 @@
         }else{
             $website='https://'.$_SERVER['SERVER_NAME'];
         }
-        if(!C(ONLINE)){
+        if(!C('ONLINE')){
             $website=$website.'/Demo';
         }
         return $website;
@@ -363,13 +359,13 @@
 
     //登录
     function login($phone,$password){
-        $where=array('phone'=>$phone,['password']=>md5($password));
+        $where=array('phone'=>$phone,'password'=>md5($password));
         $data=M('tp_credit')->where($where)->find();
         if ($data){
-            $_SESSION['isCLogin']= C(PRODUCT);
+            $_SESSION['isCLogin']= C('PRODUCT');
             $_SESSION['realname']= $data['realname'];
             $m=M('tp_customer');
-            $where=array('creditid'=>$data['creditid'],'prodid'=>C(PRODID));
+            $where=array('creditid'=>$data['creditid'],'prodid'=>C('PRODID'));
             $arr=$m->where($where)->find();
             if($arr){
             $_SESSION['userid'] =   $arr['id'];
@@ -378,7 +374,7 @@
             $_POST['lastLoginIP']=get_client_ip();
             $m->save($_POST);//更新最后登录信息
             }else {
-            $_POST['prodid']=C(PRODID);
+            $_POST['prodid']=C('PRODID');
             $_POST['creditid']=$data['id'];
             $_POST['name']=$data['realname'];
             $_POST['type']=0;
@@ -428,19 +424,19 @@
         }
     }
     //是否为微信
-    function is_weixin() {
+    function isWeiXin() {
         if (strpos($_SERVER['HTTP_USER_AGENT'], 'MicroMessenger') !== false) {
             return true;
         } return false;
     }
     //是否为QQ
-    function is_qq() {
+    function isQQ() {
         if (strpos($_SERVER['HTTP_USER_AGENT'], 'QQ') !== false) {
             return true;
         } return false;
     }
     //是否为支付宝
-    function is_alipay() {
+    function isAliPay() {
         if (strpos($_SERVER['HTTP_USER_AGENT'], 'AlipayClient') !== false) {
             return true;
         } return false;
@@ -478,6 +474,8 @@
             $ip = getenv('REMOTE_ADDR');
         } elseif(isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] && strcasecmp($_SERVER['REMOTE_ADDR'], 'unknown')) {
             $ip = $_SERVER['REMOTE_ADDR'];
+        }else{
+            $ip = '';
         }
         $res =  preg_match ( '/[\d\.]{7,15}/', $ip, $matches ) ? $matches [0] : '';
         return $res;
@@ -489,7 +487,7 @@
     /**
      * 当前请求是否是https
      **/
-    function is_https()
+    function isHttps()
     {
         return isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] != 'off';
     }
@@ -505,7 +503,7 @@
      * @param string $type
      * @return array
      */
-    function array_sort($arr, $keys, $type = 'desc')
+    function arraySort($arr, $keys, $type = 'desc')
     {
         $key_value = $new_array = array();
         foreach ($arr as $k => $v) {
@@ -524,23 +522,18 @@
     }
     /**
      * 过滤数组元素前后空格 (支持多维数组)
-     * @param $array 要过滤的数组
-     * @return array|string
      */
-    function trim_array_element($array){
-        if(!is_array($array))
-            return trim($array);
-        return array_map('trim_array_element',$array);
+    function trimArrayElement($arr){
+        if(!is_array($arr))
+            return trim($arr);
+        return array_map('trim_array_element',$arr);
     }
     /**
      * 将二维数组以元素的某个值作为键 并归类数组
      * array( array('name'=>'aa','type'=>'pay'), array('name'=>'cc','type'=>'pay') )
      * array('pay'=>array( array('name'=>'aa','type'=>'pay') , array('name'=>'cc','type'=>'pay') ))
-     * @param $arr 数组
-     * @param $key 分组值的key
-     * @return array
      */
-    function group_same_key($arr,$key){
+    function groupSameKey($arr,$key){
         $new_arr = array();
         foreach($arr as $k=>$v ){
             $new_arr[$v[$key]][] = $v;
@@ -553,7 +546,7 @@
     function combineDika() {
         $data = func_get_args();
         $data = current($data);
-        $cnt = count($data);
+//        $cnt = count($data);
         $result = array();
         $arr1 = array_shift($data);
         foreach($arr1 as $key=>$item)
@@ -585,21 +578,17 @@
     /**
      * 	array转xml
      */
-    function arrayToXml($arr)
-    {
-        $xml = "<xml>";
+    function arrayToXml($arr){
+        $xml = "";
         foreach ($arr as $key=>$val)
         {
-            if (is_numeric($val))
-            {
+            if (is_numeric($val)){
                 $xml.="<".$key.">".$val."</".$key.">";
-
-            }
-            else
+            }else{
                 $xml.="<".$key."><![CDATA[".$val."]]></".$key.">";
+            }
         }
-        $xml.="</xml>";
-        return $xml;
+        return  "<xml>".$xml."</xml>";
     }
     //接收Json并转换为数组；
     function getJsonToArray()
@@ -628,10 +617,9 @@
         return $tmpstr;
     }
     /**
-     **检查手机号码格式
-     * @param $mobile 手机号码
+     *检查手机号码格式
      */
-    function check_mobile($mobile){
+    function checkMobile($mobile){
         if(preg_match('/1[34578]\d{9}$/',$mobile))
             return true;
         return false;
@@ -641,7 +629,7 @@
      * @param $mobile
      * @return bool
      */
-    function check_telephone($mobile){
+    function checkTelephone($mobile){
         if(preg_match('/^([0-9]{3,4}-)?[0-9]{7,8}$/',$mobile))
             return true;
         return false;
@@ -650,7 +638,7 @@
      ** 检查邮箱地址格式
      * @param $email //邮箱地址
      */
-    function check_email($email){
+    function checkEmail($email){
         if(filter_var($email,FILTER_VALIDATE_EMAIL))
             return true;
         return false;
@@ -663,7 +651,7 @@
     /**
      *   实现中文字串截取无乱码的方法
      */
-    function getSubstr($string, $start, $length) {
+    function getSubStr($string, $start, $length) {
         if(mb_strlen($string,'utf-8')>$length){
             $str = mb_substr($string, $start, $length,'utf-8');
             return $str.'...';
@@ -673,9 +661,6 @@
     }
     /**
      * 替换特殊字符
-     * @param unknown 原始字符串
-     * @param string 替换字符串
-     * @return mixed
      */
     function replaceSpecialStr($orignalStr , $replace=''){
         return preg_replace("/[^\x{4e00}-\x{9fa5}]/iu", $replace ,$orignalStr);
@@ -683,7 +668,7 @@
     /**
      **手机号码脱敏
      **/
-    function mobile_hide($mobile){
+    function mobileHide($mobile){
         return substr_replace($mobile,'****',3,4);
     }
     /**
@@ -691,7 +676,7 @@
      * @param $string
      * @return mixed|string
      */
-    function urlsafe_b64encode($string)
+    function urlSafeB4encode($string)
     {
         $data = base64_encode($string);
         $data = str_replace(array('+','/','='),array('-','_',''),$data);
@@ -702,7 +687,7 @@
      * @param $zh
      * @return string
      */
-    function pinyin_long($zh){
+    function pinYinLong($zh){
         $ret = "";
         $s1 = iconv("UTF-8","gb2312", $zh);
         $s2 = iconv("gb2312","UTF-8", $s1);
@@ -860,7 +845,7 @@
         curl_setopt($ch, CURLOPT_COOKIESESSION, true);
         curl_setopt($ch, CURLOPT_COOKIEFILE, "cookiefile");
         curl_setopt($ch, CURLOPT_COOKIEJAR, "cookiefile");
-        curl_setopt($ch, CURLOPT_COOKIE, session_name() . '=' . session_id);
+        curl_setopt($ch, CURLOPT_COOKIE, session_name() . '=' . session_id());
         curl_setopt($ch, CURLOPT_HEADER, 0);        //设置头文件的信息作为数据流输出
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);  //设置获取的信息以文件流的形式返回，而不是直接输出。
         curl_setopt($ch, CURLOPT_POST, 1);            //设置post方式提交
@@ -893,7 +878,7 @@
 
 
     //根据日期获取星期
-    function wk($date) {
+    function getWeek($date) {
         $datearr = explode("-",$date);     //将传来的时间使用“-”分割成数组
         $year = $datearr[0];       //获取年份
         $month = sprintf('%02d',$datearr[1]);  //获取月份
@@ -909,11 +894,10 @@
      * @param $time
      * @return bool|string
      */
-    function friend_date($time)
+    function friendDate($time)
     {
         if (!$time)
             return false;
-        $fdate = '';
         $d = time() - intval($time);
         $ld = $time - mktime(0, 0, 0, 0, 0, date('Y')); //得出年
         $md = $time - mktime(0, 0, 0, date('m'), 0, date('Y')); //得出月
@@ -969,12 +953,12 @@
         if($_SESSION['user']){
             $user= $_SESSION['user'];
         }else{
-            $user=jie_mi(cookie(C(PRODUCT).'_user'));
+            $user=jie_mi(cookie(C('PRODUCT').'_user'));
         }
         return $user;
     }
     function getLoginUserID(){
-        $userID=jie_mi(cookie(C(PRODUCT).'_user_id'));
+        $userID=jie_mi(cookie(C('PRODUCT').'_user_id'));
         return $userID;
     }
 
@@ -986,17 +970,17 @@
      */
     //获取cookiekey的信息
     function getCookieKey($key){
-        $data=cookie(C(PRODUCT).'_'.$key);
+        $data=cookie(C('PRODUCT').'_'.$key);
         return $data;
     }
     //设置cookiekey
     function setCookieKey($key,$value,$expire=3600){
-        cookie($key,$value,array('expire'=>$expire,'prefix'=>C(PRODUCT).'_'));
+        cookie($key,$value,array('expire'=>$expire,'prefix'=>C('PRODUCT').'_'));
     }
     //清除cookie
     function clearCookie(){
         //  清空指定前缀的所有cookie值
-        $res=cookie(null,C(PRODUCT).'_');
+        $res=cookie(null,C('PRODUCT').'_');
         return $res;
     }
 
@@ -1011,8 +995,8 @@
         }
     }
     //获取列表
-    function get_list($table,$where,$name='name',$order='id'){
-        $data=M($table)->where($where)->order($order)->select();
+    function getKVList($table,$where,$name='name',$order='id'){
+        $data = getList($table,$where,$order);
         $list=array();
         foreach ($data as $k=>$da){
             $list[$k]['key']=$da['id'];
@@ -1021,18 +1005,17 @@
         return $list;
     }
     //获取字典列表
-    function get_dict_list($type,$table='tp_dict',$lim=''){
+    function getDictList($type,$table='tp_dict',$lim=''){
         $where=array('type'=>$type,'deleted'=>'0');
         if($lim){
             $where['key']=array('in',$lim);
         }
-        $data=M($table)->where($where)->order('sn')->select();
-        return $data;
+        return getList($table,$where,'sn');
     }
     //获取字典信息
-    function get_dict_info($type,$key,$table='tp_dict',$what='value'){
-        $where=array('type'=>$type,'key'=>$key,'deleted'=>'0');
-        $data=M($table)->where($where)->find();
+    function getDictInfo($type,$key,$table='tp_dict',$what='value'){
+        $where=array('type'=>$type,'key'=>$key);
+        $data = findOne($table,$where);
         if($what=='value'){
             return $data['value'];
         }else{
@@ -1040,8 +1023,8 @@
         }
     }
     //封装字典为下拉菜单
-    function dict_list($type,$field,$table='tp_dict',$default='0',$lim=''){
-        $data=get_dict_list($type,$table,$lim);
+    function dictList($type,$field,$table='tp_dict',$default='0',$lim=''){
+        $data=getDictList($type,$table,$lim);
         $var=select($data,$field,$default);
         return $var;
     }
@@ -1057,9 +1040,8 @@
         return $html;
     }
 
-
     //获取加密签名
-    function get_sign($array,$_timestamp,$appkey,$type='md5'){
+    function getSign($array,$_timestamp,$appkey,$type='md5'){
         //判定$array是否为数组
         if(!is_array($array)){
             $array=json_decode($array,TRUE);
@@ -1086,7 +1068,7 @@
         return $str;
     }
     //校验签名
-    function verify_sign($array,$appkey,$type='md5')
+    function verifySign($array,$appkey,$type='md5')
     {
         $clientSign=$array['_sign'];
         unset($array['_sign']);
@@ -1112,18 +1094,19 @@
         }
     }
 
-    function get_token(){
-        if (!S(C(PRODUCT) . 'access_token')) {//缓存中没有token先获取token，并设置失效时间
-            $url=C(WEBSERVER).'/index.php/Api/Oauth/token'.'?grant_type=client_credential'.'&appid='.C(XL_APPID).'&secret='.C(XL_SECRET);
+    function getToken(){
+        $product=C('PRODUCT');
+        if (!S($product. 'access_token')) {//缓存中没有token先获取token，并设置失效时间
+            $url=C('WEBSERVER').'/Api/Oauth/token'.'?grant_type=client_credential'.'&appid='.C('XL_APPID').'&secret='.C('XL_SECRET');
             $data=httpGet($url);
             $info = json_decode(trim($data,chr(239).chr(187).chr(191)),true);
-            S(C(PRODUCT) . 'access_token', $info['data']['access_token'], 7200);
-            return S(C(PRODUCT) . 'access_token');
+            S($product . 'access_token', $info['data']['access_token'], 7200);
+            return S($product . 'access_token');
         } else {//缓存中有token直接返回
-            return S(C(PRODUCT) . 'access_token');
+            return S($product . 'access_token');
         }
     }
-    function authcode($string, $operation = 'DECODE', $key = '', $expiry = 0) {
+    function authCode($string, $operation = 'DECODE', $key = '', $expiry = 0) {
         // 动态密匙长度，相同的明文会生成不同密文就是依靠动态密匙
         $ckey_length = 4;
         // 密匙
@@ -1256,71 +1239,9 @@
     }
 
 
-    /**
-     * 自定义函数递归的复制带有多级子目录的目录
-     * 递归复制文件夹
-     * @param type $src 原目录
-     * @param type $dst 复制到的目录
-     */
-    //参数说明：
-    //自定义函数递归的复制带有多级子目录的目录
-    function recurse_copy($src, $dst)
-    {
-        $now = time();
-        $dir = opendir($src);
-        @mkdir($dst);
-        while (false !== $file = readdir($dir)) {
-            if (($file != '.') && ($file != '..')) {
-                if (is_dir($src . '/' . $file)) {
-                    recurse_copy($src . '/' . $file, $dst . '/' . $file);
-                }
-                else {
-                    if (file_exists($dst . DIRECTORY_SEPARATOR . $file)) {
-                        if (!is_writeable($dst . DIRECTORY_SEPARATOR . $file)) {
-                            exit($dst . DIRECTORY_SEPARATOR . $file . '不可写');
-                        }
-                        @unlink($dst . DIRECTORY_SEPARATOR . $file);
-                    }
-                    if (file_exists($dst . DIRECTORY_SEPARATOR . $file)) {
-                        @unlink($dst . DIRECTORY_SEPARATOR . $file);
-                    }
-                    $copyrt = copy($src . DIRECTORY_SEPARATOR . $file, $dst . DIRECTORY_SEPARATOR . $file);
-                    if (!$copyrt) {
-                        echo 'copy ' . $dst . DIRECTORY_SEPARATOR . $file . ' failed<br>';
-                    }
-                }
-            }
-        }
-        closedir($dir);
-    }
-
-    // 递归删除文件夹
-    function delFile($path,$delDir = FALSE) {
-        if(!is_dir($path))
-            return FALSE;
-        $handle = @opendir($path);
-        if ($handle) {
-            while (false !== ( $item = readdir($handle) )) {
-                if ($item != "." && $item != "..")
-                    is_dir("$path/$item") ? delFile("$path/$item", $delDir) : unlink("$path/$item");
-            }
-            closedir($handle);
-            if ($delDir) return rmdir($path);
-        }else {
-            if (file_exists($path)) {
-                return unlink($path);
-            } else {
-                return FALSE;
-            }
-        }
-    }
-
 
     /**
      * 比较两个版本大小, $v1>v2:1 ; $v1=v2:0 ;$v1<v2:0
-     * @param unknown $v1
-     * @param unknown $v2
-     * @return number
      */
     function compareVersion($v1, $v2) {
         $v1 = explode(".",$v1);
@@ -1347,260 +1268,3 @@
     }
 
 
-    /**
-     * 创建bmp格式图片
-     *
-     * @author: legend(legendsky@hotmail.com)
-     * @link: http://www.ugia.cn/?p=96
-     * @description: create Bitmap-File with GD library
-     * @version: 0.1
-     *
-     * @param resource $im          图像资源
-     * @param string   $filename    如果要另存为文件，请指定文件名，为空则直接在浏览器输出
-     * @param integer  $bit         图像质量(1、4、8、16、24、32位)
-     * @param integer  $compression 压缩方式，0为不压缩，1使用RLE8压缩算法进行压缩
-     *
-     * @return integer
-     */
-    function imagebmp(&$im, $filename = '', $bit = 8, $compression = 0)
-    {
-        if (!in_array($bit, array(1, 4, 8, 16, 24, 32)))
-        {
-            $bit = 8;
-        }
-        else if ($bit == 32) // todo:32 bit
-        {
-            $bit = 24;
-        }
-        $bits = pow(2, $bit);
-        // 调整调色板
-        imagetruecolortopalette($im, true, $bits);
-        $width  = imagesx($im);
-        $height = imagesy($im);
-        $colors_num = imagecolorstotal($im);
-        if ($bit <= 8)
-        {
-            // 颜色索引
-            $rgb_quad = '';
-            for ($i = 0; $i < $colors_num; $i ++)
-            {
-                $colors = imagecolorsforindex($im, $i);
-                $rgb_quad .= chr($colors['blue']) . chr($colors['green']) . chr($colors['red']) . "\0";
-            }
-            // 位图数据
-            $bmp_data = '';
-            // 非压缩
-            if ($compression == 0 || $bit < 8)
-            {
-                if (!in_array($bit, array(1, 4, 8)))
-                {
-                    $bit = 8;
-                }
-                $compression = 0;
-                // 每行字节数必须为4的倍数，补齐。
-                $extra = '';
-                $padding = 4 - ceil($width / (8 / $bit)) % 4;
-                if ($padding % 4 != 0)
-                {
-                    $extra = str_repeat("\0", $padding);
-                }
-                for ($j = $height - 1; $j >= 0; $j --)
-                {
-                    $i = 0;
-                    while ($i < $width)
-                    {
-                        $bin = 0;
-                        $limit = $width - $i < 8 / $bit ? (8 / $bit - $width + $i) * $bit : 0;
-                        for ($k = 8 - $bit; $k >= $limit; $k -= $bit)
-                        {
-                            $index = imagecolorat($im, $i, $j);
-                            $bin |= $index << $k;
-                            $i ++;
-                        }
-                        $bmp_data .= chr($bin);
-                    }
-                    $bmp_data .= $extra;
-                }
-            }
-            // RLE8 压缩
-            else if ($compression == 1 && $bit == 8)
-            {
-                for ($j = $height - 1; $j >= 0; $j --)
-                {
-                    $last_index = "\0";
-                    $same_num   = 0;
-                    for ($i = 0; $i <= $width; $i ++)
-                    {
-                        $index = imagecolorat($im, $i, $j);
-                        if ($index !== $last_index || $same_num > 255)
-                        {
-                            if ($same_num != 0)
-                            {
-                                $bmp_data .= chr($same_num) . chr($last_index);
-                            }
-                            $last_index = $index;
-                            $same_num = 1;
-                        }
-                        else
-                        {
-                            $same_num ++;
-                        }
-                    }
-                    $bmp_data .= "\0\0";
-                }
-                $bmp_data .= "\0\1";
-            }
-            $size_quad = strlen($rgb_quad);
-            $size_data = strlen($bmp_data);
-        }
-        else
-        {
-            // 每行字节数必须为4的倍数，补齐。
-            $extra = '';
-            $padding = 4 - ($width * ($bit / 8)) % 4;
-            if ($padding % 4 != 0)
-            {
-                $extra = str_repeat("\0", $padding);
-            }
-            // 位图数据
-            $bmp_data = '';
-            for ($j = $height - 1; $j >= 0; $j --)
-            {
-                for ($i = 0; $i < $width; $i ++)
-                {
-                    $index  = imagecolorat($im, $i, $j);
-                    $colors = imagecolorsforindex($im, $index);
-                    if ($bit == 16)
-                    {
-                        $bin = 0 << $bit;
-                        $bin |= ($colors['red'] >> 3) << 10;
-                        $bin |= ($colors['green'] >> 3) << 5;
-                        $bin |= $colors['blue'] >> 3;
-                        $bmp_data .= pack("v", $bin);
-                    }
-                    else
-                    {
-                        $bmp_data .= pack("c*", $colors['blue'], $colors['green'], $colors['red']);
-                    }
-                    // todo: 32bit;
-                }
-                $bmp_data .= $extra;
-            }
-            $size_quad = 0;
-            $size_data = strlen($bmp_data);
-            $colors_num = 0;
-        }
-        // 位图文件头
-        $file_header = "BM" . pack("V3", 54 + $size_quad + $size_data, 0, 54 + $size_quad);
-        // 位图信息头
-        $info_header = pack("V3v2V*", 0x28, $width, $height, 1, $bit, $compression, $size_data, 0, 0, $colors_num, 0);
-        // 写入文件
-        if ($filename != '')
-        {
-            $fp = fopen("test.bmp", "wb");
-            fwrite($fp, $file_header);
-            fwrite($fp, $info_header);
-            fwrite($fp, $rgb_quad);
-            fwrite($fp, $bmp_data);
-            fclose($fp);
-            return 1;
-        }
-        // 浏览器输出
-        header("Content-Type: image/bmp");
-        echo $file_header . $info_header;
-        echo $rgb_quad;
-        echo $bmp_data;
-        return 1;
-    }
-    /**
-     * BMP 创建函数
-     * @author simon
-     * @param string $filename path of bmp file
-     * @example who use,who knows
-     * @return resource of GD
-     */
-    function imagecreatefrombmp( $filename ){
-        if ( !$f1 = fopen( $filename, "rb" ) )
-            return FALSE;
-        $FILE = unpack( "vfile_type/Vfile_size/Vreserved/Vbitmap_offset", fread( $f1, 14 ) );
-        if ( $FILE['file_type'] != 19778 )
-            return FALSE;
-        $BMP = unpack( 'Vheader_size/Vwidth/Vheight/vplanes/vbits_per_pixel' . '/Vcompression/Vsize_bitmap/Vhoriz_resolution' . '/Vvert_resolution/Vcolors_used/Vcolors_important', fread( $f1, 40 ) );
-        $BMP['colors'] = pow( 2, $BMP['bits_per_pixel'] );
-        if ( $BMP['size_bitmap'] == 0 )
-            $BMP['size_bitmap'] = $FILE['file_size'] - $FILE['bitmap_offset'];
-        $BMP['bytes_per_pixel'] = $BMP['bits_per_pixel'] / 8;
-        $BMP['bytes_per_pixel2'] = ceil( $BMP['bytes_per_pixel'] );
-        $BMP['decal'] = ($BMP['width'] * $BMP['bytes_per_pixel'] / 4);
-        $BMP['decal'] -= floor( $BMP['width'] * $BMP['bytes_per_pixel'] / 4 );
-        $BMP['decal'] = 4 - (4 * $BMP['decal']);
-        if ( $BMP['decal'] == 4 )
-            $BMP['decal'] = 0;
-        $PALETTE = array();
-        if ( $BMP['colors'] < 16777216 ){
-            $PALETTE = unpack( 'V' . $BMP['colors'], fread( $f1, $BMP['colors'] * 4 ) );
-        }
-        $IMG = fread( $f1, $BMP['size_bitmap'] );
-        $VIDE = chr( 0 );
-        $res = imagecreatetruecolor( $BMP['width'], $BMP['height'] );
-        $P = 0;
-        $Y = $BMP['height'] - 1;
-        while( $Y >= 0 ){
-            $X = 0;
-            while( $X < $BMP['width'] ){
-                if ( $BMP['bits_per_pixel'] == 32 ){
-                    $COLOR = unpack( "V", substr( $IMG, $P, 3 ) );
-                    $B = ord(substr($IMG, $P,1));
-                    $G = ord(substr($IMG, $P+1,1));
-                    $R = ord(substr($IMG, $P+2,1));
-                    $color = imagecolorexact( $res, $R, $G, $B );
-                    if ( $color == -1 )
-                        $color = imagecolorallocate( $res, $R, $G, $B );
-                    $COLOR[0] = $R*256*256+$G*256+$B;
-                    $COLOR[1] = $color;
-                }elseif ( $BMP['bits_per_pixel'] == 24 )
-                    $COLOR = unpack( "V", substr( $IMG, $P, 3 ) . $VIDE );
-                elseif ( $BMP['bits_per_pixel'] == 16 ){
-                    $COLOR = unpack( "n", substr( $IMG, $P, 2 ) );
-                    $COLOR[1] = $PALETTE[$COLOR[1] + 1];
-                }elseif ( $BMP['bits_per_pixel'] == 8 ){
-                    $COLOR = unpack( "n", $VIDE . substr( $IMG, $P, 1 ) );
-                    $COLOR[1] = $PALETTE[$COLOR[1] + 1];
-                }elseif ( $BMP['bits_per_pixel'] == 4 ){
-                    $COLOR = unpack( "n", $VIDE . substr( $IMG, floor( $P ), 1 ) );
-                    if ( ($P * 2) % 2 == 0 )
-                        $COLOR[1] = ($COLOR[1] >> 4);
-                    else
-                        $COLOR[1] = ($COLOR[1] & 0x0F);
-                    $COLOR[1] = $PALETTE[$COLOR[1] + 1];
-                }elseif ( $BMP['bits_per_pixel'] == 1 ){
-                    $COLOR = unpack( "n", $VIDE . substr( $IMG, floor( $P ), 1 ) );
-                    if ( ($P * 8) % 8 == 0 )
-                        $COLOR[1] = $COLOR[1] >> 7;
-                    elseif ( ($P * 8) % 8 == 1 )
-                        $COLOR[1] = ($COLOR[1] & 0x40) >> 6;
-                    elseif ( ($P * 8) % 8 == 2 )
-                        $COLOR[1] = ($COLOR[1] & 0x20) >> 5;
-                    elseif ( ($P * 8) % 8 == 3 )
-                        $COLOR[1] = ($COLOR[1] & 0x10) >> 4;
-                    elseif ( ($P * 8) % 8 == 4 )
-                        $COLOR[1] = ($COLOR[1] & 0x8) >> 3;
-                    elseif ( ($P * 8) % 8 == 5 )
-                        $COLOR[1] = ($COLOR[1] & 0x4) >> 2;
-                    elseif ( ($P * 8) % 8 == 6 )
-                        $COLOR[1] = ($COLOR[1] & 0x2) >> 1;
-                    elseif ( ($P * 8) % 8 == 7 )
-                        $COLOR[1] = ($COLOR[1] & 0x1);
-                    $COLOR[1] = $PALETTE[$COLOR[1] + 1];
-                }else
-                    return FALSE;
-                imagesetpixel( $res, $X, $Y, $COLOR[1] );
-                $X++;
-                $P += $BMP['bytes_per_pixel'];
-            }
-            $Y--;
-            $P += $BMP['decal'];
-        }
-        fclose( $f1 );
-        return $res;
-    }

@@ -1,47 +1,17 @@
 <?php
-
 namespace Jira\Controller;
 class ManagerController extends WebInfoController
 {
     public function index()
     {
-        $url = '/' . C(PRODUCT) . '/Manager/index';
-        cookie('url',$url,array('prefix'=>C(PRODUCT).'_'));
+        $_SESSION['url'] = '/' . C('PRODUCT') . '/Manager/index';
         $this->isLogin();
         $search = I('search');
         $this->assign('search', $search);
-        $type=I('type','1');
-        $this->assign('$type', $type);
-        $fenlei=I('fenlei','0');
-        $this->assign('fenlei', $fenlei);
-        $user=$project=cookie(C(PRODUCT).'_user');
-        $user=jie_mi($user);
-        if($fenlei=='0'){
-            //全部
-            $where = array('type' => $type, 'manager' => $user, 'deleted' => '0');
-            $where['brand|ts|serial|asset_no'] = array('like', '%' . $search . '%');
-            $data = M('tp_device')->where($where)->select();
-            $this->assign('data', $data);
-            $this->assign('riqi', date("Y-m-d", time()));
-
-
-        }elseif ($fenlei=='1'){
-            //已预定
-            $m = M('tp_device_loaning_record');
-            $riqi = date("Y-m-d", time());
-            $this->assign('riqi', $riqi);
-            $where = array('manager' => $user, 'start_time' => $riqi, 'type' => '1', 'deleted' => '0');
-            $data = $m->where($where)->order('start_time,ctime')->select();
-            $this->assign('data', $data);
-            $where['deleted'] = '1';
-            $data = $m->where($where)->order('start_time,ctime')->select();
-            $this->assign('data1', $data);
-        }else{
-            //已借出
-            $where = array('manager' => $user, 'type' => '0', 'deleted' => '0');
-            $data = M('tp_device_loaning_record')->where($where)->order('end_time')->select();
-            $this->assign('data', $data);
-        }
+        $where = array('type' => '1', 'manager' => getLoginUser(), 'deleted' => '0');
+        $where['brand|ts|serial|asset_no'] = array('like', '%' . $search . '%');
+        $this->assign('data',  getList('tp_device',$where));
+        $this->assign('riqi', date("Y-m-d", time()));
 
         $this->display();
     }
@@ -51,16 +21,11 @@ class ManagerController extends WebInfoController
         $source = I('source', 'index');
         $this->assign('source', $source);
         $this->assign('type', I('type', '1'));
-
-        $search = I('search');
-        $this->assign('search', $search);
+        $this->assign('search', I('search'));
 
         $url = 'Device/Manager/' . $source . '?search=' . I('search');
+
         $this->assign('url', $url);
-
-        $user=jie_mi(cookie(C(PRODUCT).'_user'));
-        $this->assign('user', $user);
-
         $this->display();
     }
 
@@ -68,26 +33,20 @@ class ManagerController extends WebInfoController
     {
         $source = I('source', 'index');
         $this->assign('source', $source);
-
-        $search = I('search');
-        $this->assign('search', $search);
+        $this->assign('search', I('search'));
+        $this->assign('arr', find('tp_device',I('id')));
 
         $url = 'Jira/Manager/' . $source . '?search=' . I('search');
-
         $this->assign('url', $url);
 
-        $arr = M('tp_device')->find(I('id'));
-        $this->assign('arr', $arr);
-
-        $where=array('deleted'=>'0');
-        $user=M('tp_jira_user')->where($where)->order('username')->select();
+        $user = getList('tp_jira_user',array(),'username');
         foreach ($user as $k => $v){
             $user[$k]['key'] = $v['username'];
-            $user[$k]['value'] = '【'.countId('tp_device_overdue','borrower',$v['username']).'】'.$v['name'].'('.$v['username'].')';
+            $user[$k]['value'] = '【'.countWithParent('tp_device_overdue','borrower',$v['username'])
+                .'】'.$v['name'].'('.$v['username'].')';
         }
         //封装下拉列表
-        $user = $this->select($user, 'manager',$_SESSION['user']);
-        $this->assign('user', $user);
+        $this->assign('user', select($user, 'manager',$_SESSION['user']));
 
         $this->display();
     }
@@ -96,16 +55,12 @@ class ManagerController extends WebInfoController
     {
         $source = I('source', 'index');
         $this->assign('source', $source);
-
-        $search = I('search');
-        $this->assign('search', $search);
+        $this->assign('search', I('search'));
+        $this->assign('arr', find('tp_device',I('id')));
 
         $url = 'Jira/Manager/' . $source . '?search=' . I('search');
-
         $this->assign('url', $url);
 
-        $arr = M('tp_device')->find(I('id'));
-        $this->assign('arr', $arr);
         $this->display();
     }
 
@@ -118,10 +73,9 @@ class ManagerController extends WebInfoController
     {
         $search = I('search');
         $this->assign('search', $search);
-        $where = array('type' => '3', 'manager' => $_SESSION['account'], 'deleted' => '0');
+        $where = array('type' => '3', 'manager' => getLoginUser());
         $where['brand|ts|serial|asset_no'] = array('like', '%' . $search . '%');
-        $data = M('tp_device')->where($where)->select();
-        $this->assign('data', $data);
+        $this->assign('data', getList('tp_device',$where));
         $this->assign('riqi', date("Y-m-d", time()));
 
         $this->display();
@@ -130,22 +84,17 @@ class ManagerController extends WebInfoController
     //预订列表页面
     public function yuding()
     {
-        $m = M('tp_device_loaning_record');
+        $table='tp_device_loaning_record';
         $riqi = date("Y-m-d", time());
         $this->assign('riqi', $riqi);
         $device=I('device');
+        $where = array('manager' =>  getLoginUser(), 'start_time' => $riqi, 'type' => '1');
         if($device){
-            $user=$project=cookie(C(PRODUCT).'_user');
-            $user=jie_mi($user);
-            $where = array('device'=>$device,'manager' => $user, 'start_time' => $riqi, 'type' => '1', 'deleted' => '0');
-        }else{
-            $where = array('manager' => $_SESSION['user'], 'start_time' => $riqi, 'type' => '1', 'deleted' => '0');
+            $where['device'] = $device;
         }
-        $data = $m->where($where)->order('start_time,ctime')->select();
-        $this->assign('data', $data);
+        $this->assign('data', getList($table,$where,'start_time,ctime'));
         $where['deleted'] = '1';
-        $data = $m->where($where)->order('start_time,ctime')->select();
-        $this->assign('data1', $data);
+        $this->assign('data1', getList($table,$where,'start_time,ctime'));
 
         $this->display();
     }
@@ -163,12 +112,10 @@ class ManagerController extends WebInfoController
     //设备OR图书借出
     function lend()
     {
-        $m = D('tp_device_loaning_record');
-        $arr = $m->find(I('id'));
-
+        $table='tp_device_loaning_record';
+        $arr= find($table,I('id'));
         //0判断设备状态如果硬借出直接驳回
-        $t = D('tp_device');
-        $var = $t->where(array('id' => $arr['device'], 'loaning' => '1', 'deleted' => '0'))->find();
+        $var = findOne('tp_device',array('id' => $arr['device'], 'loaning' => '1'));
         if ($var) {
             $this->error("已借给" . getJiraName($var['borrower']) . '了，他归还了吗？');
         } else {
@@ -193,9 +140,9 @@ class ManagerController extends WebInfoController
                     $_GET['end_time'] = date('Y-m-d H:i:s', $time + 15 *24 * 60 * 60 + 9 * 60 * 60 + 15 * 60);
                 }
             }
+            $_GET['moder'] =getLoginUser();
 
-            $_GET['moder'] = $_SESSION['user'];
-            if ($m->save($_GET)) {
+            if (D($table)->save($_GET)) {
                 //2.更新设备信息
                 $_POST['id'] = $arr['device'];
                 $_POST['loaning'] = '1';
@@ -209,7 +156,7 @@ class ManagerController extends WebInfoController
                     $_GET['id'] = $arr['id'];
                     $_GET['type'] = '1';
                     $_GET['end_time'] = $arr['end_time'];
-                    $m->save($_GET);
+                    D($table)->save($_GET);
                     $this->error("失败！");
                 }
             }
@@ -219,27 +166,24 @@ class ManagerController extends WebInfoController
     //借出设备&图书待归还列表
     public function guihuan()
     {
-        $user=$project=cookie(C(PRODUCT).'_user');
-        $user=jie_mi($user);
-        $where = array('manager' => $user, 'type' => '0', 'deleted' => '0');
-        $data = M('tp_device_loaning_record')->where($where)->order('end_time')->select();
-        $this->assign('data', $data);
+        $table='tp_device_loaning_record';
+        $where = array('manager' => getLoginUser(), 'type' => '0');
+        $this->assign('data', getList($table,$where,'end_time'));
 
         $this->display();
     }
-
 
     //管理员收回
     function hui_shou(){
         $_GET['loaning']='0';
         if (D('tp_device')->save($_GET)) {
-            $m = D('tp_device_loaning_record');
-            $where=array('device'=>I('id'),'type'=>'0','deleted'=>'0');
-            $arr=$m->where($where)->find();
+            $table='tp_device_loaning_record';
+            $where=array('device'=>I('id'),'type'=>'0');
+            $arr = findOne($table,$where);
             $_POST['id']=$arr['id'];
             $_POST['type']='2';
             $_POST['end_time']=date('Y-m-d H:i:s', time());
-            if ($m->save($_POST)){
+            if (D($table)->save($_POST)){
                 //发送企业微信消息$borrow,$manager,$device
                 $this->msgGuiHuan($arr['borrower'],$arr['manager'],$arr['device']);
                 $this->success("成功");
@@ -255,10 +199,9 @@ class ManagerController extends WebInfoController
         $device=I('device');
         $source=I('source','index');
         $search=I('search');
-        $m = D('tp_device_loaning_record');
         //今天的预订
-        $where=array('device'=>$device,'type'=>'1','start_time'=>date('Y-m-d',time()),'deleted'=>'0');
-        $arr = $m->where($where)->find();
+        $where=array('device'=>$device,'type'=>'1','start_time'=>date('Y-m-d',time()));
+        $arr = findOne('tp_device_loaning_record',$where);
         if($arr){//如果有预订，跳转至预订页面
             $this->redirect('Jira/Manager/yuding?device='.$device);
         }else{//如果没有预订，跳转至借出页面

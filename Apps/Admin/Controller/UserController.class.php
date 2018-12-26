@@ -66,19 +66,8 @@ class UserController extends BaseController
     function user_info(){
         //初始化
         $info = $this->init();
-        $data=find($info['table_user'],I('id'));
-        if($data){
-            $res=array(
-                'errorcode'=>'0',
-                'message'=>'ok',
-                'result'=>$data
-            );
-        }else{
-            $res=array(
-                'errorcode'=>'0',
-                'message'=>'ok'
-            );
-        }
+        $res=find($info['table_user'],I('id'));
+        $res=resFormat($res);
         $this->ajaxReturn($res);
     }
 

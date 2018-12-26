@@ -52,7 +52,7 @@
                                         </div>
                                         <div class="col-md-4">
                                             <small><{$st.updateuserid|getELUser=###}>&nbsp;更新于:<{$st.updatetime}></small>
-                                            <span class="badge pull-right"><{$st.caseid|countId='eo_project_test_case_single','caseID',###}></span>
+                                            <span class="badge pull-right"><{$st.caseid|countWithParent='eo_project_test_case_single','caseID',###}></span>
                                         </div>
                                     </div>
                                 </a>
@@ -76,7 +76,7 @@
                     <a href="__URL__/apicase/branch/<{$vo}>">
                         <small>
                             <{$vo|getName='eo_project',###,'projectname'}>
-                            <span class="badge pull-right"><{$vo|countRId='eo_project_test_case','projectID',###}></span>
+                            <span class="badge pull-right"><{$vo|countWithParent='eo_project_test_case','projectID',###}></span>
                         </small>
                     </a>
                     </li>

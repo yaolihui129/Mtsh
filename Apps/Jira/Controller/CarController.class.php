@@ -89,8 +89,6 @@ class CarController extends WebInfoController
     function offence_all(){
         $where['offence']=array('exp','is null');
         $data=getList('tp_car_info',$where);
-        foreach ($data as $vo){
 
-        }
     }
 }

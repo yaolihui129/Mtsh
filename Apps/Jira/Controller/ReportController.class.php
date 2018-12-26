@@ -4,70 +4,57 @@ class ReportController extends WebInfoController
 {
     public function index()
     {
-        $url = '/' . C(PRODUCT) . '/Report/index';
-        cookie('url',$url,array('prefix'=>C(PRODUCT).'_'));
+        $_SESSION['url'] = '/' . C('PRODUCT') . '/Report/index';
         $planid=I('planid');
-        $report_planid=cookie(C(PRODUCT).'_report_planid');
-        if(!$report_planid){
-            cookie('report_planid',$planid,array('prefix'=>C(PRODUCT).'_'));
+        if(!$_SESSION['report_planid']){
+            $_SESSION['report_planid']=$planid;
         }
         $this->isLogin();
         if(!$planid){
-            $planid=cookie(C(PRODUCT).'_report_planid');
+            $planid=$_SESSION['report_planid'];
         }
         $this->assign('planid', $planid);
-
-
         $where=array('planid'=>$planid,'type'=>'1');
-        $data=M('tp_report')->where($where)->find();
+        $data = findOne('tp_report',$where);
         $this->assign('data', $data);
-        $report_url=C(JIRAPI).'/Jira/Testcycle/index/tp/'.$planid;
+
+
+        $report_url=C('JIRAPI').'/Jira/Testcycle/index/tp/'.$planid;
         $this->assign('report_url', $report_url);
-        $plan=cookie(C(PRODUCT).'_testPlan');
-        if(!$plan){
-            //1.获取测试计划详情
-            $url = C(JIRAPI) . "/Jirapi/issue/" . $planid;
-            $plan = httpGet($url);
-            $plan = json_decode(trim($plan, "\xEF\xBB\xBF"), true);
-            cookie('testPlan',$plan,array('prefix'=>C(PRODUCT).'_'));
+        if(!$_SESSION['testPlan']){
+            $_SESSION['testPlan'] = getIssue($planid);
         }
-        $p2_num=cookie(C(PRODUCT).'_p2_num');
-        $p3_num=cookie(C(PRODUCT).'_p3_num');
-        if($p2_num){
-            if($p3_num){
-                $bug_list='P2级Bug:'.$p2_num.'个，P3级Bug'.$p3_num.'个';
+        if($_SESSION['p2_num']){
+            if($_SESSION['p3_num']){
+                $bug_list='P2级Bug:'.$_SESSION['p2_num'].'个，P3级Bug'.$_SESSION['p3_num'].'个';
             }else{
-                $bug_list='P2级Bug:'.$p2_num.'个';
+                $bug_list='P2级Bug:'.$_SESSION['p2_num'].'个';
             }
         }else{
-            if($p3_num){
-                $bug_list='P3级Bug:'.$p3_num.'个';
+            if($_SESSION['p3_num']){
+                $bug_list='P3级Bug:'.$_SESSION['p3_num'].'个';
             }else{
                 $bug_list='无遗留BUG';
             }
         }
         $this->assign('bug_list', $bug_list);
-        $quality='有效bug :'.cookie(C(PRODUCT).'_bug_num') .'个，Bug修复率 :'.cookie(C(PRODUCT).'_xiufl_num')
-            .'%；P0级Bug :'.cookie(C(PRODUCT).'_p0_num').'个，P1级Bug :'.cookie(C(PRODUCT).'_p1_num').'个。';
+        $quality='有效bug :'.$_SESSION['bug_num'].'个，Bug修复率 :'.$_SESSION['xiufl_num'].'%；P0级Bug :'.$_SESSION['p0_num'].'个，P1级Bug :'.$_SESSION['p1_num'].'个。';
         $this->assign('quality', $quality);
-        $func='<br \>';
-        $testFunc=cookie(C(PRODUCT).'_testfunc');
-        if($testFunc){
-            foreach ($testFunc as $k=>$f){
-                $func.= '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.($k+1).')'.$f['summary'].';<br \>';
+        $func='<br>';
+        if($_SESSION['testfunc']){
+            foreach ($_SESSION['testfunc'] as $k=>$f){
+                $func.= '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.($k+1).')'.$f['summary'].';<br>';
             }
         }else{
             $func='本期无修改的功能点';
         }
-
         $this->assign('func', $func);
-        $sendTo = $plan['assignee'] . '@zhidaoauto.com';
+        $sendTo = $_SESSION['testPlan']['assignee'] . '@zhidaoauto.com';
         $this->assign('sendTo', $sendTo);
         $cc = 'ylh@zhidaoauto.com;cf@zhidaoauto.com';
         $this->assign('cc', $cc);
-        $subject = '【线下测试报告】'.$plan['summary'] ;
+        $subject = '【线下测试报告】'.$_SESSION['testPlan']['summary'] ;
         $this->assign('subject', $subject);
-
         if($data['mod']==1){
             $this->assign("resume",PublicController::editor("resume",$data['resume'],'desc',250));
             $this->assign("body",PublicController::editor("body",$data['body'],'desc',450));
@@ -77,58 +64,49 @@ class ReportController extends WebInfoController
     }
 
     public function online(){
-        $url = '/' . C(PRODUCT) . '/Report/online';
-        cookie('url',$url,array('prefix'=>C(PRODUCT).'_'));
+        $_SESSION['url'] = '/' . C('PRODUCT') . '/Report/online';
         $this->isLogin();
         $planid=I('planid');
         $this->assign('planid', $planid);
         $where=array('planid'=>$planid,'type'=>'2');
         $data=M('tp_report')->where($where)->find();
         $this->assign('data', $data);
-        $report_url=C(JIRAPI).'/Jira/Testcycle/index/tp/'.$planid;
+        $report_url=C('JIRAPI').'/Jira/Testcycle/index/tp/'.$planid;
         $this->assign('report_url', $report_url);
-        $plan=cookie(C(PRODUCT).'_testPlan');
-        if(!$plan){
-            //1.获取测试计划详情
-            $url = C(JIRAPI) . "/Jirapi/issue/" . $planid;
-            $plan = httpGet($url);
-            $plan = json_decode(trim($plan, "\xEF\xBB\xBF"), true);
-            cookie('testPlan',$plan,array('prefix'=>C(PRODUCT).'_'));
+        if(!$_SESSION['testPlan']){
+            $_SESSION['testPlan'] = getIssue($planid);
         }
-        $p2_num=cookie(C(PRODUCT).'_p2_num');
-        $p3_num=cookie(C(PRODUCT).'_p3_num');
-        if($p2_num){
-            if($p3_num){
-                $bug_list='P2级Bug:'.$p2_num.'个，P3级Bug'.$p3_num.'个';
+        if($_SESSION['p2_num']){
+            if($_SESSION['p3_num']){
+                $bug_list='P2级Bug:'.$_SESSION['p2_num'].'个，P3级Bug'.$_SESSION['p3_num'].'个';
             }else{
-                $bug_list='P2级Bug:'.$p2_num.'个';
+                $bug_list='P2级Bug:'.$_SESSION['p2_num'].'个';
             }
         }else{
-            if($p3_num){
-                $bug_list='P3级Bug:'.$p3_num.'个';
+            if($_SESSION['p3_num']){
+                $bug_list='P3级Bug:'.$_SESSION['p3_num'].'个';
             }else{
                 $bug_list='无遗留BUG';
             }
         }
-        $quality='有效bug :'.cookie(C(PRODUCT).'_bug_num') .'个，Bug修复率 :'.cookie(C(PRODUCT).'_xiufl_num')
-            .'%；P0级Bug :'.cookie(C(PRODUCT).'_p0_num').'个，P1级Bug :'.cookie(C(PRODUCT).'_p1_num').'个。';
+        $this->assign('bug_list', $bug_list);
+        $quality='有效bug :'.$_SESSION['bug_num'].'个，Bug修复率 :'.$_SESSION['xiufl_num'].'%；P0级Bug :'.$_SESSION['p0_num'].'个，P1级Bug :'.$_SESSION['p1_num'].'个。';
         $this->assign('quality', $quality);
-        $func='<br \>';
-        $testFunc=cookie(C(PRODUCT).'_testfunc');
-        if($testFunc){
-            foreach ($testFunc as $k=>$f){
-                $func.= '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.($k+1).')'.$f['summary'].';<br \>';
+        $func='<br>';
+        if($_SESSION['testfunc']){
+            foreach ($_SESSION['testfunc'] as $k=>$f){
+                $func.= '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.($k+1).')'.$f['summary'].';<br>';
             }
         }else{
             $func='本期无修改的功能点';
         }
         $this->assign('func', $func);
 
-        $sendTo = $plan['assignee'] . '@zhidaoauto.com';
+        $sendTo = $_SESSION['testPlan']['assignee'] . '@zhidaoauto.com';
         $this->assign('sendTo', $sendTo);
         $cc = 'ylh@zhidaoauto.com;cf@zhidaoauto.com';
         $this->assign('cc', $cc);
-        $subject = '【线上验收报告】'.$plan['summary'] ;
+        $subject = '【线上验收报告】'.$_SESSION['testPlan']['summary'] ;
         $this->assign('subject', $subject);
 
         if($data['mod']==1){
@@ -213,7 +191,6 @@ class ReportController extends WebInfoController
         $_POST['body']=$body;
         $this->update();
     }
-
     //编辑状态更新
     function mod(){
         $_GET['mod']='2';
@@ -224,7 +201,6 @@ class ReportController extends WebInfoController
     public function performance(){
         $this->display();
     }
-
     //编辑性能测试报告
     public function edit_perfor(){
         $this->display();
@@ -291,7 +267,6 @@ class ReportController extends WebInfoController
         $this->assign('var', $var);
         $this->display();
     }
-
 
     public function score()
     {
@@ -371,7 +346,6 @@ class ReportController extends WebInfoController
         $this->display();
 
     }
-
     //测试BUG
     public function bug()
     {

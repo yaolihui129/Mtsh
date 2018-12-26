@@ -56,8 +56,8 @@ class WechatController extends Controller{
     /**
      * 首先创建二维码ticket
      * @param string $sceneid 场景值ID
-     * @param string $type 值为'temp'的时候生成临时二维码
-     * @param string $expire_seconds 二维码过期时间
+     * $type 值为'temp'的时候生成临时二维码
+     * $expire_seconds 二维码过期时间
      * @return string 二维码ticket
      */
     public function getTicket($sceneid,$appId,$type='temp',$expire_seconds=604800){

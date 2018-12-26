@@ -26,7 +26,7 @@ class VoucherController extends WebInfoController {
         $set['id']=$arr[$d]['id'];
         echo  $set['id'].';';
         $_SESSION['ticketsid']=$set['id'];
-        $set[ip]=$_SESSION['ip'];
+        $set['ip']=$_SESSION['ip'];
         $set['moder']='客户';
         $set['state']='抽奖';
         $set['chouj']=1;

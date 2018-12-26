@@ -1,49 +1,41 @@
 <?php
-
 namespace Jira\Controller;
 class RiskController extends WebInfoController
 {
     public function index()
     {
-        $project = I('project', '10006');
-        $where = array('project' => $project, 'deleted' => '0');
-        $data = M("tp_risk")->where($where)->order('ctime desc')->select();
-        $this->assign("data", $data);
+        $table='tp_risk';
+        $where = array('project' => I('project', '10006'));
+        $this->assign("data", getList($table,$where));
 
         $this->display();
-
     }
 
     public function risk()
     {
-        $_SESSION['project'] = I('project', '10006');
-        $m = D("tp_risk");
-        $where = array("proid" => $_SESSION['proid']);
-        $risks = $m->where($where)->select();
-        $this->assign("risks", $risks);
+        $table='tp_risk';
+        $where = array("proid" => I('project', '10006'));
+        $this->assign("risks", getList($table,$where));
 
-        $count = $m->where($where)->count() + 1;
-        $this->assign('c', $count);
-        $this->assign("state", formselect("打开", "state", "rstate"));
-        $this->assign("level", formselect("C", "level", "risklevel"));
+        $count = countId($table,$where);
+        $this->assign('c', $count+1);
+        $this->assign("state", select("打开", "state", "rstate"));
+        $this->assign("level", select("C", "level", "risklevel"));
         $this->assign("tamethod", PublicController::editor("amethod", "暂无方案"));
 
         $this->display();
     }
 
-
     public function mod()
     {
-        $m = D("tp_risk");
-        $where = array("proid" => $_SESSION['proid']);
-        $data = $m->where($where)->select();
+        $table='tp_risk';
+        $where = array("proid" => I('project', '10006'));
+        $this->assign("data", getList($table,$where));
 
-        $this->assign("data", $data);
-
-        $risk = $m->find(I('id'));
+        $risk = find($table,I('id'));
         $this->assign("risk", $risk);
-        $this->assign("level", formselect($risk['level'], "level", "risklevel"));
-        $this->assign("state", formselect($risk['state'], "state", "rstate"));
+        $this->assign("level", select($risk['level'], "level", "risklevel"));
+        $this->assign("state", select($risk['state'], "state", "rstate"));
         $this->assign("tamethod", PublicController::editor("amethod", $risk['amethod']));
 
 

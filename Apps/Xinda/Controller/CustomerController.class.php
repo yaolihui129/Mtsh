@@ -3,7 +3,7 @@ namespace Xinda\Controller;
 class CustomerController extends BaseController {
 	public function index(){	     
         getWebInfo(C('PRODUCT'));//获取网页信息    
-        $this->changeMuban(I('muban'));//更换模板
+
 	    $this->display();
     }   
     public function checked(){
@@ -21,7 +21,7 @@ class CustomerController extends BaseController {
     }    
     public function register(){          
         getWebInfo(C('PRODUCT'));//获取网页信息 
-        $this->changeMuban(I('muban'));//更换模板
+
         $this->assign('phone',$_GET['phone']);   
         $this->display();
     }   
@@ -48,14 +48,7 @@ class CustomerController extends BaseController {
         $this->display();
     }
     
-    public function update(){
-        $_POST['moder']=$_SESSION['realname'];
-        if (M('tp_credit')->save($_POST)){
-            $this->success("修改成功！");
-        }else{
-            $this->error("修改失败！");
-        }
-    }
+
     public function setpass(){        
         $arr=M('tp_customer')->find($_SESSION['userid']);
         $user=M('tp_credit')->find($arr['creditid']);
@@ -88,14 +81,8 @@ class CustomerController extends BaseController {
     }
 
     public function personal(){       
-        getWebInfo(C('PRODUCT'));//获取网页信息  
-        $this->changeMuban(I('muban'));//更换模板
-        if($_SESSION['isCLogin']==C(PRODUCT)){//已经登录跳过
-        }else {//未登录
-            if(I('wxAppId')){
-                $this->weiXinLogin(I('wxAppId'), I('wxOpenId'));
-            }
-        }
+        getWebInfo(C('PRODUCT'));//获取网页信息
+
         $arr=M('tp_customer')->find($_SESSION['userid']);
         $arr=M('tp_credit')->find($arr['creditid']);
         $this->assign('arr',$arr);
@@ -105,7 +92,7 @@ class CustomerController extends BaseController {
     
     public function yuyue() {        
         $arr=M('tp_customer')->find($_SESSION['userid']);
-        $map=array(['phone']=>$arr['creditid']);
+        $map=array('phone'=>$arr['creditid']);
         $data=M('tp_serviccar')->where($map)->select();
         $this->assign('data',$data);
         

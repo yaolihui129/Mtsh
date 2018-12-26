@@ -19,7 +19,7 @@ class AppController extends BaseController
         $info = $this->init();
         $where=$info['where'];
         //处理查询条件
-        $typeList=get_dict_list('app_type','dict');
+        $typeList=getDictList('app_type','dict');
         $this->assign("typeList", $typeList);
         $type=I('type',$typeList[0]['key']);
         $this->assign("type", $type);

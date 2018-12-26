@@ -1,25 +1,26 @@
 <?php
 namespace Jira\Controller;
-class LoginController extends WebInfoController
+class LoginController extends BaseController
 {
     public function index()
     {
-        layout(false); // 临时关闭当前模板的布局功能
+        layout(false);
         $this->display();
     }
 
     public function login()
     {
         $user = I('username');
-        $password = I('password');
-        $time=7*24*3600;
-        $arr = $this->jiraLogin($user,$password);
+        $arr = doJiraLogin($user,I('password'));
         if ($arr['session']) {
-            setCookieKey('user',jia_mi($user),$time);
-            setCookieKey('isLogin',C(PRODUCT),$time);
-            $url=getCookieKey('url');
-            if (!$url) {
-                $url = '/' . C(PRODUCT) . '/Index/index';
+            $_SESSION['user'] = $user;
+            setCookieKey('user',jia_mi($user),7*24*3600);
+            if ($_SESSION['url']) {
+                $url = $_SESSION['url'];
+            }elseif(getCookieKey('url')){
+                $url=getCookieKey('url');
+            }else {
+                $url = '/' . C('PRODUCT') . '/Index/index/project/' . $_SESSION['project'];;
             }
             $this->redirect($url);
         } else {
@@ -32,8 +33,9 @@ class LoginController extends WebInfoController
     {
         $username=getLoginUser();
         $username=getJiraName($username);
-        cookie(null,C(PRODUCT).'_'); //  清空指定前缀的所有cookie值
-        $this->success($username . ",再见!", U(C(PRODUCT) . '/Login'));
+        $_SESSION = array();
+        cookie(null,C('PRODUCT').'_');
+        $this->success($username . ",再见!", U(C(PRODUCT) . '/Index/index'));
 
     }
 

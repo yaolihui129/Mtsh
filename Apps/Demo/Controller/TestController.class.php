@@ -4,7 +4,7 @@ class TestController extends BaseController
 {
     public function index()
     {
-        $appID=C(appID);
+        $appID=C('appID');
         dump('appID:'.$appID);
         $ticket=S($appID.'ticket');
         dump('ticket:'.$ticket);

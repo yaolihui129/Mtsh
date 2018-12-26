@@ -1,23 +1,19 @@
 <?php
-
 namespace Jira\Controller;
 class BorrowController extends WebInfoController
 {
     public function index()
     {
-        $arr=M('tp_device')->find(I('id'));
-        $this->assign('arr', $arr);
-        $where=array('deleted'=>'0');
-        $user=M('tp_jira_user')->where($where)->order('username')->select();
+        $this->assign('arr', find('tp_device',I('id')));
+        $where=array();
+        $user = getList('tp_jira_user',$where,'username');
         foreach ($user as $k => $v){
             $user[$k]['key'] = $v['username'];
-            $user[$k]['value'] = '【'.countId('tp_device_overdue','borrower',$v['username']).'】'.$v['name'].'('.$v['username'].')';
+            $user[$k]['value'] = '【'.countWithParent('tp_device_overdue','borrower',$v['username'])
+                .'】'.$v['name'].'('.$v['username'].')';
         }
         //封装下拉列表
-        $d_user=cookie(C(PRODUCT).'_user');
-        $d_user=jie_mi($d_user);
-        $user = $this->select($user, 'borrower',$d_user);
-
+        $user = select($user, 'borrower',getLoginUser());
         $this->assign('user', $user);
 
 
@@ -29,9 +25,9 @@ class BorrowController extends WebInfoController
         if ($source=='index'){
             $this->assign('rules', $this->book_rules());
         }elseif ($source=='books'){
-            $this->assign('rules', C(BOOKS_RULES));
+            $this->assign('rules', C('BOOKS_RULES'));
         }else{
-
+            $this->assign('rules', $this->book_rules());
         }
 
         $this->display();
@@ -41,27 +37,21 @@ class BorrowController extends WebInfoController
         $id=I('id');
         $source=I('source');
         $search=I('search');
-        $url= '/' . C(PRODUCT) . '/Borrow/yuding/id/'.$id.'/source/'.$source.'/search/'.$search;
-        cookie('url',$url,array('prefix'=>C(PRODUCT).'_'));
+        $_SESSION['url'] = '/' . C('PRODUCT') . '/Borrow/yuding/id/'.$id.'/source/'.$source.'/search/'.$search;
         $this->isLogin();
-        $arr=M('tp_device')->find($id);
-        $this->assign('arr', $arr);
-        $where=array('device'=>$id,'type'=>'1','deleted'=>'0');
-        $data=M('tp_device_loaning_record')->where($where)->order('end_time desc')->select();
+        $this->assign('arr', find('tp_device',$id));
+        $where=array('device'=>$id,'type'=>'1');
+        $data =getList('tp_device_loaning_record',$where,'end_time desc');
         $this->assign('data', $data);
 
         $this->assign('source', $source);
         $this->assign('search', $search);
         $this->assign('url', 'Jira/Books/'.$source);
         $this->assign('riqi', date("Y-m-d", time()));
-        $user=jie_mi(cookie(C(PRODUCT).'_user'));
-        $this->assign('user', $user);
         if ($source=='index'){
             $this->assign('rules', $this->book_rules());
         }elseif ($source=='books'){
-            $this->assign('rules', C(BOOKS_RULES));
-        }else{
-
+            $this->assign('rules', C('BOOKS_RULES'));
         }
 
         $this->display();
@@ -69,7 +59,6 @@ class BorrowController extends WebInfoController
     //借出操作
     function lend(){
         //插入记录
-        $user=jie_mi(cookie(C(PRODUCT).'_user'));
         $m=D('tp_device_loaning_record');
         $time = strtotime(date("Y-m-d", time()));
         $week = date('w', $time);
@@ -90,8 +79,8 @@ class BorrowController extends WebInfoController
                 $_POST['end_time'] = date('Y-m-d H:i:s', $time + 15*24 * 60 * 60 + 9 * 60 * 60 + 15 * 60);
             }
         }
-        $_POST['adder'] = $user;
-        $_POST['moder'] = $user;
+        $_POST['adder'] = $_SESSION['uxer'];
+        $_POST['moder'] = $_SESSION['uxer'];
         $_POST['ctime'] = time();
         if (!$m->create()) {
             $this->error($m->getError());
@@ -105,7 +94,6 @@ class BorrowController extends WebInfoController
                 //2.发送企业微信消息
                 //$borrower,$manager,$device,$end_time,$remark
                 $this->msgJieChu($_POST['borrower'],$_POST['manager'],$_POST['device'],$_POST['end_time'],$_POST['remark']);
-
                 if ($_POST['url']){
                     $this->success("成功",U($_POST['url']));
                 }else{
@@ -121,7 +109,7 @@ class BorrowController extends WebInfoController
     }
     //预约操作
     function bespeak(){
-    //指定日期有预约或已借出，不能被预约
+        //指定日期有预约或已借出，不能被预约
         if($_POST['remark']){
             $table='tp_device_loaning_record';
             $start_time=I('start_time');
@@ -129,8 +117,9 @@ class BorrowController extends WebInfoController
             $borrow=I('borrower');
             $manager=I('manager');
             $remark=I('remark');
-            $where=array('device'=>I('device'),'start_time'=>$start_time,'deleted'=>'0');
-            $var=M($table)->where($where)->select();
+//            $serial=I('serial');
+            $where=array('device'=>I('device'),'start_time'=>$start_time);
+            $var = getList($table,$where);
             if($var){//当天有预约或借用
                 $this->error($start_time.'有人使用该设备');
             }else{//无记录，插入预订记录

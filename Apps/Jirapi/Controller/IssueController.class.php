@@ -18,7 +18,8 @@ class IssueController extends BasicController
 
     function put()
     {
-        $var=$this->init();
+        $info= $this->init();
+        $table=$info['table'];
         $data = getJsonToArray();
         if ($data['ID']) {
             //重新封装数组
@@ -46,13 +47,13 @@ class IssueController extends BasicController
             }
             $var['UPDATED'] = date('Y-m-d H:i:s', time());
             //更新数据
-            $res = update($data, 'jiraissue');
+            $data = update($table,$data);
         } else {
-            $var = $this->query('jiraissue', "", "ID desc");
+            $var = getList($table, "", "ID desc");
             //查询按issuenum排序,获取最大的issuenum
             $where = array('PROJECT' => $data['PROJECT']);
             $order = 'issuenum desc';
-            $arr = getList($var['table'], $where, $order);
+            $arr = getList($table, $where, $order);
             //封装插入的数组
             $data['ID'] = intval($var[0]['id']) + 1;
             $data['issuestatus'] = 1;
@@ -65,21 +66,21 @@ class IssueController extends BasicController
             $data['UPDATED'] = $data['CREATED'];
             $data['WORKFLOW_ID'] = intval($var[0]['workflow_id']) + 1;
             //写库操作
-            $res = insert($var['table'],$data);
+            $data = insert($table,$data);
         }
-        $this->ajaxReturn($res);
+        $this->ajaxReturn($data);
     }
 
     public function issuenum()
     {
         switch ($this->_method) {
-            case 'get':
+            case 'get': // get请求处理代码
                 $this->issuenum_get_list();
                 break;
-            case 'put':
+            case 'put': // put请求处理代码
                 $this->put();
                 break;
-            case 'post':
+            case 'post': // post请求处理代码
                 $this->post();
                 break;
         }
@@ -88,16 +89,17 @@ class IssueController extends BasicController
     function issuenum_get_list()
     {
         $var = $this->init();
+        $table=$var['table'];
+        $data = array();
         if ($_GET) {
             $arr = explode('-', $_GET['issuenum']);
             $where = array('pkey' => $arr[0]);
-            $data = findone('project', $where);
+            $data = findOne('project', $where);
             $where = array('issuenum' => $arr[1], 'PROJECT' => $data['id']);
-            $data = findone($var['table'], $where);
-        } else {
-            $data = array('暂不提供该功能');
+            $data = findOne($table, $where);
         }
-        $this->ajaxReturn($data);
+        $res = resFormat($data);
+        $this->ajaxReturn($res);
     }
 
 }

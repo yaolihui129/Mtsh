@@ -68,19 +68,8 @@ class SetController extends BaseController
     function dict_info(){
         //初始化
         $info = $this->init();
-        $data=find($info['table_dict'],I('id'));
-        if($data){
-            $res=array(
-                'errorcode'=>'0',
-                'message'=>'ok',
-                'result'=>$data
-            );
-        }else{
-            $res=array(
-                'errorcode'=>'0',
-                'message'=>'ok'
-            );
-        }
+        $res=find($info['table_dict'],I('id'));
+        $res=resFormat($res);
         $this->ajaxReturn($res);
     }
 

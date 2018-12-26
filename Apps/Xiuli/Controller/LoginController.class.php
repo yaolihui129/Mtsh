@@ -2,7 +2,7 @@
 namespace Xiuli\Controller;
 use Think\Controller;
 class LoginController extends Controller {
-private static $data;   
+    private static $data;
     private $app_id='101376709';
     private $app_key="17bf1ad6668548c147ae3a65a1c739ef";
     private $callBackUrl="http://www.xiuliguanggao.com/index.php/Xiuli/Login/qq_callback";//回调地址
@@ -89,11 +89,11 @@ private static $data;
         $rzt=$this->getAccessToken();
         parse_str($rzt,$data);
         $this->accessToken=$data['access_token'];
-        $url="https://graph.qq.com/oauth2.0/me";        
+        $url="https://graph.qq.com/oauth2.0/me";
         $param=array('access_token'=>$this->accessToken);
         $param =http_build_query($param,'','&');
         $url=$url."?".$param;
-        $response=httpGet($url);       
+        $response=httpGet($url);
         if(strpos($response, "callback") !== false){//--------检测错误是否发生
             $lpos = strpos($response, "(");
             $rpos = strrpos($response, ")");
@@ -105,8 +105,8 @@ private static $data;
         }
         return $user->openid;
     }
-    
-    
+
+
     public function getUsrInfo(){//获取信息
         if($_GET['state'] != $_SESSION['state']){
             exit("错误代码：300001");

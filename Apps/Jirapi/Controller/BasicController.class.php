@@ -4,23 +4,23 @@ use Think\Controller\RestController;
 class BasicController extends RestController
 {
 
-    function index()
+    public function index()
     {
         switch ($this->_method) {
-            case 'get':
+            case 'get': // get请求处理代码
                 $this->getMethod();
                 break;
-            case 'put':
-                $this->putMethod();
+            case 'put': // put请求处理代码
+                $this->put();
                 break;
-            case 'post':
-                $this->postMethod();
+            case 'post': // post请求处理代码
+                $this->post();
                 break;
-            case 'delete':
-                $this->delMethod();
+            case 'delete': // delete请求处理代码
+                $this->delete();
                 break;
-            case 'head':
-                $this->headMethod();
+            case 'head': // head请求处理代码
+                $this->head();
                 break;
         }
     }
@@ -29,11 +29,11 @@ class BasicController extends RestController
     {
         $var = $this->init();
         if ($_GET['id']) {
-            $data = $this->find($var['table'], $_GET['id'], $var['field']);
+            $data = find($var['table'], $_GET['id'], $var['field']);
         } elseif ($_GET['method'] == 'find') {
-            $data=findOne($var['table'],$var['where'],$var['order'],$var['field']);
+            $data = findOne($var['table'], $var['where'], $var['order'], $var['field']);
         } elseif ($_GET['method'] == 'count') {
-            $data =countId($var['table'], $var['where']);
+            $data = countId($var['table'], $var['where']);
         } else {
             if($_GET['order']){
                 $var['order']= $_GET['order'];
@@ -44,18 +44,21 @@ class BasicController extends RestController
             }
             $data = getList($var['table'], $var['where'], $var['order'], $var['field'],$var['page'],$var['size']);
         }
-        $res=resFormat($data);
+        $res = resFormat($data);
         $this->ajaxReturn($res);
     }
 
-    function putMethod()
+    function put()
     {
+//        $var = $this->init();
         $data = array();
-        $res=resFormat($data,'-1','暂不提供该功能');
+        $code = 404;
+        $msg = '暂不提供该功能';
+        $res = resFormat($data,$code,$msg);
         $this->ajaxReturn($res);
     }
 
-    function postMethod()
+    function post()
     {
         $var = $this->init();
         $where = getJsonToArray();
@@ -66,23 +69,33 @@ class BasicController extends RestController
             $var['page']=$where['page'];
             $var['size']=$where['size'];
         }
-        $data = getList($var['table'], $var['where'], $var['order'], $var['field'],$var['page'],$var['size']);
-        $res=resFormat($data);
+        $res = resFormat(getList($var['table'],$where,$var['order'],$var['field'],$var['page'],$var['size']));
+        $this->ajaxReturn($res);
+
+    }
+
+    function delete()
+    {
+        $var = $this->init();
+        $data = array();
+        $code = 404;
+        $msg = '暂不提供该功能';
+        $res = resFormat($data,$code,$msg);
         $this->ajaxReturn($res);
     }
 
-    function delMethod()
+    function head()
     {
+        $var = $this->init();
         $data = array();
-        $res=resFormat($data,'-1','暂不提供该功能');
+        $code = 404;
+        $msg = '暂不提供该功能';
+        $res = resFormat($data,$code,$msg);
         $this->ajaxReturn($res);
     }
 
-    function headMethod()
-    {
-        $data = array();
-        $res=resFormat($data,'-1','暂不提供该功能');
-        $this->ajaxReturn($res);
-    }
+
+
+
 
 }

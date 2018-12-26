@@ -3,29 +3,26 @@
     <div class="starter-template">
         <table class="am-table am-table-striped am-table-hover table-main table-bordered">
             <thead>
-                <tr>
-                    <th class="table-type" bgcolor="#ccc">平台-业务端</th>
-                    <th class="table-title" bgcolor="#ccc">接口名称</th>
-                    <th class="table-type" bgcolor="#ccc">线上版本</th>
-                </tr>
+            <tr>
+                <th class="table-type" bgcolor="#ccc">平台-业务端</th>
+                <th class="table-title" bgcolor="#ccc">接口名称</th>
+                <th class="table-type" bgcolor="#ccc">线上版本</th>
+            </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td><{$data.projectid|getName='eo_project',###,'projectname'}></td>
-                    <td><{$data.apiname}>【<{$data.apirequesttype}>】<{$data.apiuri}></td>
-                    <td><{$data.online}></td>
-                </tr>
+            <tr>
+                <td><{$data.projectid|getName='eo_project',###,'projectname'}></td>
+                <td><{$data.apiname}>【<{$data.apirequesttype}>】<{$data.apiuri}></td>
+                <td><{$data.online}></td>
+            </tr>
             </tbody>
         </table>
     </div>
     <div class="panel panel-info">
         <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="active">
-                <a href="__URL__/details/id/<{$data.apiid}>">参数信息
-                    <span class="badge"><{$count}></span>
-                </a>
-            </li>
+            <li role="presentation" class="active"><a href="__URL__/details/id/<{$data.apiid}>">参数信息<span class="badge"><{$count}></span></a></li>
             <switch name="data.pressure">
+                <case value="0"></case>
                 <case value="1">
                     <li role="presentation"><a href="__URL__/press/id/<{$data.apiid}>">性能场景</a></li>
                 </case>
@@ -87,6 +84,11 @@
             </div>
         </div>
     </div>
+
+
+
+
+
 </div>
 
 

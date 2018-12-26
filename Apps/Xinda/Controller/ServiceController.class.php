@@ -1,6 +1,6 @@
 <?php
 namespace Xinda\Controller;
-class ServiceController extends WebInfoController {  
+class ServiceController extends BaseController {
     function init(){
         $info=array(
             'table'=>'tp_product',

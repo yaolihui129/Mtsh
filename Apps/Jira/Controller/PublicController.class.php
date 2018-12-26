@@ -1,17 +1,7 @@
 <?php
 namespace Jira\Controller;
-use Think\Controller;
-class PublicController extends Controller
+class PublicController extends BaseController
 {
-    /**
-     * 编辑器
-     * @param int $textareaid
-     * @param int $toolbar 有basic full 和desc三种
-     * @param int $color 编辑器颜色
-     * @param string $alowuploadexts 允许上传类型
-     * @param string $height 编辑器高度
-     * @param string $disabled_page 是否禁用分页和子标题
-     */
     public static function editor($textareaid = 'content', $value = '', $toolbar = 'desc', $height = 200, $color = '', $up = true)
     {
         $str = '<textarea id="' . $textareaid . '" name="' . $textareaid . '">' . $value . '</textarea>';

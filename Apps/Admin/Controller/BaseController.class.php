@@ -7,10 +7,10 @@ class BaseController extends Controller
     public function _initialize()
     {
         //判定登录态
-        $isLogin=cookie(C(PRODUCT).'_isLogin');
-        $user=cookie(C(PRODUCT).'_user');
+        $isLogin=cookie(C('PRODUCT').'_isLogin');
+        $user=cookie(C('PRODUCT').'_user');
         if($isLogin==''||$user==''){
-            $this->redirect(C(PRODUCT).'/Login/index');
+            $this->redirect(C('PRODUCT').'/Login/index');
         }
         if (ismobile()) {//设置默认默认主题为 Amaze
             C('DEFAULT_V_LAYER', 'Amaze');

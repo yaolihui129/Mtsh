@@ -113,7 +113,7 @@
                     <a href="__URL__/index/branch/<{$vo}>">
                         <small>
                             <{$vo|getName='eo_project',###,'projectname'}>
-                            <span class="badge pull-right"><{$vo|countRId='eo_api','projectID',###}></span>
+                            <span class="badge pull-right"><{$vo|countWithParent='eo_api','projectID',###}></span>
                         </small>
                     </a>
                     </li>

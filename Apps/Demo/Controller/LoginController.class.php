@@ -20,18 +20,17 @@ class LoginController extends Controller
     {
         $user = I('username');
         $password = I('password');
-        S($user, $password);
-        $url = C(JIRAURL) . '/rest/auth/1/session';
+        $url = C('JIRAUR') . '/rest/auth/1/session';
         $json = json_encode(array('username' => $user, 'password' => $password));
         $json = httpJsonPost($url, $json);
         $arr = json_decode($json, true);
         if ($arr['session']) {
             $_SESSION['user'] = $user;
-            $_SESSION['isLogin'] = C(PRODUCT);
+            $_SESSION['isLogin'] = C('PRODUCT');
             if ($_SESSION['url']) {
                 $url = $_SESSION['url'];
             } else {
-                $url = '/' . C(PRODUCT) . '/Index/index/project/' . $_SESSION['project'];;
+                $url = '/' . C('PRODUCT') . '/Index/index/project/' . $_SESSION['project'];;
             }
             $this->redirect($url);
         } else {
@@ -46,7 +45,7 @@ class LoginController extends Controller
         $username = $_SESSION['user'];
         $_SESSION = array();
         session_destroy();
-        $this->success($username . ",再见!", U(C(PRODUCT) . '/Index/index'));
+        $this->success($username . ",再见!", U(C('PRODUCT') . '/Index/index'));
 
     }
 

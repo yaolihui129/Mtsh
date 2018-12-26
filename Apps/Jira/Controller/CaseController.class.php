@@ -6,34 +6,26 @@ class CaseController extends WebInfoController
     {
 
         if (I('project')) {
-            cookie('project',I('project'),array('prefix'=>C(PRODUCT).'_'));
+            $_SESSION['project'] = I('project');
         }
-        $project=cookie(C(PRODUCT).'_project');
-        $where['PROJECT'] = intval($project);
+
+        $where['PROJECT'] = intval($_SESSION['project']);
 
         $search = trim(I('search'));
         $_SESSION['search']['index'] = $search;
         $this->assign('search', $search);
 
         $where['SUMMARY|issuenum'] = array('like', '%' . $search . '%');
-        $_SESSION['map']['plan'] = $where;
-        $url = C(JIRAPI) . "/Jirapi/issue";
-        $data = httpJsonPost($url, json_encode($where));
-        $data = json_decode(trim($data, "\xEF\xBB\xBF"), true);
-        $this->assign('data', $data);
+        $this->assign('data', postIssue($where));
 
-        $project = $this->projectDict();
-        $this->assign('project', $project);
+        $this->assign('project', $this->projectDict());
 
         $this->display();
     }
 
     public function func(){
-        $url= '/' . C(PRODUCT) . '/Case/func';
-        cookie('url',$url,array('prefix'=>C(PRODUCT).'_'));
         $this->isLogin();
-        $project=cookie(C(PRODUCT).'_project');
-        $where['PROJECT'] = intval($project);
+        $where['PROJECT'] = intval($_SESSION['project']);
         $where['issuetype'] = '10101';
         $where['PRIORITY'] = '1';
         $search = trim(I('search','呼叫中心'));
@@ -41,11 +33,8 @@ class CaseController extends WebInfoController
         $this->assign('search', $search);
 
         $where['SUMMARY|issuenum'] = array('like', '%' . $search . '%');
-        $_SESSION['map']['plan'] = $where;
-        $url = C(JIRAPI) . "/Jirapi/issue";
-        $data = httpJsonPost($url, json_encode($where));
-        $data = json_decode(trim($data, "\xEF\xBB\xBF"), true);
-        $this->assign('data', $data);
+
+        $this->assign('data', postIssue($where));
 
         $this->display();
     }

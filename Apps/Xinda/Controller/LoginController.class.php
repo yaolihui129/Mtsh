@@ -96,23 +96,7 @@ class LoginController extends Controller {
     }
     
     
-    public function getUsrInfo(){//获取信息
-        if($_GET['state'] != $_SESSION['state']){
-            exit("错误代码：300001");
-        }
-        $this->code=$_GET['code'];
-        $openid=$this->getOpenID();
-        $_SESSION['openid']=$openid;
-        if(empty($openid)){
-            return false;
-        }
-        $url="https://graph.qq.com/user/get_user_info";
-        $param=array('access_token'=>$this->accessToken,'oauth_consumer_key'=>$this->app_id,'openid'=>$openid);
-        $param =http_build_query($param,'','&');
-        $url=$url."?".$param;
-        $rzt=httpGet($url);
-        return $rzt;
-    }
+
        
     public function login(){           
       if (login($_POST['phone'], $_POST['password'])){

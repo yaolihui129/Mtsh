@@ -1,6 +1,7 @@
 <?php
 namespace Goods\Controller;
-class IndexController extends WebInfoController
+use Think\Controller;
+class IndexController extends Controller
 {
     public function index()
     {

@@ -5,8 +5,8 @@ class PlanController extends WebInfoController
     //测试计划列表
     public function index()
     {
-        cookie('type_plan',I('type','doing'),array('prefix'=>C(PRODUCT).'_'));
-        $tpye=cookie(C(PRODUCT).'_type_plan');
+        cookie('type_plan',I('type','doing'),array('prefix'=>C('PRODUCT').'_'));
+        $tpye=cookie(C('PRODUCT').'_type_plan');
         if ($tpye == 'online') {
             $where['issuestatus'] = array('in', '3,10002,10011,6');
             $where['order']='UPDATED desc';
@@ -19,57 +19,65 @@ class PlanController extends WebInfoController
             $where['order']='issuestatus desc,ASSIGNEE';
         }
 
-        $project=cookie(C(PRODUCT).'_project');
+        $project=cookie(C('PRODUCT').'_project');
         if($project ==10006){
-            cookie('testGroup',I('testGroup','one'),array('prefix'=>C(PRODUCT).'_'));
-            $testGroup=cookie(C(PRODUCT).'_testGroup');
+            cookie('testGroup',I('testGroup','one'),array('prefix'=>C('PRODUCT').'_'));
+            $testGroup=cookie(C('PRODUCT').'_testGroup');
             $this->assign('testGroup', $testGroup);
 
             if($testGroup=='one'){
-                $where['CREATOR'] =array('in',C(QA_TESTER));
+                $where['CREATOR'] =array('in',C('QA_TESTER'));
             }else{
                 $where['CREATOR'] =array('in','qinzhenxia,congtianyue,zhangaonan');
             }
-
         }
         $where['PROJECT'] = intval($project);
         $where['issuetype'] = '10102';
         $search = trim(I('search'));
         $this->assign('search', $search);
         $where['SUMMARY|issuenum'] = array('like', '%' . $search . '%');
-        $url = C(JIRAPI) . "/Jirapi/issue";
-        $data = httpJsonPost($url, json_encode($where));
         //同步到本地库
-        $this->synch_Jira_issue($data);
+        $this->synchJiraIssue(postIssue($where));
 
 
         //从本地库查询
         $where['project'] = intval($project);
+        $testGroup=cookie(C('PRODUCT').'_testGroup');
         if($testGroup=='one'){
-            $where['reporter'] =array('in',C(QA_TESTER));
+            $where['reporter'] =array('in',C('QA_TESTER'));
         }else{
             $where['reporter'] =array('in','qinzhenxia,congtianyue,zhangaonan');
         }
         $where['summary|pkey'] = array('like', '%' . $search . '%');
-        $data=M('tp_jira_issue')->where($where)->order('issuestatus desc,assignee')->select();
-
-        $this->assign('data', $data);
+        $table= 'tp_jira_issue';
+        $order='issuestatus desc,assignee';
+        $this->assign('data', getList($table,$where,$order));
 
 
         $this->display();
     }
-
-
     //更改测试计划类型
     function change_type(){
-        $project=cookie(C(PRODUCT) .'project');
-        $testGroup=cookie(C(PRODUCT) .'testGroup');
-        $url = '/' . C(PRODUCT) . '/Plan/index/project/'.$project.'/testGroup/'.$testGroup;
-        cookie('url',$url,array('prefix'=>C(PRODUCT).'_'));
+        $project=cookie(C('PRODUCT') .'project');
+        $testGroup=cookie(C('PRODUCT') .'testGroup');
+        $url = '/' . C('PRODUCT') . '/Plan/index/project/'.$project.'/testGroup/'.$testGroup;
+        cookie('url',$url,array('prefix'=>C('PRODUCT').'_'));
         $this->isLogin();
         $_GET['plantype']=I('plantype');
         $_GET['table']='tp_jira_issue';
         $this->update();
+    }
+    //更改测试计划类型
+    function change_type1(){
+        $table='tp_project_plan_extend';
+        $_GET['ptype']=I('ptype');
+        $extend = find($table,I('id'));
+        $_GET['table']=$table;
+        if($extend){
+            $this->update();
+        }else{
+            $this->insert();
+        }
     }
 
     public function gongneng(){
@@ -77,7 +85,10 @@ class PlanController extends WebInfoController
         //获取计划详情
         $this->getPlanInfo($tp);
         //获取计划周期
-        $this->getPlanCycle($tp);
+        $cycle=getCyclePlan($tp);
+        $this->assign('cycle', $cycle);
+
+        $this->display();
 
     }
 
@@ -86,13 +97,14 @@ class PlanController extends WebInfoController
         //获取计划详情
         $this->getPlanInfo($tp);
         //获取计划周期
-        $this->getPlanCycle($tp);
+        $cycle=getCyclePlan($tp);
+        $this->assign('cycle', $cycle);
 
         $map=array('deleted'=>'0','planid'=>$tp);
         $api=M('tp_project_plan_api')->where($map)->select();
         $this->assign('api', $api);
 
-        $this->display('api');
+        $this->display();
     }
 
     public function xingneng(){
@@ -100,11 +112,12 @@ class PlanController extends WebInfoController
         //获取计划详情
         $this->getPlanInfo($tp);
         //获取计划周期
-        $this->getPlanCycle($tp);
+        $cycle=getCyclePlan($tp);
+        $this->assign('cycle', $cycle);
 
         $topology='<p>压力产生器连接服务端系统，客户端发送请求到服务端，服务端响应并处理后将结果返回到客户端。
             本次测试环境的网络环境为1000Mbps局域网（腾讯云内部），使用独立的网段，忽略防火墙延迟，
-            交易请求一级结果返回的网络传输时间可以忽略不计。<br \>
+            交易请求一级结果返回的网络传输时间可以忽略不计。<br>
             简图如下：
             </p>';
         $target='<p>通过对XXX系统的性能测试实施，在测试范围内可以达到如下目的：
@@ -122,7 +135,7 @@ class PlanController extends WebInfoController
         $resource_utilization_rate='80%';
         $begin='';
         $end='';
-        $per_scheme=$this->dict_list('per_scheme','per_scheme','2');
+        $per_scheme=$this->dictList('per_scheme','per_scheme','2');
 
         $map=array('deleted'=>'0','planid'=>$tp);
         $api=M('tp_project_plan_api')->where($map)->select();
@@ -159,7 +172,6 @@ class PlanController extends WebInfoController
 
         $this->display('pressure');
     }
-
     //考核积分
     public function appraisal(){
         $user = ['ylh', 'cf'];
@@ -167,15 +179,13 @@ class PlanController extends WebInfoController
             array('key' => '1', 'value' => '允许申诉'),
             array('key' => '0', 'value' => '不允许申诉'),
         );
-        $tester = C(QA_TESTER);
-        cookie('Appraisal_tester',I('tester', $tester[0]),array('prefix'=>C(PRODUCT).'_'));
+        $tester = C('QA_TESTER');
+        $_SESSION['Appraisal']['tester'] = I('tester', $tester[0]);
         $this->assign("tester", $tester);
-        $d_user=cookie(C(PRODUCT).'_user');
-        $d_user=jie_mi($d_user);
-        if (in_array($d_user, $user)) {
+        if (in_array(getLoginUser(), $user)) {
             $project=array();
             $map['status']=array('in','1,2');
-            $pending=M('tp_project_pending')->where($map)->select();
+            $pending=getList('tp_project_pending',$map);
             foreach ($pending as $k => $pend){
                 $project[$k]['key']=$pend['id'];
                 $project[$k]['value']='【'.$pend['pkey'].'】'.$pend['pname'].'('.$pend['id'].')';
@@ -185,42 +195,26 @@ class PlanController extends WebInfoController
             $this->assign("p", $tp);
 
             if($tp){
-                $url = C(JIRAPI) . "/Jirapi/issue/" . $tp;
-                $data = httpGet($url);
-                $data = json_decode(trim($data, "\xEF\xBB\xBF"), true);
-
-                $Appraisal_project= '【'.cookie(C(PRODUCT).'_pkey'). $data['issuenum'] .'】'.$data['summary'] ;
-                cookie('Appraisal_project',$Appraisal_project,array('prefix'=>C(PRODUCT).'_'));
-
-               //获取测试计划id
-                $plan=M('tp_project_pending')->find($tp);
-                //查询功能点个数
-                $url = C(JIRAPI) . "/Jirapi/plancase/" . $plan['planid'] . "/plan";
-                $case = httpGet($url);
-                $case = json_decode(trim($case, "\xEF\xBB\xBF"), true);
+                $data=getIssue($tp);
+                $_SESSION['Appraisal']['project'] = '【'.$_SESSION['pkey']. $data['issuenum'] .'】'.$data['summary'] ;
+                $case = getPlanCase($tp);
+                $case_id_arr=array();
                 if ($case) {
                     foreach ($case as $ca) {
                         $case_id_arr[] = $ca['tc_id'];
                     }
-                    //3.获取测试功能点（测试范围）
                     $where['ID'] = array('in', $case_id_arr);
                     $where['PRIORITY'] = '1';
-                    $url = C(JIRAPI) . "/Jirapi/issue";
-                    $func = httpJsonPost($url, json_encode($where));
-                    $func = json_decode(trim($func, "\xEF\xBB\xBF"), true);
+                    $func = postIssue($where);
                     $this->assign('c', sizeof($func));
                 } else {
                     $this->assign('c', 0);
                 }
                 //查询测试人员
-                $url = C(JIRAPI) . "/Jirapi/cycle/" . $plan['planid'] . "/plan";
-                $data = httpGet($url);
-                $data = json_decode(trim($data, "\xEF\xBB\xBF"), true);
+                $data=getCyclePlan($tp);
                 $ceshiren=array();
                 foreach ($data as $da){
-                    $url = C(JIRAPI) . "/Jirapi/testrun?cycle=" . $da['id'];
-                    $case = httpGet($url);
-                    $case = json_decode(trim($case, "\xEF\xBB\xBF"), true);
+                    $case = getCycleTestRun($da['id']);
                     foreach ($case as $ca){
                         if($ca['executed_by']){
                             if(!in_array($ca['executed_by'], $ceshiren)){
@@ -231,126 +225,108 @@ class PlanController extends WebInfoController
                 }
                 $this->assign("ceshiren", $ceshiren);
             }else{
-                cookie('Appraisal_project','【未关联】迭代或项目',array('prefix'=>C(PRODUCT).'_'));
+                $_SESSION['Appraisal']['project'] = '【未关联】迭代或项目';
             }
-            $tester=cookie(C(PRODUCT).'_Appraisal_tester');
-            $score = sumScore($tester, C(KH_QUARTER));
-            $this->assign("score", $score);
-            $this->assign("quarter", C(KH_QUARTER));
+            $this->assign("score", sumScore($_SESSION['Appraisal']['tester'], C('KH_QUARTER')));
+            $this->assign("quarter", C('KH_QUARTER'));
 
             //封装加分项下拉
+            $where = array('project' => '0', 'type' => '1');
+            $map  = array('project' => '0', 'type' => '2' );
+            $dissent = select($dissent, 'dissent', '0');
+            $var = array(
+                'quarter' => C('KH_QUARTER'),
+                'user' => $_SESSION['Appraisal']['tester']
+            );
             if ($tp) {
-                $where = array('project' => '1', 'type' => '1', 'deleted' => '0');
-                $map = array('project' => '1', 'type' => '2', 'deleted' => '0');
-                $dissent = $this->select($dissent, 'dissent', '1');
-                $var = array(
-                    'issueid' => $tp,
-                    'quarter' => C(KH_QUARTER),
-                    'user' => $tester,
-                    'deleted' => '0'
-                );
-            } else {
-                $where = array('project' => '0', 'type' => '1', 'deleted' => '0');
-                $map = array('project' => '0', 'type' => '2', 'deleted' => '0');
-                $dissent = $this->select($dissent, 'dissent', '0');
-                $var = array(
-                    'quarter' => C(KH_QUARTER),
-                    'user' => $tester,
-                    'deleted' => '0'
-                );
+                $where['project'] = '1';
+                $map['project'] = '1';
+                $dissent = select($dissent, 'dissent', '1');
+                $var['issueid'] =$tp;
             }
             //人员积分明细
-            $m = M('tp_my_score');
-            $data = $m->where($var)->order('ctime desc')->select();
-            $this->assign("data", $data);
-
-            $count = $m->where(array('status' => '1', 'deleted' => '0'))->count();
-            $this->assign("count", $count);
-
-            $m = M('tp_score_rules');
-            $jiaF = $m->where($where)->select();
+            $table='tp_my_score';
+            $this->assign("data", getList($table,$var,'ctime desc'));
+            $this->assign("count", countId($table,array('status' => '1')));
+            $table='tp_score_rules';
+            $jiaF = getList($table,$where);
+            $jiaFen=array();
             foreach ($jiaF as $jia) {
                 $jiaFen[] = array(
                     'key' => $jia['id'],
                     'value' => '【' . $jia['cate'] . '】' . $jia['name'] . ' +' . $jia['score']
                 );
             }
-            $jiaFen = $this->select($jiaFen, 'rules');
-            $this->assign("jiaFen", $jiaFen);
-
+            $this->assign("jiaFen", select($jiaFen, 'rules','0'));
             //封装减分项下拉
-            $jianF = $m->where($map)->select();
+            $jianF = getList($table,$map);
+            $jianFen=array();
             foreach ($jianF as $jian) {
                 $jianFen[] = array(
                     'key' => $jian['id'],
                     'value' => '【' . $jian['cate'] . '】' . $jian['name'] . ' -' . $jian['score']
                 );
             }
-            $jianFen = $this->select($jianFen, 'rules');
-            $this->assign("jianFen", $jianFen);
-
+            $this->assign("jianFen", select($jianFen, 'rules','0'));
             //封装允许申诉下拉
             $this->assign("dissent", $dissent);
-            $this->display();
         } else {
             $this->error('你没有权限访问此功能!');
         }
-    }
 
+        $this->display();
+    }
     //申诉列表
     public function appeal()
     {
-        $where = array('status' => '1', 'deleted' => '0');
-        $m = M('tp_my_score');
-        $this->assign("data", $m->where($where)->select());
-        $this->assign("acount", $m->where($where)->count());
-        $where = array('quarter' => C(KH_QUARTER), 'status' => '2', 'deleted' => '0');
-        $this->assign("dcount", $m->where($where)->count());
-        $where = array('quarter' => C(KH_QUARTER), 'status' => '3', 'deleted' => '0');
-        $this->assign("rcount", $m->where($where)->count());
+        $table='tp_my_score';
+        $where = array('status' => '1');
+        $this->assign("data", getList($table,$where));
+        $this->assign("acount", countId($table,$where));
+        $where = array('quarter' => C('KH_QUARTER'), 'status' => '2');
+        $this->assign("dcount", countId($table,$where));
+        $where = array('quarter' => C('KH_QUARTER'), 'status' => '3');
+        $this->assign("rcount", countId($table,$where));
+
         $this->display();
     }
-
     //申诉已完成
     public function done()
     {
-        $where = array('quarter' => C(KH_QUARTER), 'status' => '2', 'deleted' => '0');
-        $m = M('tp_my_score');
-        $this->assign("data", $m->where($where)->select());
-        $this->assign("dcount", $m->where($where)->count());
+        $table='tp_my_score';
+        $where = array('quarter' => C('KH_QUARTER'), 'status' => '2');
+        $this->assign("data", getList($table,$where));
+        $this->assign("dcount", countId($table,$where));
         $where = array('status' => '1', 'deleted' => '0');
-        $this->assign("acount", $m->where($where)->count());
-        $where = array('quarter' => C(KH_QUARTER), 'status' => '3', 'deleted' => '0');
-        $this->assign("rcount", $m->where($where)->count());
+        $this->assign("acount", countId($table,$where));
+        $where = array('quarter' => C('KH_QUARTER'), 'status' => '3');
+        $this->assign("rcount", countId($table,$where));
+
         $this->display();
     }
-
     //申诉被驳回
     public function reject()
     {
-        $where = array('quarter' => C(KH_QUARTER), 'status' => '3', 'deleted' => '0');
-        $m = M('tp_my_score');
-        $this->assign("data", $m->where($where)->select());
-        $this->assign("rcount", $m->where($where)->count());
-        $this->assign("dcount", $m->where($where)->count());
-        $where = array('quarter' => C(KH_QUARTER), 'status' => '3', 'deleted' => '0');
-        $where = array('status' => '1', 'deleted' => '0');
-        $this->assign("acount", $m->where($where)->count());
+        $table='tp_my_score';
+        $where = array('quarter' => C('KH_QUARTER'), 'status' => '3');
+        $this->assign("data", getList($table,$where));
+        $this->assign("rcount", countId($table,$where));
+        $this->assign("dcount", countId($table,$where));
+        $where = array('status' => '1');
+        $this->assign("acount", countId($table,$where));
+
         $this->display();
     }
-
     //插入数据
     function charu()
     {
         if (!I('score')) {
-            $data = M('tp_score_rules')->find(I('rules'));
+            $data = find('tp_score_rules',I('rules'));
             $_POST['score'] = $data['score'];
         }
         $m = D('tp_my_score');
-        $user=cookie(C(PRODUCT).'_user');
-        $user=jie_mi($user);
-        $_POST['adder'] = $user;
-        $_POST['moder'] = $user;
+        $_POST['adder'] = getLoginUser();
+        $_POST['moder'] = getLoginUser();
         $_POST['ctime'] = time();
         if (!$m->create()) {
             $this->error($m->getError());
@@ -365,171 +341,205 @@ class PlanController extends WebInfoController
             $this->error("失败");
         }
     }
-
     //驳回
     function bohui()
     {
         $_GET['status'] = 3;
-        $_GET['table'] = 'tp_my_score';
+        $_GET['table']='tp_my_score';
         $this->update();
     }
-
     //更新积分排行
     function updateList($user, $quarter)
     {
-        //1.查询list
+        $table='tp_score_list';
         $score = sumScore($user, $quarter);
-        $where = array('user' => $user, 'quarter' => $quarter, 'deleted' => '0');
-        $m = D('tp_score_list');
-        $arr = $m->where($where)->select();
-        $d_user=cookie(C(PRODUCT).'_user');
-        $d_user=jie_mi($d_user);
+        $where = array('user' => $user, 'quarter' => $quarter);
+        $arr= getList($this,$where);
         //2.判断是否有值
         if ($arr) {
             //3.有值更新人员积分
             $_GET['id'] = $arr[0]['id'];
             $_GET['score'] = $score;
-            $_GET['moder'] = $d_user;
-            $id = $m->save($_GET);
+            $id=update($table,$_GET);
         } else {
             //4.无值插入人员积分
             $_GET['user'] = $user;
             $_GET['score'] = $score;
             $_GET['quarter'] = $quarter;
-            $_GET['adder'] = $d_user;
-            $_GET['moder'] = $d_user;
-            $_GET['ctime'] = time();
-            if (!$m->create($_GET)) {
-                $this->error($m->getError());
-            }
-            $id = $m->add($_GET);
+            $id=insert($table,$_GET);
         }
         return $id;
     }
 
     //计划详情
     public function detail(){
-        //1.获取测试计划详情
         $tp = I('tp');
-        //获取计划详情
-        $plan=$this->getPlanInfo($tp);
-        //获取计划周期
-        $this->getPlanCycle($tp);
-        //2.获取测试关联的测试用例
-        $url = C(JIRAPI) . "/Jirapi/plancase/" . $tp . "/plan";
-        $case = httpGet($url);
-        $case = json_decode(trim($case, "\xEF\xBB\xBF"), true);
-        cookie('testCase',$case,array('prefix'=>C(PRODUCT).'_'));
-        $this->assign('case', $case);
-        if ($case) {
-            $count = sizeof($case);
-            foreach ($case as $ca) {
-                $case_id_arr[] = $ca['tc_id'];
+        //1.获取测试计划详情
+        $_SESSION['testPlan'] = getIssue($tp);
+        if($_SESSION['testPlan']['assignee']==getLoginUser()){
+            $editable=1;
+        }else{
+            $editable=0;
+        }
+        $this->assign('editable', $editable);
+        $this->assign('plan', $_SESSION['testPlan']);
+
+        $extend = find('tp_project_plan_extend',$tp);
+        $this->assign('extend', $extend);
+
+        $var=$this->getDictInfo('per_scheme',$extend['per_scheme']);
+        $per_scheme=json_decode($var['json']);
+        $list=$this->getDictList('press_type');
+
+        foreach ($list as $key=>$vo){
+            if (in_array($key,$per_scheme)){
+                $where=array('press_type'=>$key,'selected'=>'1','project'=>$tp);
+                $scene = getList('tp_api_scene_pressure',$where,'api');
+                $a=true;
+            }else{
+                $scene=array();
+                $a=false;
             }
-            //3.获取测试功能点（测试范围）
-            $where['ID'] = array('in', $case_id_arr);
+            $this->assign('extend_scheme'.$key, $a);
+            $this->assign('scene'.$key, $scene);
+        }
+        //4.获取测试计划下的测试周期
+        $this->assign('data', getCyclePlan($tp));
+        if($extend['ptype']=='2'){
+            //性能测试
+            $this->assign('api', getList('tp_project_plan_api',array('type'=>'1','planid'=>$tp)));
+            $this->assign('tools', getList('tp_project_tool_term',array('type'=>'1','planid'=>$tp)));
+            $this->assign('term', getList('tp_project_tool_term',array('type'=>'0','planid'=>$tp)));
+            if($extend['status']){
+                $topology=trim($extend['topology']);
+                $target=$extend['target'];
+                $range=$extend['range'];
+                $response_time=$extend['response_time'];
+                $success_rate=$extend['success_rate'];
+                $throughput=$extend['throughput'];
+                $resource_utilization_rate=$extend['resource_utilization_rate'];
+                $begin=$extend['begin'];
+                $end=$extend['end'];
+                $per_scheme=dictList('per_scheme','per_scheme',$extend['per_scheme']);
+            }else{
+                $topology='<p>压力产生器连接服务端系统，客户端发送请求到服务端，服务端响应并处理后将结果返回到客户端。
+            本次测试环境的网络环境为1000Mbps局域网（腾讯云内部），使用独立的网段，忽略防火墙延迟，
+            交易请求一级结果返回的网络传输时间可以忽略不计。<br>
+            简图如下：
+            </p>';
+                $target='<p>通过对XXX系统的性能测试实施，在测试范围内可以达到如下目的：
+                    <ul>
+                        <li>了解XXX系统在各个业务场景下的性能表现；</li>
+                        <li>了解XXX业务系统的稳定性；</li>
+                        <li>通过各个业务场景的测试实施，为系统调优提供数据参考；</li>
+                        <li>通过性能测试发现系统瓶颈，并进行优化</li>
+                    </ul>
+                </p>';
+                $per_scheme=dictList('per_scheme','per_scheme','2');
+                $range=' XXX系统说明记忆系统业务介绍和需要测试的业务模块，业务逻辑图如下：';
+                $response_time='50-200-500ms';
+                $success_rate='99.9%';
+                $throughput='';
+                $resource_utilization_rate='80%';
+                $begin='';
+                $end='';
+            }
+            $this->assign("topology", $topology);
+            $this->assign("target",PublicController::editor("target",$target,'desc',120));
+            $this->assign("range", $range);
+            $this->assign('response_time', $response_time);
+            $this->assign('success_rate', $success_rate);
+            $this->assign('throughput', $throughput);
+            $this->assign('resource_utilization_rate', $resource_utilization_rate);
+            $this->assign('begin', $begin);
+            $this->assign('end', $end);
+            $this->assign('per_scheme', $per_scheme);
+
+            $this->display('pressure');
+
+        }elseif ($extend['ptype']=='1'){
+            //Api测试
+            $this->assign('api', getList('tp_project_plan_api',array('type'=>'0','planid'=>$tp)));
+
+            $this->display('api');
+        }else{
+            //2.获取测试关联的测试用例
+            $_SESSION['testCase'] = getPlanCase($tp);
+            $this->assign('case', $_SESSION['testCase']);
+            if ($_SESSION['testCase']) {
+                $count = sizeof($_SESSION['testCase']);
+                $case_id_arr=array();
+                foreach ($_SESSION['testCase'] as $ca) {
+                    $case_id_arr[] = $ca['tc_id'];
+                }
+                //3.获取测试功能点（测试范围）
+                $where['ID'] = array('in', $case_id_arr);
+                $where['PRIORITY'] = '1';
+                $_SESSION['testfunc']=postIssue($where);
+                $this->assign('func', $_SESSION['testfunc']);
+                $this->assign('c', sizeof($_SESSION['testfunc']));
+            } else {
+                $count = 0;
+                $this->assign('c', 0);
+            }
+            $this->assign('count', $count);
+            //5.获取本次迭代的BUG
+            $_SESSION['testBug'] = getPlanBug($tp);
+            $_SESSION['bug_num']=sizeof($_SESSION['testBug']);
+            if ($_SESSION['testBug']) {
+                foreach ($_SESSION['testBug'] as $b) {
+                    $bug_id[] = $b['id'];
+                }
+            }
+            //6.获取遗留BUG
+            $where = array();
+            $where['tp']=$tp;
+            $where['issuestatus'] = array('not in', '6');
+            $_SESSION['testYiliu']=postPlanBug($where);
+            $_SESSION['bug_yiliu']=sizeof($_SESSION['testYiliu']);
+            $xiufl_num=($_SESSION['bug_num']-$_SESSION['bug_yiliu'])/$_SESSION['bug_num'];
+            $xiufl_num=round($xiufl_num,4)*100;
+            $_SESSION['xiufl_num']=$xiufl_num;
+
+            //7.P0级别的bug的数量
+            $where = array();
+            $where['tp']=$tp;
             $where['PRIORITY'] = '1';
-            $url = C(JIRAPI) . "/Jirapi/issue";
-            $func = httpJsonPost($url, json_encode($where));
-            $func = json_decode(trim($func, "\xEF\xBB\xBF"), true);
-            cookie('testfunc',$func,array('prefix'=>C(PRODUCT).'_'));
-            $this->assign('func', $func);
-            $c = sizeof($func);
-            $this->assign('c', $c);
-        } else {
-            $count = 0;
-            $this->assign('c', 0);
+            $_SESSION['p0_num']=sizeof(postPlanBug($where));
+
+            //8.P1级别的bug的数量
+            $where['PRIORITY'] = '2';
+            $_SESSION['p1_num']=sizeof(postPlanBug($where));
+
+            //9.P2级别的遗留BUG数量
+            $where['PRIORITY'] = '3';
+            $where['issuestatus'] = array('not in', '6');
+            $_SESSION['p2_num']=sizeof(postPlanBug($where));
+
+            //10.P3级别的遗留BUG数量
+            $where['PRIORITY'] = '4';
+            $_SESSION['p3_num']=sizeof(postPlanBug($where));
+
+            //11.P4级别的遗留BUG数量
+            $where['PRIORITY'] = '5';
+            $_SESSION['p4_num']=sizeof(postPlanBug($where));
+
+            $this->display();
         }
-        $this->assign('count', $count);
-        //5.获取本次迭代的BUG
-        $key = cookie(C(PRODUCT).'_pkey') . '-' . $plan['issuenum'];
-
-        $url = C(JIRAURL) . "/rest/synapse/latest/public/testPlan/" . $key . "/defects";
-        $bug = httpAuthGet($url, ylh, 123456);
-        $bug = json_decode(trim($bug, "\xEF\xBB\xBF"), true);
-        cookie('testBug',$bug,array('prefix'=>C(PRODUCT).'_'));
-        cookie('bug_num',sizeof($bug),array('prefix'=>C(PRODUCT).'_'));
-        if ($bug) {
-            foreach ($bug as $b) {
-                $bug_id[] = $b['id'];
-            }
-        }
-        //6.获取遗留BUG
-        $where = array();
-        $where['ID'] = array('in', $bug_id);
-        $where['issuestatus'] = array('not in', '6');
-        $where['order']='PRIORITY,issuenum';
-        $url = C(JIRAPI) . "/Jirapi/issue";
-        $yiliu = httpJsonPost($url, json_encode($where));
-        $yiliu = json_decode(trim($yiliu, "\xEF\xBB\xBF"), true);
-        cookie('testYiliu',$yiliu,array('prefix'=>C(PRODUCT).'_'));
-        cookie('bug_yiliu',sizeof($yiliu),array('prefix'=>C(PRODUCT).'_'));
-
-        $xiufl_num=(cookie(C(PRODUCT).'_bug_num')-cookie(C(PRODUCT).'_bug_yiliu'))/cookie(C(PRODUCT).'_bug_num');
-        cookie('xiufl_num',round($xiufl_num,4)*100,array('prefix'=>C(PRODUCT).'_'));
-        //7.P0级别的bug的数量
-        $where = array();
-        $where['ID'] = array('in', $bug_id);
-        $where['PRIORITY'] = '1';
-        $url = C(JIRAPI) . "/Jirapi/issue";
-        $p0 = httpJsonPost($url, json_encode($where));
-        $p0 = json_decode(trim($p0, "\xEF\xBB\xBF"), true);
-        cookie('p0_num',sizeof($p0),array('prefix'=>C(PRODUCT).'_'));
-
-        //8.P1级别的bug的数量
-        $where['PRIORITY'] = '2';
-        $url = C(JIRAPI) . "/Jirapi/issue";
-        $p1 = httpJsonPost($url, json_encode($where));
-        $p1 = json_decode(trim($p1, "\xEF\xBB\xBF"), true);
-        cookie('p1_num',sizeof($p1),array('prefix'=>C(PRODUCT).'_'));
-
-        //9.P2级别的遗留BUG数量
-        $where['PRIORITY'] = '3';
-        $where['issuestatus'] = array('not in', '6');
-        $url = C(JIRAPI) . "/Jirapi/issue";
-        $p2 = httpJsonPost($url, json_encode($where));
-        $p2 = json_decode(trim($p2, "\xEF\xBB\xBF"), true);
-        cookie('p2_num',sizeof($p2),array('prefix'=>C(PRODUCT).'_'));
-
-        //10.P3级别的遗留BUG数量
-        $where['PRIORITY'] = '4';
-        $where['issuestatus'] = array('not in', '6');
-        $url = C(JIRAPI) . "/Jirapi/issue";
-        $p3 = httpJsonPost($url, json_encode($where));
-        $p3 = json_decode(trim($p3, "\xEF\xBB\xBF"), true);
-        cookie('p3_num',sizeof($p3),array('prefix'=>C(PRODUCT).'_'));
-
-        //11.P4级别的遗留BUG数量
-        $where['PRIORITY'] = '5';
-        $where['issuestatus'] = array('not in', '6');
-        $url = C(JIRAPI) . "/Jirapi/issue";
-        $p4 = httpJsonPost($url, json_encode($where));
-        $p4 = json_decode(trim($p4, "\xEF\xBB\xBF"), true);
-        cookie('p4_num',sizeof($p4),array('prefix'=>C(PRODUCT).'_'));
-
-        $this->display();
     }
 
     public function tcase()
     {
         $tp = I('tp');
-        $this->assign('tp', $tp);
-
-        $plan=cookie(C(PRODUCT).'_testPlan');
-        if (!$plan) {
-            $url = C(JIRAPI) . "/Jirapi/issue/" . $tp;
-            $plan = httpGet($url);
-            $plan = json_decode(trim($plan, "\xEF\xBB\xBF"), true);
-            cookie('testPlan',$plan,array('prefix'=>C(PRODUCT).'_'));
+        if (!$_SESSION['testPlan']) {
+            $_SESSION['testPlan'] = getIssue($tp);
         }
-        $this->assign('plan', $plan);
+        $this->assign('plan', $_SESSION['testPlan']);
 
-        //2.获取测试关联的测试用例
-        $url = C(JIRAPI) . "/Jirapi/plancase/" . $plan['id'] . "/plan";
-        $case = httpGet($url);
-        $case = json_decode(trim($case, "\xEF\xBB\xBF"), true);
-        cookie('testCase',$case,array('prefix'=>C(PRODUCT).'_'));
-        $this->assign('case', $case);
+        if(!$_SESSION['testCase']){
+            $_SESSION['testCase'] = getPlanCase($tp);
+        }
+        $this->assign('case', $_SESSION['testCase']);
 
         $this->display();
     }
@@ -537,59 +547,35 @@ class PlanController extends WebInfoController
     public function bug()
     {
         $tp = I('tp');
-        $this->assign('tp', $tp);
-        $plan=cookie(C(PRODUCT).'_testPlan');
-        if (!$plan) {
-            $url = C(JIRAPI) . "/Jirapi/issue/" . $tp;
-            $plan = httpGet($url);
-            $plan = json_decode(trim($plan, "\xEF\xBB\xBF"), true);
-            cookie('testPlan',$plan,array('prefix'=>C(PRODUCT).'_'));
+        if (!$_SESSION['testPlan']) {
+            $_SESSION['testPlan'] = getIssue($tp);
         }
-        $this->assign('plan', $plan);
+        $this->assign('plan', $_SESSION['testPlan']);
 
-        $key = cookie(C(PRODUCT).'_pkey'). '-' . $plan['issuenum'];
-        $url = C(JIRAURL) . "/rest/synapse/latest/public/testPlan/" . $key . "/defects";
-        $bug = httpAuthGet($url, ylh, 123456);
-        $bug = json_decode(trim($bug, "\xEF\xBB\xBF"), true);
-        cookie('testBug',$bug,array('prefix'=>C(PRODUCT).'_'));
-        $this->assign('bug', $bug);
+        if(!$_SESSION['testBug']){
+            $_SESSION['testBug'] = getPlanBug($tp);
+        }
+        $this->assign('bug', $_SESSION['testBug']);
 
         $this->display();
     }
 
     public function yiliu()
     {
-        $tp = I('tp');
-        $this->assign('tp', $tp);
-        $plan=cookie(C(PRODUCT).'_testPlan');
-        if (!$plan) {
-            $url = C(JIRAPI) . "/Jirapi/issue/" . $tp;
-            $plan = httpGet($url);
-            $plan = json_decode(trim($plan, "\xEF\xBB\xBF"), true);
-            cookie('testPlan',$plan,array('prefix'=>C(PRODUCT).'_'));
+        $tp=I('tp');
+        if (!$_SESSION['testPlan']) {
+            $_SESSION['testPlan'] = getIssue($tp);
         }
-        $this->assign('plan', $plan);
+        $this->assign('plan', $_SESSION['testPlan']);
 
-        $key =  cookie(C(PRODUCT).'_pkey') . '-' . $plan['issuenum'];
-        $url = C(JIRAURL) . "/rest/synapse/latest/public/testPlan/" . $key . "/defects";
-        $bug = httpAuthGet($url, ylh, 123456);
-        $bug = json_decode(trim($bug, "\xEF\xBB\xBF"), true);
-        $this->assign('bug', $bug);
-        if ($bug) {
-            foreach ($bug as $b) {
-                $bug_id[] = $b['id'];
-            }
+        if(!$_SESSION['testYiliu']){
+            $where = array();
+            $where['tp']=$tp;
+            $where['issuestatus'] = array('not in', '6');
+            $where['order']='PRIORITY';
+            $_SESSION['testYiliu'] = postPlanBug($where);
         }
-        //6.获取遗留BUG
-        $where = array();
-        $where['ID'] = array('in', $bug_id);
-        $where['issuestatus'] = array('not in', '6');
-        $where['order']='PRIORITY';
-        $url = C(JIRAPI) . "/Jirapi/issue";
-        $yiliu = httpJsonPost($url, json_encode($where));
-        $yiliu = json_decode(trim($yiliu, "\xEF\xBB\xBF"), true);
-        cookie('testYiliu',$yiliu,array('prefix'=>C(PRODUCT).'_'));
-        $this->assign('yiliu', $yiliu);
+        $this->assign('yiliu', $_SESSION['testYiliu']);
 
         $this->display();
     }
@@ -599,22 +585,21 @@ class PlanController extends WebInfoController
         $planid=I('planid');
         $this->assign('planid', $planid);
         $where=array('planid'=>$planid,'type'=>'2');
-        $data=M('tp_risk')->where($where)->find();
+        $data = findOne('tp_risk',$where);
         $this->assign('data', $data);
 
-        $plan=cookie(C(PRODUCT).'_testPlan');
         //5.提测打回邮件
-        $sendTo = $plan['assignee'] . '@zhidaoauto.com';
+        $sendTo = $_SESSION['testPlan']['assignee'] . '@zhidaoauto.com';
         $this->assign('sendTo', $sendTo);
         $cc = 'ylh@zhidaoauto.com;cf@zhidaoauto.com';
         $this->assign('cc', $cc);
-        $subject = $plan['summary'] . '，未按计划时间提交测试，会造成项目可能延期的风险';
+        $subject = $_SESSION['testPlan']['summary'] . '，未按计划时间提交测试，会造成项目可能延期的风险';
         $this->assign('subject', $subject);
         $body = '原计划XX月XX日（上午上班前\下午下班前）提测<br>';
 
         $body.= '截止到  XXX  仍未收到提测信息，因此会造成项目可能延期的风险!<br>
                 <br>
-                请相关责任人务必回复邮件说明原因，并明确给出可以提测的时间节点。<br \>';
+                请相关责任人务必回复邮件说明原因，并明确给出可以提测的时间节点。<br>';
         if($data){
             switch ($data['mod'])
             {
@@ -629,49 +614,42 @@ class PlanController extends WebInfoController
         }
         $this->display();
     }
-
     //提测打回
     public function repulse()
     {
         $planid=I('planid');
         $this->assign('planid', $planid);
-        $where=array('planid'=>$planid,'type'=>'0','deleted'=>'0');
-        $data=M('tp_risk')->where($where)->find();
+        $where=array('planid'=>$planid,'type'=>'0');
+        $data = findOne('tp_risk',$where);
         $this->assign('data', $data);
 
         //2.获取测试关联的测试用例
-        $url = C(JIRAPI) . "/Jirapi/plancase/" . $planid . "/plan";
-        $case = httpGet($url);
-        $case = json_decode(trim($case, "\xEF\xBB\xBF"), true);
+        $case = getPlanCase($planid);
+        $case_id_arr=array();
         foreach ($case as $ca) {
             $case_id_arr[] = $ca['tc_id'];
         }
         //3.获取测试功能点（测试范围）
         $where['ID'] = array('in', $case_id_arr);
         $where['PRIORITY'] = '1';
-        $url = C(JIRAPI) . "/Jirapi/issue";
-        $func = httpJsonPost($url, json_encode($where));
-        $func = json_decode(trim($func, "\xEF\xBB\xBF"), true);
+        $func =postIssue($where);
         $this->assign('func', $func);
-        $str='<ol>';
+        $str='';
         foreach ($func as $f){
             $str.='<li><small><span class="label label-danger">未通过</span>【'.$_SESSION['pkey'].'-'.$f['issuenum'].'】'.$f['summary'].'</small></li>';
         }
-        $str.='</ol>';
-
         //5.提测打回邮件
-        $plan=cookie(C(PRODUCT).'_testPlan');
-        $sendTo = $plan['assignee'] . '@zhidaoauto.com';
+        $sendTo = $_SESSION['testPlan']['assignee'] . '@zhidaoauto.com';
         $this->assign('sendTo', $sendTo);
         $cc = 'ylh@zhidaoauto.com;cf@zhidaoauto.com';
         $this->assign('cc', $cc);
-        $subject = $plan['summary'] . '，测试准入验收未通过，提测版本打回，有项目可能延期的风险';
+        $subject = $_SESSION['testPlan']['summary'] . '，测试准入验收未通过，提测版本打回，有项目可能延期的风险';
         $this->assign('subject', $subject);
         $body = '在按照给出的冒烟测试标准进行测试准入验收时，发现有部分冒烟用例测试未通过<br>
                 附上冒烟用例测试结果：<br>
                 ';
         if(!$data['mod']){
-            $body.= $str;
+            $body.= '<ol>'.$str.'</ol>';
         }else{
             $body.='<small>（请从右侧复制冒烟用例结果到FoxMail的邮件正文中）</small><br>';
         }
@@ -690,87 +668,54 @@ class PlanController extends WebInfoController
         }else{
             $this->assign("body",PublicController::editor("body",$body));
         }
-
-
         $this->display();
     }
-
     //编辑状态更新
     function mod(){
         $_GET['mod']='2';
         $_GET['table']='tp_risk';
         $this->update();
     }
-
     //延期预警
     public function warning()
     {
-        $planid=I('planid');
-        $this->assign('planid', $planid);
-        $where=array('planid'=>$planid,'type'=>'1');
-        $data=M('tp_risk')->where($where)->find();
+        $tp=I('planid');
+        $this->assign('planid', $tp);
+        $where=array('planid'=>$tp,'type'=>'1');
+        $data = find('tp_risk',$where);
         $this->assign('data', $data);
-
-        $plan=cookie(C(PRODUCT).'_testPlan');
-        if (!$plan) {
-            $tp = I('tp');
-            //1.获取测试计划详情
-            $url = C(JIRAPI) . "/Jirapi/issue/" . $tp;
-            $plan = httpGet($url);
-            $plan = json_decode(trim($plan, "\xEF\xBB\xBF"), true);
-            $_SESSION['testPlan'] = $plan;
+        if (!$_SESSION['testPlan']) {
+            $_SESSION['testPlan'] = getIssue($tp);;
         }
-
-        $yiliu=cookie(C(PRODUCT).'_testYiliu');
-        if(!$yiliu){
-            //5.获取本次迭代的BUG
-            $key = cookie(C(PRODUCT).'_pkey'). '-' . $plan['issuenum'];
-            $url = C(JIRAURL) . "/rest/synapse/latest/public/testPlan/" . $key . "/defects";
-            $bug = httpAuthGet($url, ylh, 123456);
-            $bug = json_decode(trim($bug, "\xEF\xBB\xBF"), true);
-            $this->assign('bug', $bug);
-            if ($bug) {
-                foreach ($bug as $b) {
-                    $bug_id[] = $b['id'];
-                }
-            }
-            //6.获取遗留BUG
+        if(!$_SESSION['testYiliu']){
             $where = array();
-            $where['ID'] = array('in', $bug_id);
+            $where['tp']=$tp;
             $where['issuestatus'] = array('not in', '6');
             $where['order']='PRIORITY';
-            $url = C(JIRAPI) . "/Jirapi/issue";
-            $yiliu = httpJsonPost($url, json_encode($where));
-            $yiliu = json_decode(trim($yiliu, "\xEF\xBB\xBF"), true);
-            cookie('testYiliu',$yiliu,array('prefix'=>C(PRODUCT).'_'));
+            $_SESSION['testYiliu'] = postPlanBug($where);
         }
-        $this->assign('yiliu', $yiliu);
-
-        $str='<ol>';
-        foreach ($yiliu as $f){
+        $this->assign('yiliu', $_SESSION['testYiliu']);
+        $str='';
+        foreach ($_SESSION['testYiliu'] as $f){
             $str.='<li><small><span class="badge">'
                 .getIssueStatus($f['issuestatus'])
-                .'</span>【'.cookie(C(PRODUCT).'_pkey').'-'.$f['issuenum'].'】'.$f['summary']
+                .'</span>【'.$_SESSION['pkey'].'-'.$f['issuenum'].'】'.$f['summary']
                 .'</small></li>';
         }
-        $str.='</ol>';
-
-
-        $mail = $plan['assignee'] . '@zhidaoauto.com';
+        $mail = $_SESSION['testPlan']['assignee'] . '@zhidaoauto.com';
         $this->assign('sendTo', $mail);
         $cc = 'ylh@zhidaoauto.com;cf@zhidaoauto.com';
         $this->assign('cc', $cc);
-        $subject = $plan['summary'] . '，未达到最基本的上线标准，项目已经延期';
+        $subject = $_SESSION['testPlan']['summary'] . '，未达到最基本的上线标准，项目已经延期';
         $this->assign('subject', $subject);
-        $body = $plan['summary'] . ',<br>
+        $body = $_SESSION['testPlan']['summary'] . ',<br>
                 原计划XX月XX日上线，截止到XX时间<br>'
             . 'Jira中还有BUG没有关闭:<br>';
         if(!$data['mod']){
-            $body.= $str;
+            $body.= '<ol>'.$str.'</ol>';
         }else{
             $body.='<small>（请从右侧复制遗留BUG列表到FoxMail的邮件正文中）</small><br>';
         }
-
         $body.='<br>
                 完全达不到上线的最基本要求，项目已经延期<br><br>
                 请产品经理或其他负责人紧急召开项目会议，商议下一步的解决方案';
@@ -786,10 +731,10 @@ class PlanController extends WebInfoController
         }else{
             $this->assign("body",PublicController::editor("body",$body));
         }
-
         $this->display();
 
     }
+
 
     function upload_range(){
         $table='tp_project_plan_extend';
@@ -809,18 +754,14 @@ class PlanController extends WebInfoController
 
     //选择被测接口
     public function choice_api(){
-        $tp=I('tp');
-        $this->assign('tp', $tp);
-        $type=I('type');
-        $this->assign('type', $type);
-
-        $map=array('deleted'=>'0','planid'=>$tp);
-        $api=M('tp_project_plan_api')->where($map)->select();
+        $table='tp_project_plan_api';
+        $map=array('type'=>'1','planid'=>$_SESSION['testPlan']['id']);
+        $api = getList($table,$map);
         $this->assign('api', $api);
 
         $search = I('search');
         $this->assign('search', $search);
-        $where = array('removed' => '0');
+        $where = array();
         $where['apiName|apiURI'] = array('like', '%' . $search . '%');
         $where['apiName'] = array('neq', '示例接口');
         if($api){
@@ -830,33 +771,27 @@ class PlanController extends WebInfoController
             }
             $where['apiID']  = array('not in',$arrApi);
         }
-        $project = $this->projectID();
-        $this->assign('project', $project);
-        $branch=I('branch','2');
-        $this->assign('branch', $branch);
-        $where['projectID']=$branch;
-        $data = M('eo_api')->where($where)->select();
-        $this->assign('data', $data);
+        $this->assign('project', $this->projectID());
+        $where['projectID']=I('branch','2');
+        $this->assign('branch', $where['projectID']);
+        $table='eo_api';
+        $this->assign('data', getList($table,$where));
 
         $this->display();
     }
-
     //编辑被测接口
     public function mod_api(){
-        $m=M('tp_project_plan_api');
-        $api=$m->find(I('id'));
-        $this->assign('api', $api);
-        $where=array('planid'=>$api['planid'],'type'=>'1','deleted'=>'0');
-        $data=$m->where($where)->select();
-        $this->assign('data', $data);
+        $table='tp_project_plan_api';
+        $this->assign('api', find($table,I('id')));
+        $where=array('planid'=>$_SESSION['testPlan']['id'],'type'=>'1');
+        $this->assign('data', getList($table,$where));
 
         $this->display();
     }
 
     //标记性能
     function pressure(){
-        $url = '/' . C(PRODUCT) . '/Plan/choice_api/branch/'.I('branch');
-        cookie('url',$url,array('prefix'=>C(PRODUCT).'_'));
+        $_SESSION['url'] = '/' . C('PRODUCT') . '/Plan/choice_api/branch/'.$_GET['branch'];
         $this->isLogin();
         $_GET['table']='eo_api';
         if($_GET['pressure']=='0'){
@@ -879,18 +814,21 @@ class PlanController extends WebInfoController
 
     //标记性能
     function jiaru(){
-        $where=$_GET;
-        $_GET['table']='tp_project_plan_api';
-        $data=M($_GET['table'])->where($where)->find();
-        if($data){
-            //更新删除标识
-            $_GET['id']=$data['id'];
-            $_GET['deleted']='0';
-            $this->update();
+        if($_GET['pressure']){
+            $where=$_GET;
+            $_GET['table']='tp_project_plan_api';
+            $data= findOne($_GET['table'],$where);
+            if($data){
+                $_GET['id']=$data['id'];
+                $_GET['deleted']='0';
+                $this->update();
+            }else{
+                $this->insert();
+            }
         }else{
-            //更新插入数据
-            $this->insert();
+            $this->error('请先标记性能（Y）');
         }
+
     }
 
     //添加工具和术语
@@ -907,26 +845,14 @@ class PlanController extends WebInfoController
 
     //测试执行记录
     public function run(){
-
-
         $cyc = I('cyc');
         //1.获取测试周期详情
-        $url = C(JIRAPI) . "/Jirapi/cycle/" . $cyc;
-        $cycle = httpGet($url);
-        $cycle = json_decode(trim($cycle, "\xEF\xBB\xBF"), true);
-        $this->assign('cycle', $cycle);
-
-        $url = C(JIRAPI) . "/Jirapi/issue/" . $cycle['tp_id'];
-        $plan = httpGet($url);
-        $plan = json_decode(trim($plan, "\xEF\xBB\xBF"), true);
-        $this->assign('plan', $plan);
-
-        //3.获取测试关联的测试用例
-        $url = C(JIRAPI) . "/Jirapi/testrun?cycle=" . $cyc;
-        $case = httpGet($url);
-        $case = json_decode(trim($case, "\xEF\xBB\xBF"), true);
-        $this->assign('case', $case);
+        $this->assign('cycle', getCycle($cyc));
+        //2.获取测试关联的测试用例
+        $this->assign('case', getCycleRun($cyc));
 
         $this->display();
     }
+
+
 }

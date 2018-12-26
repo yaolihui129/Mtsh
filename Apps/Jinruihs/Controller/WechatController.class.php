@@ -19,14 +19,14 @@ class WechatController extends Controller{
         $signature = $_GET["signature"];//从用户端获取签名赋予变量signature
         $timestamp = $_GET["timestamp"];//从用户端获取时间戳赋予变量timestamp
         $nonce = $_GET["nonce"];	//从用户端获取随机数赋予变量nonce
-        $token = C(PRODUCT);//将常量token赋予变量token
+        $token = C('PRODUCT');//将常量token赋予变量token
         $tmpArr = array($token, $timestamp, $nonce);//简历数组变量tmpArr
         sort($tmpArr, SORT_STRING);//新建排序
         $tmpStr = implode( $tmpArr );//字典排序
         $tmpStr = sha1( $tmpStr );//shal加密
         //tmpStr与signature值相同，返回真，否则返回假
         $data['name']=json_encode($_GET);
-        $data['web']=C(PRODUCT);
+        $data['web']=C('PRODUCT');
         $data['signature']=$tmpStr;
         insert('token',$data);
         if( $tmpStr == $signature ){
@@ -86,8 +86,8 @@ class WechatController extends Controller{
     }
 
     function getAccessToken() {
-        $appID=C(appID);
-        $appsecret=C(appsecret);
+        $appID=C('appID');
+        $appsecret=C('appsecret');
         $access_token= S($appID.'access_token');
         if (!$access_token) {
             $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".$appID."&secret=".$appsecret;
@@ -111,7 +111,7 @@ class WechatController extends Controller{
         $string = "jsapi_ticket=$jsapiTicket&noncestr=$nonceStr&timestamp=$timestamp&url=$url";
         $signature = sha1($string);
         $signPackage = array(
-            "appId"     => C(appID),
+            "appId"     => C('appID'),
             "nonceStr"  => $nonceStr,
             "timestamp" => $timestamp,
             "url"       => $url,
@@ -131,7 +131,7 @@ class WechatController extends Controller{
     }
 
     private function getJsApiTicket() {
-        $appID=C(appID);
+        $appID=C('appID');
         $ticket=S($appID.'ticket');
         if (!$ticket) {
             $accessToken = $this->getAccessToken();
@@ -149,16 +149,16 @@ class WechatController extends Controller{
 
     function getBaseInfo($scope='snsapi_userinfo',$state='123'){
         //1.获取code $scope='snsapi_base';snsapi_userinfo
-        $appid = C(appID);
-        $redirect_uri = urlencode(C(WEBSITE).'/'.C(PRODUCT).'/Wechat/getUserOpenId');
+        $appid = C('appID');
+        $redirect_uri = urlencode(C('WEBSITE').'/'.C('PRODUCT').'/Wechat/getUserOpenId');
         $url='https://open.weixin.qq.com/connect/oauth2/authorize?appid='.$appid
               .'&redirect_uri='.$redirect_uri.'&response_type=code&scope='.$scope.'&state='.$state.'#wechat_redirect';
         header('Location:'.$url);
     }
 
     function getUserOpenId(){
-        $appid     = C(appID);
-        $appsecret = C(appsecret);
+        $appid     = C('appID');
+        $appsecret = C('appsecret');
         $code = $_GET['code'];
         $state= $_GET['state'];
         $url= 'https://api.weixin.qq.com/sns/oauth2/access_token?appid='.$appid.'&secret='.$appsecret.'&code='.$code.'&grant_type=authorization_code';
@@ -187,7 +187,7 @@ class WechatController extends Controller{
             //插入数据
             if($openid){
               $data['app_id']=$appid;
-              $data['merchant_id']=C(MERCHANTID);
+              $data['merchant_id']=C('MERCHANTID');
               $data['openid']=$openid;
               $data['id']=insert('customer_third_party',$data);
             }
@@ -201,28 +201,18 @@ class WechatController extends Controller{
     //更新用户信息
     function updateCustomerThirdParty($userinfo,$state){
       $userinfo=json_decode($userinfo,true);
-      $userinfo['id']= cookie(C(appID).'_isLogin');
+      $userinfo['id']= cookie(C('appID').'_isLogin');
       $userinfo['source']= $state;
       $userinfo['flag']= '0';
       update('customer_third_party',$userinfo);
     }
 
-    function qrCodeTime($id,$day=30){//getTimeQrCode($scene_id,$expire=30)
-        $url=$this->getTimeQrCode($id,$day);
-        echo "临时二维码";
-        echo "<img src='".$url."'/>";
-    }
 
-    function qrCodeForever($id){//getForeverQrCode($wxId,$scene_id);
-        $url=$this->getForeverQrCode($id);
-        echo "用久二维码";
-        echo "<img src='".$url."'/>";
-    }
     //换取微信短链接
     function getShortUrl($long_url){
         $url='https://api.weixin.qq.com/cgi-bin/shorturl?access_token='.$this->getAccessToken();
-        $array=array('action'=>'long2short','long_url'=>$long_url );                        //组装数组
-        $postJson = json_encode($array);                                                    //封装json
+        $array=array('action'=>'long2short','long_url'=>$long_url );
+        $postJson = json_encode($array);
         $res = httpPost($url, $postJson);
         $res = json_decode($res,true);
         return $res['short_url'];
@@ -231,15 +221,15 @@ class WechatController extends Controller{
     function getTimeQrCode($scene_id,$expire=30){
         $url='https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token='.$this->getAccessToken();
         $expire = $expire*24*60*60;
-        $postArr =array(                                                                //组装数组
+        $postArr =array(
             'expire_seconds'=>$expire,
             'action_name'=>"QR_SCENE",
             'action_info'=>array('scene'=>array('scene_id'=>$scene_id) )
         );
-        $postJson = json_encode($postArr);                                              //封装json
-        $res = httpPost($url, $postJson);                                               //获取 $ticket
-        $res = json_decode($res,true);                                          //转换成数组
-        $long_url='https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket='.$res['ticket']; //使用$ticket换去二维码图片
+        $postJson = json_encode($postArr);
+        $res = httpPost($url, $postJson);
+        $res = json_decode($res,true);
+        $long_url='https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket='.$res['ticket'];
         return $this->getShortUrl($long_url);
     }
     //获取永久二维码
@@ -406,7 +396,7 @@ class WechatController extends Controller{
                 array(
                     'title'         => $activity['desc'],
                     'description'   => $activity['title'],
-                    'picUrl'        => C(WEBSITE).'/Upload'.$activity['img'],
+                    'picUrl'        => C('WEBSITE').'/Upload'.$activity['img'],
                     'url'           => $scene['url'],
                 ),
             );
@@ -446,7 +436,7 @@ class WechatController extends Controller{
                 'title'         => '图片上传成功',
                 'description'   => "MediaId:".$postObj->MediaId,
                 'picUrl'        => $postObj->PicUrl,
-                'url'           => C(WEBSERVER),
+                'url'           => C('WEBSERVER'),
             ),
         );
         $this->wxReplyNews($toUser,$fromUser,$arr);
@@ -460,7 +450,7 @@ class WechatController extends Controller{
                 'title'=>'视频上传成功',
                 'description'=>"MediaId:".$postObj->MediaId,
                 'picUrl'=>$postObj->ThumbMediaId,
-                'url'=>C(WEBSERVER),
+                'url'=>C('WEBSERVER'),
             ),
         );
         $this->wxReplyNews($toUser,$fromUser,$arr);
