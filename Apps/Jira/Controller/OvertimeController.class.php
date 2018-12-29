@@ -21,6 +21,7 @@ class OvertimeController extends WebInfoController
         $this->isLogin($url);
         $table='tp_overtime';
         $user=getLoginUser();
+        $this->assign("user", $user);
         if ($user) {
             $where = array('user' => $user);
             $where['type'] = '1';
