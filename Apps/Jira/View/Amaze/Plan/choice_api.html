@@ -13,19 +13,19 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                             <{$branch|getName='eo_project',###,'projectname'}>
-                            <span class="badge"><{$branch|countRId='eo_api','projectID',###}></span>
+                            <span class="badge"><{$branch|countWithParent='eo_api','projectID',###}></span>
                             <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
                             <volist name="project" id="vo">
                                 <li>
-                                <a href="__URL__/choice_api/tp/<{$tp}>/branch/<{$vo}>/type/<{$type}>">
+                                <a href="__URL__/choice_api/tp/<{$tp}>/branch/<{$vo}>/source/<{$source}>">
                                     <{$vo|getName='eo_project',###,'projectname'}>
-                                    <span class="badge pull-right"><{$vo|countRId='eo_api','projectID',###}></span>
+                                    <span class="badge pull-right"><{$vo|countWithParent='eo_api','projectID',###}></span>
                                 </a>
                                 </li>
                             </volist>
-                            <li><a href="__URL__/choice_api/tp/<{$tp}>/type/<{$type}>"><small>全部</small></a></li>
+                            <li><a href="__URL__/choice_api/tp/<{$tp}>"><small>全部</small></a></li>
                         </ul>
                     </li>
                 </ul>
@@ -35,6 +35,7 @@
                             <input type="text" class="form-control" name="search" value="<{$search}>"
                                    placeholder="接口名称、接口URI">
                             <input type="hidden" name="branch" value="<{$branch}>"/>
+                            <input type="hidden" name="source" value="<{$source}>"/>
                             <span class="input-group-btn">
                                 <button type="submit" class="btn btn-default">
                                     <span class="glyphicon glyphicon-search"></span>
@@ -42,7 +43,7 @@
                             </span>
                         </div>
                     </form>
-                    <li><a href="__URL__/detail/tp/<{$tp}>">返回</a></li>
+                    <li><a href="__URL__/<{$source}>/tp/<{$tp}>">返回</a></li>
                 </ul>
             </div>
         </div>
@@ -64,7 +65,7 @@
                                     <small><{$st.api|getName='eo_api',###,'apiname'}>(<{$st.api|getName='eo_api',###,'apiuri'}>)</small>
                                 </div>
                                 <div class="col-md-2">
-                                    <a href="__URL__/chexiao/id/<{$st.id}>"><span class="pull-right">撤销</span></a>
+                                    <a href="__URL__/cheXiao/id/<{$st.id}>"><span class="pull-right">撤销</span></a>
                                 </div>
                             </div>
                         </li>
@@ -86,21 +87,15 @@
                             <div class="row">
                                 <div class="col-md-10">
                                     <switch name="st.pressure">
-                                        <case value="1">
-                                            <a href="__URL__/pressure/apiID/<{$st.apiid}>/pressure/<{$st.pressure}>/branch/<{$branch}>">
-                                                <span class="label label-success">性能(Y)</span>
-                                            </a>
-                                        </case>
-                                        <case value="0">
-                                            <a href="__URL__/pressure/apiID/<{$st.apiid}>/pressure/<{$st.pressure}>/branch/<{$branch}>">
-                                                <span class="label label-warning">性能(N)</span>
-                                            </a>
-                                        </case>
+                                        <case value="1"><span class="label label-success">性能(Y)</span></case>
+                                        <case value="0"><span class="label label-warning">性能(N)</span></case>
                                     </switch>
                                     <small><{$st.apiname}>(<{$st.apiuri}>)</small>
                                 </div>
                                 <div class="col-md-2">
-                                    <a href="__URL__/jiaru/api/<{$st.apiid}>/planid/<{$tp}>/pressure/<{$st.pressure}>"><span class="pull-right">加入</span></a>
+                                    <a href="__URL__/jiaRu/api/<{$st.apiid}>/planid/<{$tp}>/source/<{$source}>">
+                                        <span class="pull-right">加入</span>
+                                    </a>
                                 </div>
                             </div>
                         </li>

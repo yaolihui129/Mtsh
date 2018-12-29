@@ -4,22 +4,21 @@ class ReportController extends WebInfoController
 {
     public function index()
     {
-        $_SESSION['url'] = '/' . C('PRODUCT') . '/Report/index';
-        $planid=I('planid');
-        if(!$_SESSION['report_planid']){
-            $_SESSION['report_planid']=$planid;
-        }
-        $this->isLogin();
-        if(!$planid){
-            $planid=$_SESSION['report_planid'];
+        $planid=I('planid',getCache('tp'));
+        if(!$planid==getCache('tp')){
+            setCache('tp',$planid);
         }
         $this->assign('planid', $planid);
+        $url = '/' . C('PRODUCT') . '/Report/index';
+        $this->isLogin($url);
+
+
         $where=array('planid'=>$planid,'type'=>'1');
         $data = findOne('tp_report',$where);
         $this->assign('data', $data);
 
 
-        $report_url=C('JIRAPI').'/Jira/Testcycle/index/tp/'.$planid;
+        $report_url=C('JIRAPI').'/Jira/Plan/index/tp/'.$planid;
         $this->assign('report_url', $report_url);
         if(!$_SESSION['testPlan']){
             $_SESSION['testPlan'] = getIssue($planid);

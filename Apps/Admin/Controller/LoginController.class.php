@@ -24,10 +24,10 @@ class LoginController extends Controller
         $where=array('username'=>$user,'password'=>md5($password),'status'=>'1');
         $data=findOne('user',$where);
         if ($data) {
-            setCookieKey('user',jia_mi($user),$time);
-            setCookieKey('user_id',jia_mi($data['id']),$time);
-            setCookieKey('isLogin',C('PRODUCT'),$time);
-            $url=getCookieKey('url');
+            setCache('user',jia_mi($user),$time);
+            setCache('user_id',jia_mi($data['id']),$time);
+            setCache('isLogin',C('PRODUCT'),$time);
+            $url=getCache('url');
             if(!$url){
                 $url = '/' . C('PRODUCT') . '/Index/index';
             }
@@ -43,6 +43,7 @@ class LoginController extends Controller
     {
         $username=getLoginUserID();
         $username = getName('user',$username,'real_name');
+        clearSession();
         clearCookie();
         $this->success($username . ",再见!", U(C('PRODUCT') . '/Login/index'));
 

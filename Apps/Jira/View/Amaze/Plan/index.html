@@ -5,13 +5,7 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                           aria-expanded="false"><b>测试计划</b></a>
-                        <ul class="dropdown-menu">
-                            <volist name='project' id='pro'>
-                                <li><a href="__URL__/index/project/<{$pro.key}>"><{$pro.value}></a></li>
-                            </volist>
-                        </ul>
+                        <a href="#" class="dropdown-toggle"><b>测试计划</b></a>
                     </li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
@@ -24,37 +18,36 @@
                             <span class="am-icon-caret-down"></span>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a href="__URL__/index/project/<{$Think.cookie.Jira_project}>/testGroup/<{$Think.cookie.Jira_testGroup}>">进行中</a></li>
-                            <li><a href="__URL__/index/type/done/project/<{$Think.cookie.Jira_project}>/testGroup/<{$Think.cookie.Jira_testGroup}>">已完成</a></li>
-                            <li><a href="__URL__/index/type/online/project/<{$Think.cookie.Jira_project}>/testGroup/<{$Think.cookie.Jira_testGroup}>">已上线</a></li>
+                            <li><a href="__URL__/index/project/<{$project}>/testGroup/<{$testGroup}>">进行中</a></li>
+                            <li><a href="__URL__/index/type/done/project/<{$project}>/testGroup/<{$testGroup}>">已完成</a></li>
+                            <li><a href="__URL__/index/type/online/project/<{$project}>/testGroup/<{$testGroup}>">已上线</a></li>
                         </ul>
                     </li>
-                    <if condition="$_COOKIE['Jira_project'] eq '10006' ">
+                    <if condition="$project eq '10006' ">
                         <li role="presentation">
                             <if condition="$testGroup eq 'one' ">
-                                <a href="__URL__/index/project/<{$Think.cookie.Jira_project}>/testGroup/two"> 切换到二组</a>
+                                <a href="__URL__/index/project/<{$project}>/testGroup/two"> 切换到二组</a>
                                 <else />
-                                <a href="__URL__/index/project/<{$Think.cookie.Jira_project}>/testGroup/one"> 切换到一组</a>
+                                <a href="__URL__/index/project/<{$project}>/testGroup/one"> 切换到一组</a>
                             </if>
                         </li>
                     </if>
-                    <if condition="$_SESSION['user'] eq 'ylh' ">
-                        <li role="presentation">
-                            <a href="__URL__/appraisal">考核计划</a>
-                        </li>
+                    <if condition="$user eq 'ylh' ">
+                        <li role="presentation"><a href="__APP__/<{$Think.config.PRODUCT}>/Score/appraisal" target="_blank">考核计划</a></li>
                     </if>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <form action="__URL__/index " method="post" class="navbar-form navbar-left" role="search">
+                    <form action="__URL__/index " method="post" class="navbar-form navbar-left" role="search" autocomplete="on">
                         <div class="form-group input-group">
                             <input type="text" class="form-control" name="search" value="<{$search}>"
-                                   placeholder="名称、关键字">
-                            <input type="hidden" class="form-control" name="project" value="<{$Think.cookie.Jira_project}>">
-                            <input type="hidden" class="form-control" name="testGroup" value="<{$Think.cookie.Jira_testGroup}>">
-                            <input type="hidden" class="form-control" name="type" value="<{$Think.cookie.Jira_type_plan}>">
+                                   placeholder="名称、关键字" autocomplete="off">
+                            <input type="hidden" class="form-control" name="project" value="<{$project}>">
+                            <input type="hidden" class="form-control" name="testGroup" value="<{$testGroup}>">
+                            <input type="hidden" class="form-control" name="type" value="<{$typePlan}>">
                             <span class="input-group-btn">
-                                 <button type="submit" class="btn btn-default"><span
-                                         class="glyphicon glyphicon-search"></span></button>
+                                 <button type="submit" class="btn btn-default">
+                                     <span class="glyphicon glyphicon-search"></span>
+                                 </button>
                             </span>
                         </div>
                     </form>
@@ -82,7 +75,7 @@
                     <switch name="da.plantype">
                         <case value="0">
                             <span class="label label-success">功能</span>
-                            <a href="__URL__/gongneng/tp/<{$da.id}>"><{$da.summary}></a>
+                            <a href="__URL__/details/tp/<{$da.id}>" target="_blank"><{$da.summary}></a>
                             <span class="pull-right">
                                 <a href="__URL__/change_type/id/<{$da.id}>/plantype/1" class=" btn am-btn-danger btn-xs ">
                                     <span class="glyphicon glyphicon-retweet"> 性能 </span>
@@ -94,7 +87,7 @@
                         </case>
                         <case value="1">
                             <span class="label label-danger">性能</span>
-                            <a href="__URL__/xingneng/tp/<{$da.id}>"><{$da.summary}></a>
+                            <a href="__URL__/capability/tp/<{$da.id}>" target="_blank"><{$da.summary}></a>
                             <span class="pull-right">
                                 <a href="__URL__/change_type/id/<{$da.id}>/plantype/0" class=" btn am-btn-success btn-xs ">
                                     <span class="glyphicon glyphicon-retweet"> 功能 </span>
@@ -106,7 +99,7 @@
                         </case>
                         <case value="2">
                             <span class="label label-primary">api</span>
-                            <a href="__URL__/api/tp/<{$da.id}>"><{$da.summary}></a>
+                            <a href="__URL__/api/tp/<{$da.id}>" target="_blank"><{$da.summary}></a>
                             <span class="pull-right">
                                 <a href="__URL__/change_type/id/<{$da.id}>/plantype/0" class=" btn am-btn-success btn-xs ">
                                     <span class="glyphicon glyphicon-retweet"> 功能 </span>

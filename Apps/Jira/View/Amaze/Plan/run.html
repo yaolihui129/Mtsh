@@ -6,10 +6,6 @@
             <small><{$cycle.name}></small>
             <span class="badge"><{$cycle.planned_start_time|substr=###,0,10}>-<{$cycle.planned_end_time|substr=###,0,10}></span>
             <span class="label label-warning">用例数：<{$case|sizeof=###}></span>
-            <div class="btn-group pull-right">
-                <a href="__URL__/detail/tp/<{$cycle.tp_id}>"
-                   class=" btn btn-warning btn-xs ">返回</a>
-            </div>
         </div>
         <div class="panel-body">
             <div class="well">

@@ -4,14 +4,12 @@
         <div class="container-fluid">
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                    <li ><a href="#"> 系统功能点：<{$Think.session.pname}></a></li>
+                    <li ><a href="#"> 系统功能点：<{$pname}></a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <form action="__URL__/index " method="post" class="navbar-form navbar-left" role="search">
                         <div class="form-group input-group">
                             <input type="text" class="form-control" name="search" value="<{$search}>" placeholder="名称、关键字">
-                            <input type="hidden" class="form-control" name="project" value="<{$Think.session.project}>">
-                            <input type="hidden" class="form-control" name="type" value="<{$Think.session.type.plan}>">
                             <span class="input-group-btn">
                                  <button type="submit" class="btn btn-default">
                                      <span class="glyphicon glyphicon-search"></span>
@@ -32,7 +30,7 @@
                         <h4 class="panel-title">
                             <a data-toggle="collapse" data-parent="#accordion" href="#<{$st.id}>" aria-expanded="true" aria-controls="<{$st.id}>">
                                 <small>
-                                    【<{$Think.session.pkey}>-<{$st.issuenum}>】
+                                    【<{$pkey}>-<{$st.issuenum}>】
                                     <{$st.summary}>
                                 </small>
                                 <span class="badge pull-right"><{$st.reporter|getJiraName=###}></span>

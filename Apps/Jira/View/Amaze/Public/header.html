@@ -67,7 +67,7 @@
                     <ul class="am-dropdown-content">
                         <li><a href="__APP__/<{$Think.config.PRODUCT}>/Mine/index"><i class="glyphicon glyphicon-phone"> 设备</i> </a></li>
                         <li><a href="__APP__/<{$Think.config.PRODUCT}>/Mine/books"><i class="glyphicon glyphicon-book"> 图书</i> </a></li>
-                        <li><a href="__APP__/<{$Think.config.PRODUCT}>/Score/gengduo/user/<{$_Think.cookie.Jira_user}>/quarter/<{$Think.config.KH_QUARTER}>">
+                        <li><a href="__APP__/<{$Think.config.PRODUCT}>/Score/gengduo">
                             <i class="glyphicon glyphicon-credit-card"> 积分</i>
                         </a>
                         <li><a href="__APP__/<{$Think.config.PRODUCT}>/Mine/bug"><i class="am-icon-bug">&nbsp;&nbsp;Bug</i> </a></li>
@@ -90,20 +90,22 @@
     <div class="admin-sidebar hide">
         <ul class="am-list admin-sidebar-list">
             <li>
-                <a href="__APP__/<{$Think.config.PRODUCT}>/Index/index/project/<{$Think.session.project}>">
+                <a href="__APP__/<{$Think.config.PRODUCT}>/Index/index">
                     <span class="glyphicon glyphicon-home"> 迭代&任务</span>
                 </a>
             </li>
             <li>
-                <a href="__APP__/<{$Think.config.PRODUCT}>/Plan/index/project/<{$Think.session.project}>">
+                <a href="__APP__/<{$Think.config.PRODUCT}>/Plan/index">
                     <span class="am-icon-calendar"> &nbsp; &nbsp;  测试计划</span>
                 </a>
             </li>
             <li>
-                <a href="__APP__/<{$Think.config.PRODUCT}>/Bug"><span class="am-icon-bug"> &nbsp; &nbsp;  待处理Bug</span></a>
+                <a href="__APP__/<{$Think.config.PRODUCT}>/Bug">
+                    <span class="am-icon-bug"> &nbsp; &nbsp;  待处理Bug</span>
+                </a>
             </li>
             <li>
-                <a href="__APP__/<{$Think.config.PRODUCT}>/Risk/index/project/<{$Think.session.project}>">
+                <a href="__APP__/<{$Think.config.PRODUCT}>/Risk/index">
                     <span class="glyphicon glyphicon-glass"> 风险预警</span>
                 </a>
             </li>
@@ -114,12 +116,12 @@
             </li>
             <in name="Think.cookie.Jira_user|jie_mi=###" value="ylh,wcz,mhh,fj,lixiaomei">
                 <li>
-                    <a href="__APP__/<{$Think.config.PRODUCT}>/Case/func/project/<{$Think.session.project}>">
+                    <a href="__APP__/<{$Think.config.PRODUCT}>/Case/func">
                         <span class="glyphicon glyphicon-globe"> 功能地图</span>
                     </a>
                 </li>
                 <li>
-                    <a href="__APP__/<{$Think.config.PRODUCT}>/Case/index/project/<{$Think.session.project}>">
+                    <a href="__APP__/<{$Think.config.PRODUCT}>/Case">
                         <span class="am-icon-th"> &nbsp; &nbsp; 测试用例</span>
                     </a>
                 </li>
@@ -129,8 +131,12 @@
                     </a>
                 </li>
                 <li>
-                    <a href="__APP__/<{$Think.config.PRODUCT}>/Report/standard/">
+                    <a href="__APP__/<{$Think.config.PRODUCT}>/Report/standard">
                         <span class="am-icon-file"> &nbsp; &nbsp;测试规范</span></a>
+                </li>
+                <li>
+                    <a href="__APP__/<{$Think.config.PRODUCT}>/Weekly">
+                        <span class="am-icon-file"> &nbsp; &nbsp;测试周报</span></a>
                 </li>
             </in>
 

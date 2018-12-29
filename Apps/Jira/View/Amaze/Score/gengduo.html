@@ -4,7 +4,7 @@
     <div class="panel panel-default">
         <div class="panel-heading"><{$quarter}>
             <div class="btn-group pull-right">
-                <a href="__URL__/index/quarter/<{$quarter}>" class=" btn btn-warning btn-xs">返回</a>
+                <a href="__URL__/index" target="_blank" class=" btn btn-warning btn-xs">排行榜</a>
             </div>
         </div>
         <div class="jumbotron">
@@ -29,10 +29,10 @@
                     </switch>
                     <small>
                         <{$st.pname}>--<{$st.rules|getName='tp_score_rules',###,'cate'}>--<{$st.rules|getName='tp_score_rules',###}>:
-                        <if condition="$st.user eq $_SESSION['user'] ">
+                        <if condition="$st.user eq $loginUser ">
                             <switch name="st.dissent">
                                 <case value="1">
-                                    <a href="__URL__/appeal/id/<{$st.id}>" class=" btn btn-danger btn-xs">
+                                    <a href="__URL__/doAppeal/id/<{$st.id}>" class=" btn btn-danger btn-xs">
                                         <span class="glyphicon glyphicon-exclamation-sign"> 申诉</span></a>
                                 </case>
                                 <case value="0">

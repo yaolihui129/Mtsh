@@ -17,8 +17,8 @@ class OvertimeController extends WebInfoController
 
     public function mine()
     {
-        $_SESSION['url'] = '/' . C('PRODUCT') . '/Overtime/mine/';
-        $this->isLogin();
+        $url = '/' . C('PRODUCT') . '/Overtime/mine/';
+        $this->isLogin($url);
         $table='tp_overtime';
         $user=getLoginUser();
         if ($user) {

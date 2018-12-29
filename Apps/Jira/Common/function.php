@@ -9,9 +9,6 @@
         }
         return $str;
     }
-    function getSession($key){
-
-    }
     /**
      * 获取接口数据
      */
@@ -152,6 +149,10 @@
             }
         }
     }
+    function getJiraNameM($name){
+        $name=jie_mi($name);
+        return getJiraName($name);
+    }
     //获取禅道用户名
     function getZTUserName($account){
         if($account){
@@ -168,14 +169,6 @@
         $arr = M('eo_user')->find($id);
         return $arr['usernickname'];
     }
-    //解密用户
-    function getJiraNameM($name){
-        $name=jie_mi($name);
-        $name=getJiraName($name);
-        return $name;
-    }
-
-
     //获取迭代抽签信息
     function drawInfo($project)
     {
@@ -210,10 +203,8 @@
     //获取issue详情
     function getIssueInfo($id)
     {
-        $url = C(JIRAPI) . "/Jirapi/issue/" . $id;
-        $data = httpGet($url);
-        $data = json_decode(trim($data, "\xEF\xBB\xBF"), true);
-        $str = cookie(C(PRODUCT).'_pkey') . '-' . $data['issuenum'] . '&nbsp;' . $data['summary'];
+        $data = getIssue($id);
+        $str = getCache('pkey') . '-' . $data['issuenum'] . '&nbsp;' . $data['summary'];
         $str .= '<span class="badge pull-right">' . getPriority($data['priority']) . '</span>';
         return $str;
     }
@@ -493,6 +484,23 @@
         $where=array('quarter'=>$quarter,'type'=>'2','user'=>$user,'deleted'=>'0');
         $jianf=$m->where($where)->sum('score');
         return $jiaf-$jianf;
+    }
+
+    /**
+     * 计算个级别的BUG数量
+     * $type false 计算所有，
+     * $type true  计算遗留，
+     * */
+    function countTpBugPriority($tp,$priority=0,$type=''){
+        $where = array();
+        $where['tp']=$tp;
+        $where['PRIORITY'] =strval($priority+1);
+        if($type){
+            $where['issuestatus'] = array('not in', '6');
+        }
+        $bug=postPlanBug($where);
+        $bugNum=sizeof($bug);
+        return $bugNum;
     }
 
 

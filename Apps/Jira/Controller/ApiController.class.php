@@ -50,22 +50,7 @@ class ApiController extends WebInfoController
 
         $this->display();
     }
-    //标记性能
-    function pressure(){
-        $_SESSION['url'] = '/' . C('PRODUCT') . '/Api/index';
-        $this->isLogin();
-        $_GET['table']='eo_api';
-        if($_GET['pressure']=='0'){
-            $_GET['pressure']='1';
-            $this->update();
-        }elseif ($_GET['pressure']=='1'){
-            $_GET['pressure']='0';
-            $this->update();
-        }else{
-            $this->error('性能标识非法');
-        }
 
-    }
     //API详情
     public function details()
     {
@@ -87,8 +72,8 @@ class ApiController extends WebInfoController
     //API性能测试场景
     public function press(){
         $id = I('id');
-        $_SESSION['url'] = '/' . C('PRODUCT') . '/Api/press/id/'.$id;
-        $this->isLogin();
+        $url = '/' . C('PRODUCT') . '/Api/press/id/'.$id;
+        $this->isLogin($url);
         $data = find('eo_api',$id);
         $this->assign('data', $data);
 
@@ -98,9 +83,9 @@ class ApiController extends WebInfoController
         $this->assign('scheme', $scheme);
 
         if($project){
-            $where = array('api' => $id, 'project'=>$project,'deleted' => '0');
+            $where = array('api' => $id, 'project'=>$project);
         }else{
-            $where = array('api' => $id, 'deleted' => '0');
+            $where = array('api' => $id);
         }
         $scene = getList('tp_api_scene_pressure',$where,'project,sn,id');
         $this->assign('scene', $scene);
@@ -139,7 +124,8 @@ class ApiController extends WebInfoController
     }
     //API压测记录
     public function pressure_test(){
-        $this->isLogin();
+        $url = '/' . C('PRODUCT') . '/Api/pressure_test';
+        $this->isLogin($url);
         $id = I('id');
         $this->assign('id', $id);
         $arr = find('tp_api_scene_pressure',$id);
@@ -160,7 +146,8 @@ class ApiController extends WebInfoController
     }
     //标记结果
     function record_result(){
-        $this->isLogin();
+        $url = '/' . C('PRODUCT') . '/Api/index';
+        $this->isLogin($url);
         $arr =find('tp_api_scene_pressure_test',I('id'));
         $_GET['id']=$arr['scene'];
         $_GET['samples']=$arr['samples'];

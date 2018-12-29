@@ -17,19 +17,12 @@
                     <ul class="nav navbar-nav">
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                               aria-haspopup="true" aria-expanded="false">
-                                项目：<{$Think.session.project|getName='project',###,'pname'}>
+                               aria-haspopup="true" aria-expanded="false">项目：<{$pname}>
                                 <span class="am-icon-caret-down"></span>
                             </a>
                             <ul class="dropdown-menu">
-                                <volist name='project' id='pro'>
-                                    <li>
-                                        <if condition="$pro['key'] eq '10006' ">
-                                            <a href="__URL__/started/type/assigned/project/<{$pro.key}>"><{$pro.value}></a>
-                                            <else />
-                                            <a href="__URL__/assigned/type/assigned/project/<{$pro.key}>"><{$pro.value}></a>
-                                        </if>
-                                    </li>
+                                <volist name='projectList' id='pro'>
+                                    <li><a href="__URL__/started/project/<{$pro.key}>"><{$pro.value}></a></li>
                                 </volist>
                             </ul>
                         </li>
@@ -40,10 +33,7 @@
                             <div class="form-group input-group">
                                 <input type="text" class="form-control" name="search" value="<{$search}>"
                                        placeholder="名称、关键字">
-                                <input type="hidden" class="form-control" name="project"
-                                       value="<{$Think.cookie.Jira_project}>">
-                                <input type="hidden" class="form-control" name="type"
-                                       value="<{$Think.cookie.Jira_type_index}>">
+                                <input type="hidden" class="form-control" name="project" value="<{$project}>">
                                 <span class="input-group-btn">
                                      <button type="submit" class="btn btn-default">
                                          <span class="glyphicon glyphicon-search"></span>
@@ -58,32 +48,21 @@
 
         <ul class="nav nav-pills" role="tablist">
             <li role="presentation">
-                <a href="__URL__/index/project/<{$Think.cookie.Jira_project}>">进行中</a>
+                <a href="__URL__/index/project/<{$project}>">进行中</a>
             </li>
-            <if condition="$_SESSION['project'] eq 10006 ">
-                <li role="presentation">
-                    <a href="__URL__/pending">分派</a>
-                </li>
-                <li role="presentation" class="active">
-                    <a href="__URL__/started/type/assigned/project/<{$Think.cookie.Jira_project}>">
-                        未开始<span class="badge"> <{$data|sizeof=###}></span>
-                    </a>
-                </li>
-                <li role="presentation" >
-                    <a href="__APP__/<{$Think.config.PRODUCT}>/Weekly/index">测试周报</a>
-                </li>
-                <else/>
-                <li role="presentation" class="active">
-                    <a href="__URL__/assigned/type/assigned/project/<{$Think.cookie.Jira_project}>">待处理</a>
-                </li>
-            </if>
+            <li role="presentation">
+                <a href="__URL__/pending">分派</a>
+            </li>
+            <li role="presentation" class="active">
+                <a href="__URL__/started/project/<{$project}>">未开始<span class="badge"><{$data|sizeof=###}></span></a>
+            </li>
         </ul>
         <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
             <volist name='data' id='da' empty="没有数据">
                 <div class="panel panel-default" style="margin-bottom:0px;">
                     <div class="panel-heading" role="tab" id="heading<{$da.id}>">
-                        <a href="http://jira.zhidaohulian.com/browse/<{$Think.cookie.Jira_pkey}>-<{$da.issuenum}>" target="_blank">
-                            <small><{$Think.cookie.Jira_pkey}>-<{$da.issuenum}>:</small>
+                        <a href="http://jira.zhidaohulian.com/browse/<{$pkey}>-<{$da.issuenum}>" target="_blank">
+                            <small><{$pkey}>-<{$da.issuenum}>:</small>
                         </a>
                         <a data-toggle="collapse" data-parent="#accordion" href="#<{$da.id}>" aria-expanded="true"
                            aria-controls="<{$da.id}>">
@@ -99,7 +78,6 @@
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
                                     <volist name='group' id='vo' empty="没有数据">
                                         <li><a href="__URL__/jion/issueid/<{$da.id}>/pgroup/<{$vo.key}>"><small><{$vo.value}></small></a></li>
-                                        <li role="separator" class="divider"></li>
                                     </volist>
                                 </ul>
                             </div>

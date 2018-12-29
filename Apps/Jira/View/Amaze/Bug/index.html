@@ -26,9 +26,12 @@
                     </a>
                     <a data-toggle="collapse" data-parent="#accordion" href="#<{$st.id}>" aria-expanded="true"
                        aria-controls="<{$st.id}>">
-
                         (<{$st.reporter|getJiraName=###}>)<{$st.summary}>【<{$st.created}>】
-                        <span class="badge pull-right"><{$st.assignee|getJiraName=###}></span>
+                        <a href="__URL__/setStatus/id/<{$st.id}>">
+                            <span class="badge pull-right">
+                                <{$st.assignee|getJiraName=###}>
+                            </span>
+                        </a>
                     </a>
                 </small>
             </div>
@@ -36,7 +39,6 @@
                 <div class="panel-body">
                     <{$st.description}>
                 </div>
-
             </div>
         </div>
     </volist>

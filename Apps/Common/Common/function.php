@@ -118,6 +118,14 @@
             return 0;
         }
     }
+    function filterID($table,$map){
+        $var=getList($table,$map);
+        $id=array();
+        foreach ($var as $v){
+            $id[]=$v['id'];
+        }
+        return $id;
+    }
     function getId($table, $where)
     {
         $data = M($table)->where($where)->find();
@@ -163,18 +171,7 @@
         //初始化
         $info = $this->init();
         $data=find($info[$init_table],$id);
-        if($data){
-            $res=array(
-                'errorcode'=>'0',
-                'message'=>'ok',
-                'result'=>$data
-            );
-        }else{
-            $res=array(
-                'errorcode'=>'0',
-                'message'=>'ok'
-            );
-        }
+        $res = resFormat($data);
         $this->ajaxReturn($res);
     }
 
@@ -333,12 +330,10 @@
 
 
     function getWebsite(){
-        if($_SERVER['SERVER_PORT']=='80'){
-            $website='http://'.$_SERVER['SERVER_NAME'];
-        }elseif ($_SERVER['SERVER_PORT']=='80'){
+        if(isHttps()){
             $website='https://'.$_SERVER['SERVER_NAME'];
         }else{
-            $website='https://'.$_SERVER['SERVER_NAME'];
+            $website='http://'.$_SERVER['SERVER_NAME'];
         }
         if(!C('ONLINE')){
             $website=$website.'/Demo';
@@ -354,8 +349,6 @@
         $_SESSION['browser']=GetBrowser();
         $_SESSION['os']=GetOs();
     }
-
-
 
     //登录
     function login($phone,$password){
@@ -493,9 +486,7 @@
     }
 
     /**
-     **数组相关操作
-     * @return string
-     */
+     *数组相关操作
     /**
      * 二维数组排序
      * @param $arr
@@ -540,38 +531,27 @@
         }
         return $new_arr;
     }
+
     /**
-     ** 多个数组的笛卡尔积
+     * 计算多个集合的笛卡尔积
      */
-    function combineDika() {
-        $data = func_get_args();
-        $data = current($data);
-//        $cnt = count($data);
+    function CartesianProduct($sets){
         $result = array();
-        $arr1 = array_shift($data);
-        foreach($arr1 as $key=>$item)
-        {
-            $result[] = array($item);
-        }
-        foreach($data as $key=>$item)
-        {
-            $result = combineArray($result,$item);
-        }
-        return $result;
-    }
-    /**
-     **两个数组的笛卡尔积
-     */
-    function combineArray($arr1,$arr2) {
-        $result = array();
-        foreach ($arr1 as $item1)
-        {
-            foreach ($arr2 as $item2)
-            {
-                $temp = $item1;
-                $temp[] = $item2;
-                $result[] = $temp;
+        // 循环遍历集合数据
+        for($i=0,$count=count($sets); $i<$count-1; $i++){
+            // 初始化
+            if($i==0){
+                $result = $sets[$i];
             }
+            $tmp = array();
+            // 结果与下一个集合计算笛卡尔积
+            foreach($result as $res){
+                foreach($sets[$i+1] as $set){
+                    $tmp[] = $res.$set;
+                }
+            }
+            // 将笛卡尔积写入结果
+            $result = $tmp;
         }
         return $result;
     }
@@ -606,7 +586,7 @@
         $array = array(
             'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
             'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
-            '0','1','2','3','4','5','6','8','9'
+            '0','1','2','3','4','5','6','8','9','_'
         );
         $tmpstr ='';
         $max =count($array);
@@ -625,9 +605,7 @@
         return false;
     }
     /**
-     **检查固定电话
-     * @param $mobile
-     * @return bool
+     *检查固定电话
      */
     function checkTelephone($mobile){
         if(preg_match('/^([0-9]{3,4}-)?[0-9]{7,8}$/',$mobile))
@@ -635,8 +613,7 @@
         return false;
     }
     /**
-     ** 检查邮箱地址格式
-     * @param $email //邮箱地址
+     * 检查邮箱地址格式
      */
     function checkEmail($email){
         if(filter_var($email,FILTER_VALIDATE_EMAIL))
@@ -672,20 +649,16 @@
         return substr_replace($mobile,'****',3,4);
     }
     /**
-     **URL安全转化
-     * @param $string
-     * @return mixed|string
+     *URL安全转化
      */
-    function urlSafeB4encode($string)
+    function urlSafeB4encode($uri)
     {
-        $data = base64_encode($string);
+        $data = base64_encode($uri);
         $data = str_replace(array('+','/','='),array('-','_',''),$data);
         return $data;
     }
     /**
      * 获取整条字符串汉字拼音首字母
-     * @param $zh
-     * @return string
      */
     function pinYinLong($zh){
         $ret = "";
@@ -745,15 +718,14 @@
 
     // CURL_GET操作
     function httpGet($url){
-        $ch=curl_init(); //1.获取初始化URL
-        //2.设置curl的参数
+        $ch=curl_init();
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 500);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($ch, CURLOPT_URL, $url);
-        $res = curl_exec($ch);//3.采集
-        curl_close($ch);//4.关闭
+        $res = curl_exec($ch);
+        curl_close($ch);
         if(curl_errno($ch)){
             $res=curl_errno($ch);
         }
@@ -761,8 +733,7 @@
     }
     function httpAuthGet($url, $user, $password)
     {
-        $ch = curl_init(); //1.获取初始化URL
-        //2.设置curl的参数
+        $ch = curl_init();
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 500);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -770,26 +741,24 @@
         curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
         curl_setopt($ch, CURLOPT_USERPWD, "$user:$password");
         curl_setopt($ch, CURLOPT_URL, $url);
-        $res = curl_exec($ch);//3.采集
-        curl_close($ch);//4.关闭
+        $res = curl_exec($ch);
+        curl_close($ch);
         if (curl_errno($ch)) {
             $res = curl_errno($ch);
         }
         return $res;
     }
     function httpPost($url,$postJson){
-        //1.获取初始化URL
         $ch=curl_init();
-        //2.设置curl的参数
-        curl_setopt($ch, CURLOPT_TIMEOUT, 500);       //设置超时时间
-        curl_setopt($ch, CURLOPT_URL, $url);          //设置抓取的url
-        curl_setopt($ch, CURLOPT_HEADER, false);        //设置头文件的信息作为数据流输出
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);  //设置获取的信息以文件流的形式返回，而不是直接输出。
-        curl_setopt($ch, CURLOPT_POST, 1);            //设置post方式提交
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $postJson);//post变量
+        curl_setopt($ch, CURLOPT_TIMEOUT, 500);
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postJson);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        $res = curl_exec($ch);//3.采集
-        curl_close($ch);//4.关闭
+        $res = curl_exec($ch);
+        curl_close($ch);
         if(curl_errno($ch)){
             $res=curl_errno($ch);
         }
@@ -797,19 +766,17 @@
     }
     function httpJsonPost($url, $postJson)
     {
-        //1.获取初始化URL
         $ch = curl_init();
-        //2.设置curl的参数
-        curl_setopt($ch, CURLOPT_TIMEOUT, 500);       //设置超时时间
-        curl_setopt($ch, CURLOPT_URL, $url);          //设置抓取的url
-        curl_setopt($ch, CURLOPT_HEADER, 0);        //设置头文件的信息作为数据流输出
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);  //设置获取的信息以文件流的形式返回，而不是直接输出。
-        curl_setopt($ch, CURLOPT_POST, 1);            //设置post方式提交
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $postJson);//post变量
+        curl_setopt($ch, CURLOPT_TIMEOUT, 500);
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postJson);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        $res = curl_exec($ch);//3.采集
-        curl_close($ch);//4.关闭
+        $res = curl_exec($ch);
+        curl_close($ch);
         if (curl_errno($ch)) {
             $res = curl_errno($ch);
         }
@@ -834,11 +801,9 @@
     }
     function httpAuthPost($url, $postJson,$user,$password)
     {
-        //1.获取初始化URL
         $ch = curl_init();
-        //2.设置curl的参数
-        curl_setopt($ch, CURLOPT_TIMEOUT, 500);       //设置超时时间
-        curl_setopt($ch, CURLOPT_URL, $url);          //设置抓取的url
+        curl_setopt($ch, CURLOPT_TIMEOUT, 500);
+        curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
         curl_setopt($ch, CURLOPT_USERPWD, "$user:$password");
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
@@ -846,14 +811,14 @@
         curl_setopt($ch, CURLOPT_COOKIEFILE, "cookiefile");
         curl_setopt($ch, CURLOPT_COOKIEJAR, "cookiefile");
         curl_setopt($ch, CURLOPT_COOKIE, session_name() . '=' . session_id());
-        curl_setopt($ch, CURLOPT_HEADER, 0);        //设置头文件的信息作为数据流输出
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);  //设置获取的信息以文件流的形式返回，而不是直接输出。
-        curl_setopt($ch, CURLOPT_POST, 1);            //设置post方式提交
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $postJson);//post变量
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postJson);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        $res = curl_exec($ch);//3.采集
-        curl_close($ch);//4.关闭
+        $res = curl_exec($ch);
+        curl_close($ch);
         if (curl_errno($ch)) {
             $res = curl_errno($ch);
         }
@@ -879,20 +844,18 @@
 
     //根据日期获取星期
     function getWeek($date) {
-        $datearr = explode("-",$date);     //将传来的时间使用“-”分割成数组
-        $year = $datearr[0];       //获取年份
-        $month = sprintf('%02d',$datearr[1]);  //获取月份
-        $day = sprintf('%02d',$datearr[2]);      //获取日期
+        $dateArr = explode("-",$date);     //将传来的时间使用“-”分割成数组
+        $year = $dateArr[0];       //获取年份
+        $month = sprintf('%02d',$dateArr[1]);  //获取月份
+        $day = sprintf('%02d',$dateArr[2]);      //获取日期
         $hour = $minute = $second = 0;   //默认时分秒均为0
-        $dayofweek = mktime($hour,$minute,$second,$month,$day,$year);    //将时间转换成时间戳
-        $shuchu = date("w",$dayofweek);      //获取星期值
-        $weekarray=array("星期日","星期一","星期二","星期三","星期四","星期五","星期六");
-        return  $weekarray[$shuchu];
+        $dayOfWeek = mktime($hour,$minute,$second,$month,$day,$year);    //将时间转换成时间戳
+        $shuChu = date("w",$dayOfWeek);      //获取星期值
+        $weekArray=array("星期日","星期一","星期二","星期三","星期四","星期五","星期六");
+        return  $weekArray[$shuChu];
     }
     /**
      * 友好时间显示
-     * @param $time
-     * @return bool|string
      */
     function friendDate($time)
     {
@@ -950,44 +913,65 @@
 
     //获取登录用户
     function getLoginUser(){
-        if($_SESSION['user']){
-            $user= $_SESSION['user'];
-        }else{
-            $user=jie_mi(cookie(C('PRODUCT').'_user'));
-        }
+        $user = getCache('user');
+        $user = jie_mi($user);
         return $user;
     }
     function getLoginUserID(){
-        $userID=jie_mi(cookie(C('PRODUCT').'_user_id'));
+        $userID = getCache('user_id');
+        $userID =jie_mi($userID);
         return $userID;
     }
 
 
     /**
      ** Cookie相关的操作
-     * @param $key
-     * @return mixed
      */
-    //获取cookiekey的信息
     function getCookieKey($key){
         $data=cookie(C('PRODUCT').'_'.$key);
         return $data;
     }
-    //设置cookiekey
     function setCookieKey($key,$value,$expire=3600){
         cookie($key,$value,array('expire'=>$expire,'prefix'=>C('PRODUCT').'_'));
     }
-    //清除cookie
     function clearCookie(){
         //  清空指定前缀的所有cookie值
         $res=cookie(null,C('PRODUCT').'_');
         return $res;
     }
+    /**
+     ** Session相关的操作
+     */
+    function getSession($key){
+        return $_SESSION[C('PRODUCT')][$key];
+    }
+    function setSession($key,$value){
+        $_SESSION[C('PRODUCT')][$key]=$value;
+    }
+    function clearSession(){
+        $_SESSION[C('PRODUCT')]='';
+    }
+    function getCache($key){
+        $value=getSession($key);
+        if(!$value){
+            $value=getCookieKey($key);
+            if($value){
+                setSession($key,$value);
+            }
+        }
+        return $value;
+    }
+    function setCache($key,$value,$expire=7*24*3600){
+        setSession($key,$value);
+        setCookieKey($key,$value,$expire);
+        return true;
+    }
+
 
     //获取某一字典值
-    function getDictValue($type,$key,$value='value'){
-        $where=array('type'=>$type,'key'=>$key,'deleted'=>'0');
-        $data=M('tp_dict')->where($where)->find();
+    function getDictValue($type,$key,$value='value',$table='tp_dict'){
+        $where=array('type'=>$type,'key'=>$key);
+        $data = findOne($table,$where);
         if($data[$value]){
             return $data[$value];
         }else{
@@ -1006,7 +990,7 @@
     }
     //获取字典列表
     function getDictList($type,$table='tp_dict',$lim=''){
-        $where=array('type'=>$type,'deleted'=>'0');
+        $where=array('type'=>$type);
         if($lim){
             $where['key']=array('in',$lim);
         }
@@ -1168,7 +1152,7 @@
 
     //Excel相关的函数
     /**
-     **根据下标获得单元格所在列位置
+     *根据下标获得单元格所在列位置
      **/
     function getCells($index){
         $arr=array(
@@ -1194,10 +1178,10 @@
         return $styleArray;
     }
     /**
-     ** 导出Excel到浏览器
-     * @param $type
-     * @param $filename
-     * @param $objPHPExcel
+     **导出Excel到浏览器
+     *  $type
+     * $filename
+     * $objPHPExcel
      */
     function browser_export($type,$filename,$objPHPExcel){
         //清除缓冲区,避免乱码
@@ -1216,7 +1200,6 @@
         $objWriter=\PHPExcel_IOFactory::createWriter($objPHPExcel,$type);
         $objWriter->save('php://output');
     }
-
     /**
      **微信公众号相关
      */
@@ -1237,9 +1220,6 @@
         }
         return $access_token;
     }
-
-
-
     /**
      * 比较两个版本大小, $v1>v2:1 ; $v1=v2:0 ;$v1<v2:0
      */

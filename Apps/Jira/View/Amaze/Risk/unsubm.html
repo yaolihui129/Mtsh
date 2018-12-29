@@ -4,10 +4,10 @@
         <li role="presentation" >
             <a href="__URL__/repulse/planid/<{$planid}>" class="">提测打回 </a>
         </li>
-        <li role="presentation" >
+        <li role="presentation" class="active">
             <a href="__URL__/unsubm/planid/<{$planid}>" class="">未按时提测 </a>
         </li>
-        <li role="presentation" class="active">
+        <li role="presentation" >
             <a href="__URL__/warning/planid/<{$planid}>" class="">项目延期 </a>
         </li>
     </ul>
@@ -18,7 +18,7 @@
                 <input type="hidden" name="planid" value="<{$planid}>"/>
                 <input type="hidden" name="subject" value="<{$subject}>"/>
                 <input type="hidden" name="sn" value="1"/>
-                <input type="hidden" name="type" value="1"/>
+                <input type="hidden" name="type" value="2"/>
                 <input type="hidden" name="priority" value="3"/>
                 <input type="hidden" name="table" value="tp_risk"/>
                 <div class="form-group">
@@ -80,63 +80,46 @@
                             <div class="col-sm-11"><{$body}></div>
                         </div>
                         <div class="modal-footer">
-                            <a href="__URL__/detail/tp/<{$planid}>" type="button" class="btn btn-default" >返回</a>
+                            <a href="__URL__/index/tp/<{$planid}>" type="button" class="btn btn-default" >返回</a>
                             <button type="submit" class="btn btn-primary">保存</button>
                         </div>
                     </form>
                 </case>
                 <case value="1">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <form action="mailto:<{$sendTo}>" class="form-horizontal">
                                 <br />
                                 <div class="form-group">
-                                    <label class="col-sm-2 control-label">发送给:</label>
-                                    <div class="col-sm-10">
+                                    <label class="col-sm-1 control-label">发送给:</label>
+                                    <div class="col-sm-11">
                                         <input type="text" class="form-control" name="mailto" value="<{$data.mailto}>" placeholder="收件人邮件" readonly>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-sm-2 control-label">抄送给:</label>
-                                    <div class="col-sm-10">
+                                    <label class="col-sm-1 control-label">抄送给:</label>
+                                    <div class="col-sm-11">
                                         <input type="text" class="form-control"  name="cc" value="<{$data.cc}>" placeholder="抄送人邮件" readonly>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-sm-2 control-label">主题:</label>
-                                    <div class="col-sm-10">
+                                    <label class="col-sm-1 control-label">主题:</label>
+                                    <div class="col-sm-11">
                                         <input type="text" class="form-control"  name='subject' value="<{$data.subject}>" placeholder="主题" readonly >
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-sm-2 control-label">正文:</label>
-                                    <div class="col-sm-10"><{$body}></div>
+                                    <label class="col-sm-1 control-label">正文:</label>
+                                    <div class="col-sm-11">
+                                        <{$body}>
+                                        <span class="help-block"><small><b>请不要在此页面进行修改，如果确实需要修改请点击【编辑】后，才可以保存成功</b></small></span>
+                                    </div>
                                 </div>
                                 <div class="modal-footer">
-                                    <a href="__URL__/index/tp/<{$planid}>" type="button" class="btn btn-default" >返回</a>
                                     <a href="__URL__/mod/id/<{$data.id}>" type="button" class="btn btn-primary" >编辑</a>
-                                    <button type="submit" class="btn btn-primary" onclick="return confirm('遗留BUG列表，不能自动添加到Foxmail中，需要自己手动复制')">发送</button>
+                                    <button type="submit" class="btn btn-primary" >发送</button>
                                 </div>
                             </form>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">遗留BUG清单<span class="badge pull-right"><{$yiliu|sizeof=###}></span></div>
-                                <ul class="list-group">
-                                    <empty name="yiliu">
-                                        <li class="list-group-item">没有查到遗留BUG</li>
-                                        <else />
-                                        <volist name="yiliu" id="st" key="k" >
-                                            <li class="list-group-item">
-                                                <small>
-                                                    <span class="label label-danger"><{$st.issuestatus|getIssueStatus=###}></span>
-                                                    【<{$Think.cookie.Jira_pkey}>-<{$st.issuenum}>】<{$st.summary}>
-                                                </small>
-                                            </li>
-                                        </volist>
-                                    </empty>
-                                </ul>
-                            </div>
                         </div>
                     </div>
                 </case>

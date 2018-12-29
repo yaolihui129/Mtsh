@@ -13,14 +13,10 @@ class LoginController extends BaseController
         $user = I('username');
         $arr = doJiraLogin($user,I('password'));
         if ($arr['session']) {
-            $_SESSION['user'] = $user;
-            setCookieKey('user',jia_mi($user),7*24*3600);
-            if ($_SESSION['url']) {
-                $url = $_SESSION['url'];
-            }elseif(getCookieKey('url')){
-                $url=getCookieKey('url');
-            }else {
-                $url = '/' . C('PRODUCT') . '/Index/index/project/' . $_SESSION['project'];;
+            setCache('user',jia_mi($user));
+            $url=getCache('url');
+            if (!$url) {
+                $url = '/' . C('PRODUCT') . '/Index/index';
             }
             $this->redirect($url);
         } else {
@@ -33,8 +29,9 @@ class LoginController extends BaseController
     {
         $username=getLoginUser();
         $username=getJiraName($username);
-        $_SESSION = array();
-        cookie(null,C('PRODUCT').'_');
+        clearSession();
+        $_SESSION=array();
+        clearCookie();
         $this->success($username . ",再见!", U(C(PRODUCT) . '/Index/index'));
 
     }

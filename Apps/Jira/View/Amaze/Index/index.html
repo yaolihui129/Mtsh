@@ -18,11 +18,11 @@
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                    aria-haspopup="true" aria-expanded="false">
-                                    项目：<{$Think.cookie.Jira_pname}>
+                                    项目：<{$pname}>
                                     <span class="am-icon-caret-down"></span>
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <volist name='project' id='pro'>
+                                    <volist name='projectList' id='pro'>
                                         <li><a href="__URL__/index/project/<{$pro.key}>"><{$pro.value}></a></li>
                                     </volist>
                                 </ul>
@@ -30,15 +30,15 @@
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                    aria-haspopup="true" aria-expanded="false">
-                                    <switch name="Think.cookie.Jira_type_index">
+                                    <switch name="typeIndex">
                                         <case value="done">已完成</case>
                                         <case value="doing">进行中</case>
                                     </switch>
                                     <span class="am-icon-caret-down"></span>
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <li><a href="__URL__/index/type/doing/project/<{$Think.cookie.Jira_project}>">进行中</a></li>
-                                    <li><a href="__URL__/index/type/done/project/<{$Think.cookie.Jira_project}>">已完成</a>
+                                    <li><a href="__URL__/index/type/doing/project/<{$project}>">进行中</a></li>
+                                    <li><a href="__URL__/index/type/done/project/<{$project}>">已完成</a>
                                     </li>
                                 </ul>
                             </li>
@@ -49,9 +49,9 @@
                                     <input type="text" class="form-control" name="search" value="<{$search}>"
                                            placeholder="名称、关键字">
                                     <input type="hidden" class="form-control" name="project"
-                                           value="<{$Think.cookie.Jira_project}>">
+                                           value="<{$project}>">
                                     <input type="hidden" class="form-control" name="type"
-                                           value="<{$Think.cookie.Jira_type_index}>">
+                                           value="<{$typeIndex}>">
                                     <span class="input-group-btn">
                                          <button type="submit" class="btn btn-default">
                                              <span class="glyphicon glyphicon-search"></span>
@@ -66,34 +66,24 @@
 
         <ul class="nav nav-pills" role="tablist">
             <li role="presentation" class="active">
-                <a href="__URL__/index/project/<{$Think.cookie.Jira_project}>">
-                    <switch name="Think.cookie.Jira_type_index">
+                <a href="__URL__/index/project/<{$project}>">
+                    <switch name="typeIndex">
                         <case value="done">已完成<span class="badge"><{$count}></span></case>
                         <case value="doing">进行中<span class="badge"><{$count}></span></case>
                     </switch>
                 </a>
             </li>
-            <if condition="$_COOKIE['Jira_project'] eq 10006 ">
-                <li role="presentation"> <a href="__URL__/pending">分派</a> </li>
-                <li role="presentation" >
-                    <a href="__URL__/started/type/assigned/project/<{$Think.cookie.Jira_project}>">未开始</a>
-                </li>
-                <li role="presentation">
-                    <a href="__APP__/<{$Think.config.PRODUCT}>/Weekly/index">测试周报</a>
-                </li>
-                <else/>
-                <li role="presentation">
-                    <a href="__URL__/assigned/type/assigned/project/<{$Think.cookie.Jira_project}>">未开始</a>
-                </li>
-            </if>
-
+            <li role="presentation"> <a href="__URL__/pending">分派</a> </li>
+            <li role="presentation" >
+                <a href="__URL__/started/project/<{$project}>">未开始</a>
+            </li>
         </ul>
         <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
             <volist name='data' id='da' empty="没有数据">
                 <div class="panel panel-default" style="margin-bottom:0px;">
                     <div class="panel-heading" role="tab" id="heading<{$da.id}>">
-                        <a href="http://jira.zhidaohulian.com/browse/<{$Think.cookie.Jira_pkey}>-<{$da.issuenum}>" target="_blank">
-                            <small><{$Think.cookie.Jira_pkey}>-<{$da.issuenum}>:</small>
+                        <a href="http://jira.zhidaohulian.com/browse/<{$pkey}>-<{$da.issuenum}>" target="_blank">
+                            <small><{$pkey}>-<{$da.issuenum}>:</small>
                         </a>
                         <a data-toggle="collapse" data-parent="#accordion" href="#<{$da.id}>" aria-expanded="true"
                            aria-controls="<{$da.id}>">

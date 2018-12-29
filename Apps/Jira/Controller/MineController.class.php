@@ -4,6 +4,8 @@ class MineController extends WebInfoController
 {
     public function index()
     {
+        $url = '/' . C('PRODUCT') . '/Mine';
+        $this->isLogin($url);
         $table='tp_device_loaning_record';
         //预约中
         $where=array('borrower'=>getLoginUser(),'type'=>'1');
@@ -26,6 +28,9 @@ class MineController extends WebInfoController
     }
 
     public function books(){
+        $url = '/' . C('PRODUCT') . '/Mine/books/';
+        setCache('url',$url);
+        $this->isLogin();
         $table='tp_device_loaning_record';
         //预约中
         $where=array('borrower'=>getLoginUser(),'leibie'=>'3','type'=>'1');
@@ -45,23 +50,25 @@ class MineController extends WebInfoController
     }
     //指派给我的任务
     public function task(){
-        $_SESSION['url'] = '/' . C('PRODUCT') . '/Mine/task/';
-        $this->isLogin();
+        $url = '/' . C('PRODUCT') . '/Mine/task/';
+        $this->isLogin($url);
         $where['issuetype'] = array('in','10005,10006,10007');
         $where['issuestatus'] = array('not in', '10011,6,10002');
         $where['ASSIGNEE'] = getLoginUser();
         $this->assign('data', postIssue($where));
+        $this->assign('pkey', getCache('pkey'));
 
         $this->display();
     }
     //指派给我的Bug
     public function bug(){
-        $_SESSION['url'] = '/' . C('PRODUCT') . '/Mine/bug/';
-        $this->isLogin();
+        $url = '/' . C('PRODUCT') . '/Mine/bug/';
+        $this->isLogin($url);
         $where['issuetype'] = '10008';
         $where['issuestatus'] = array('not in', '10011,6');
         $where['ASSIGNEE'] = getLoginUser();
         $this->assign('data', postIssue($where));
+        $this->assign('pkey', getCache('pkey'));
 
         $this->display();
     }
@@ -73,6 +80,7 @@ class MineController extends WebInfoController
         $where['issuestatus'] = array('not in', '10011,6');
         $where['REPORTER'] =getLoginUser();
         $this->assign('data', postIssue($where));
+        $this->assign('pkey', getCache('pkey'));
 
         $this->display();
     }

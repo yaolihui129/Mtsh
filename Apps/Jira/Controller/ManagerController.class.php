@@ -4,8 +4,8 @@ class ManagerController extends WebInfoController
 {
     public function index()
     {
-        $_SESSION['url'] = '/' . C('PRODUCT') . '/Manager/index';
-        $this->isLogin();
+        $url = '/' . C('PRODUCT') . '/Manager/index';
+        $this->isLogin($url);
         $search = I('search');
         $this->assign('search', $search);
         $where = array('type' => '1', 'manager' => getLoginUser(), 'deleted' => '0');

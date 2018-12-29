@@ -2,12 +2,12 @@
 <div class="admin-content container" style="min-height: 500px">
     <div class="panel panel-info">
         <div class="panel-heading">
-            测试计划：<{$Think.cookie.Jira_pkey}>-<{$plan.issuenum}>：<{$plan.summary}>
-            <div class="btn-group pull-right">
-                <a href="__URL__/index/project/<{$Think.cookie.Jira_project}>/type/<{$Think.cookie.Jira_type_plan}>"
-                   class=" btn btn-warning btn-xs ">返回</a>
-            </div>
+            测试计划详情：
+            <a href="http://jira.zhidaohulian.com/browse/<{$pkey}>-<{$plan.issuenum}>" target="_blank">
+                <{$plan.summary}>
+            </a>
         </div>
+
         <div class="panel-body">
             <div class="well">
                 <div class="row">
@@ -16,55 +16,52 @@
                         状态:【<{$plan.issuestatus|getIssueStatus=###}>】
                     </div>
                     <div class="col-md-7">
-                        有效bug:【<{$Think.cookie.Jira_bug_num}>个】，
-                        Bug修复率:【<{$Think.cookie.Jira_xiufl_num}>%】，
-                        其中：P0级Bug:【<{$Think.cookie.Jira_p0_num}>个】,
-                        P1级Bug:【<{$Think.cookie.Jira_p1_num}>个】
+                        有效bug:【<{$bugNum}>个】，Bug修复率:【<{$bugRepairRate}>%】，其中：P0级Bug:【<{$bugNumP0}>个】,
+                        P1级Bug:【<{$bugNumP1}>个】
                     </div>
                     <div class="col-md-2">
-                        <a href="__URL__/repulse/planid/<{$plan.id}>" class="btn btn-warning"> 预警邮件</a>
-                        <a href="__APP__/<{$Think.config.PRODUCT}>/Report/index/planid/<{$plan.id}>/status/<{$plan.issuestatus}>"
-                           class="btn btn-info pull-right">测试报告</a>
+                        <a href="__URL__/repulse/planid/<{$tp}>" class="btn btn-warning"> 预警邮件</a>
+                        <a href="__APP__/<{$Think.config.PRODUCT}>/Report/index/planid/<{$tp}>" class="btn btn-info pull-right">测试报告</a>
                     </div>
                 </div>
             </div>
 
 
             <ul class="nav nav-pills" role="tablist">
-                <li role="presentation"><a href="__URL__/detail/tp/<{$tp}>">周期&范围</a></li>
+                <li role="presentation"><a href="__URL__/details/tp/<{$tp}>">周期&范围</a></li>
                 <li role="presentation">
-                    <a href="__URL__/tcase/tp/<{$tp}>">
-                        关联用例<span class="badge"><{$case|sizeof=###}></span>
-                    </a>
+                    <a href="__URL__/tcase/tp/<{$tp}>"> 关联用例<span class="badge"><{$caseNum}></span></a>
                 </li>
                 <li role="presentation">
-                    <a href="__URL__/bug/tp/<{$tp}>">
-                        本期缺陷<span class="badge"><{$Think.cookie.Jira_bug_num}></span>
-                    </a>
+                    <a href="__URL__/bug/tp/<{$tp}>">本期缺陷<span class="badge"><{$bugNum}></span></a>
                 </li>
                 <li role="presentation" class="active">
-                    <a href="__URL__/yiliu/tp/<{$tp}>">
-                        遗留BUG<span class="badge"><{$Think.cookie.Jira_bug_yiliu}></span>
-                    </a>
+                    <a href="__URL__/yiliu/tp/<{$tp}>">遗留BUG<span class="badge"><{$residueBugNum}></span></a>
                 </li>
             </ul>
 
 
             <div class="panel panel-info">
-                <ul class="list-group">
-                    <volist name='yiliu' id='st' empty="没有数据">
-                        <li class="list-group-item">
-                            <small>
-                                <a href="http://jira.zhidaohulian.com/browse/<{$Think.cookie.Jira_pkey}>-<{$st.issuenum}>"
-                                   target="_blank">
-                                    【<{$Think.cookie.Jira_pkey}>-<{$st.issuenum}>】
-                                </a>
-                                <{$st.summary}>
-                            </small>
-                            <span class="badge"><{$st.priority|getPriority=###}></span>
-                        </li>
-                    </volist>
-                </ul>
+                <empty name="residueBug">
+                    <br><br>
+                    <img src="__IMG__/wao.jpg" class="img-responsive center-block" alt="error">
+                    <h1 class="text-center">已经没有遗留BUG了，棒棒哒！</h1>
+                    <else/>
+                        <ul class="list-group">
+                            <volist name='residueBug' id='st' empty="没有数据">
+                                <li class="list-group-item">
+                                    <small>
+                                        <a href="http://jira.zhidaohulian.com/browse/<{$pkey}>-<{$st.issuenum}>" target="_blank">
+                                            【<{$pkey}>-<{$st.issuenum}>】
+                                        </a>
+                                        【<{$st.issuestatus|getIssueStatus=###}>】【提交人：<{$st.reporter|getJiraName=###}>】
+                                        【指派给：<{$st.assignee|getJiraName=###}>】<{$st.summary}>
+                                    </small>
+                                    <span class="badge"><{$st.priority|getPriority=###}></span>
+                                </li>
+                            </volist>
+                        </ul>
+                </empty>
             </div>
         </div>
     </div>

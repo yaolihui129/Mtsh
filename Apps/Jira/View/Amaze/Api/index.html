@@ -59,14 +59,10 @@
                                             <small><{$st.apiname}>(<{$st.apiid}>)</small>
                                             <switch name="st.pressure">
                                                 <case value="1">
-                                                    <a href="__URL__/pressure/apiID/<{$st.apiid}>/pressure/<{$st.pressure}>">
-                                                        <span class="label label-success pull-right">性能(Y)</span>
-                                                    </a>
+                                                    <span class="label label-success pull-right">性能(Y)</span>
                                                 </case>
                                                 <case value="0">
-                                                    <a href="__URL__/pressure/apiID/<{$st.apiid}>/pressure/<{$st.pressure}>">
-                                                        <span class="label label-warning pull-right">性能(N)</span>
-                                                    </a>
+                                                    <span class="label label-warning pull-right">性能(N)</span>
                                                 </case>
                                             </switch>
                                         </div>
@@ -76,17 +72,11 @@
                                             </small>
                                         </div>
                                         <div class="col-md-1">
-                                                <switch name="st.apistatus">
-                                                    <case value="0">
-                                                        <span class="label label-success pull-right">正常</span>
-                                                    </case>
-                                                    <case value="1">
-                                                        <span class="label label-warning pull-right">维护</span>
-                                                    </case>
-                                                    <case value="2">
-                                                        <span class="label label-danger pull-right">弃用</span>
-                                                    </case>
-                                                </switch>
+                                            <switch name="st.apistatus">
+                                                <case value="0"><span class="label label-success pull-right">正常</span></case>
+                                                <case value="1"><span class="label label-warning pull-right">维护</span></case>
+                                                <case value="2"><span class="label label-danger pull-right">弃用</span></case>
+                                            </switch>
                                         </div>
                                     </div>
                                 </a>

@@ -27,7 +27,13 @@
                        aria-controls="<{$st.id}>">
 
                         (<{$st.reporter|getJiraName=###}>)<{$st.summary}>【<{$st.created}>】
-                        <span class="badge pull-right"><{$st.assignee|getJiraName=###}></span>
+
+                        <a href="__URL__/setStatus/id/<{$st.id}>">
+                            <span class="badge pull-right">
+                                <{$st.assignee|getJiraName=###}>
+                            </span>
+                        </a>
+
                     </a>
                 </small>
             </div>

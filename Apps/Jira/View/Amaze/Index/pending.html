@@ -1,30 +1,80 @@
 <layout name="layout"/>
 <div class="admin-content container" style="min-height: 500px">
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">迭代-需求&任务</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                           aria-haspopup="true" aria-expanded="false">项目：<{$pname}>
+                            <span class="am-icon-caret-down"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <volist name='projectList' id='pro'>
+                                <li><a href="__URL__/pending/project/<{$pro.key}>"><{$pro.value}></a></li>
+                            </volist>
+                        </ul>
+                    </li>
+                </ul>
+
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                           aria-haspopup="true" aria-expanded="false">
+                            <empty name="draw">全部<else /> 负责人：<{$draw|getJiraName=###}></empty>
+                            <span class="am-icon-caret-down"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="__URL__/pending">全部</a></li>
+                            <volist name='user' id='vo'>
+                                <li><a href="__URL__/pending/draw/<{$vo}>"><{$vo|getJiraName=###}></a></li>
+                            </volist>
+                        </ul>
+                    </li>
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                    <form action="__URL__/pending " method="post" class="navbar-form navbar-left" role="search">
+                        <div class="form-group input-group">
+                            <input type="text" class="form-control" name="search" value="<{$search}>"
+                                   placeholder="名称、关键字">
+                            <input type="hidden"  name="project" value="<{$project}>">
+                            <input type="hidden"  name="draw" value="<{$draw}>">
+                            <span class="input-group-btn">
+                                 <button type="submit" class="btn btn-default">
+                                     <span class="glyphicon glyphicon-search"></span>
+                                 </button>
+                                <button type="button" data-toggle="modal" href="#tianj" class=" btn btn-success">
+                                    添加
+                                </button>
+                            </span>
+                        </div>
+                    </form>
+                </ul>
+            </div>
+        </div>
+    </nav>
     <ul class="nav nav-pills" role="tablist">
         <li role="presentation">
-            <a href="__URL__/index/project/<{$Think.cookie.Jira_project}>">进行中</a>
+            <a href="__URL__/index/project/<{$project}>">进行中</a>
         </li>
-        <if condition="$_SESSION['project'] eq 10006 ">
-            <li role="presentation" class="active">
-                <a href="__URL__/pending">分派 &nbsp;<span class="badge"><{$data|sizeof=###}></span></a>
-            </li>
-            <li role="presentation">
-                <a href="__URL__/started/type/assigned/project/<{$Think.cookie.Jira_project}>">未开始</a>
-            </li>
-            <notempty name="editable2">
-                <li role="presentation" >
-                    <a href="__URL__/add">添加</a>
-                </li>
-            </notempty>
+        <li role="presentation" class="active">
+            <a href="__URL__/pending">分派 &nbsp;<span class="badge"><{$data|sizeof=###}></span></a>
+        </li>
+        <li role="presentation">
+            <a href="__URL__/started/project/<{$project}>">未开始</a>
+        </li>
 
-            <li role="presentation" >
-                <a href="__APP__/<{$Think.config.PRODUCT}>/Weekly/index">测试周报</a>
-            </li>
-            <else/>
-            <li role="presentation">
-                <a href="__URL__/assigned/type/assigned/project/<{$Think.cookie.Jira_project}>">待处理</a>
-            </li>
-        </if>
     </ul>
     <div class="panel panel-default" style="min-height: 350px">
         <div class="row">
@@ -76,7 +126,8 @@
                                                 </notempty>
                                             <else />
                                                 <notempty name="editable2">
-                                                    <a href="__URL__/add_member/project/<{$da.id}>" class="btn btn-primary btn-xs">添加</a>
+                                                    <a data-toggle="modal" href="#tianjRenyuan" id="<{$da.id}>"
+                                                       class="btn btn-primary btn-xs" onclick="mod(this.id)">添加</a>
                                                 </notempty>
                                         </empty>
                                     <else />
@@ -84,8 +135,6 @@
                                             <a href="__URL__/jieshu/project/<{$da.id}>" class="btn btn-info btn-xs">结束</a>
                                         </notempty>
                                 </if>
-
-
                                 <span class="badge pull-right">
                                 <switch name="da.status">
                                     <case value="0">进行中</case>
@@ -105,32 +154,6 @@
                 </empty>
             </div>
             <div class="col-md-3">
-                <ul class="list-group">
-                    <eq name="draw" value="">
-                        <li class="list-group-item list-group-item-warning">
-                            <else/>
-                        <li class="list-group-item ">
-                    </eq>
-                        <a href="__URL__/pending">全部</a>
-                    </li>
-                    <volist name="user" id="vo">
-                        <eq name="vo" value="$draw">
-                            <li class="list-group-item list-group-item-warning">
-                                <a href="__URL__/pending/draw/<{$vo}>">
-                                    <{$vo|getJiraName=###}>
-                                    <span class="badge pull-right"><{$data|sizeof=###}></span>
-                                </a>
-                                <else/>
-                            <li class="list-group-item ">
-                            <a href="__URL__/pending/draw/<{$vo}>">
-                                <{$vo|getJiraName=###}>
-                                <!--<span class="badge pull-right">1</span>-->
-                            </a>
-                        </eq>
-
-                            </li>
-                    </volist>
-                </ul>
                 <div class="panel panel-primary">
                     <div class="panel-heading">测试分组</div>
                     <ul class="list-group">
@@ -161,11 +184,99 @@
                                 </small>
                             </li>
                         </volist>
-
-
                     </ul>
                 </div>
-
             </div>
+    </div>
+</div>
+
+
+
+
+<!-- 添加-模态框 -->
+<div class="modal fade " id="tianj" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <form action="__URL__/supple" method="post" class="form-horizontal" role="form">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">添加</h4>
+                </div>
+                <div class="modal-body">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">任务Key:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="pkey" value="" placeholder="例如：CX-24">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">分组:</label>
+                            <div class="col-sm-10"><{$pgroup}></div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">状态:</label>
+                            <div class="col-sm-10"><{$ststus}></div>
+                        </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="submit" class="btn btn-primary">提交</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function mod(id) {
+        // alert(id)
+        $.ajax({
+            type: "GET",
+            url: "__URL__/pendingInfo",
+            data: {id: id},
+            dataType: "json",
+            success: function (ss) {
+                // alert(ss.result.name);
+                $("#mod_id").val(ss.result.id);
+                $("#name").empty().append(ss.result.name);
+            }
+        })
+    }
+</script>
+<!-- 添加-模态框 -->
+<div class="modal fade " id="tianjRenyuan" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <form action="__URL__/assigne" method="post" class="form-horizontal" role="form">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title" >添加人员</h4>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="project" id="mod_id" value=""/>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">人员:</label>
+                        <div class="col-sm-10" id="name"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">角色:</label>
+                        <div class="col-sm-10"><{$role}></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="submit" class="btn btn-primary">提交</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>

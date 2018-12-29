@@ -9,17 +9,17 @@ class IndexController extends BaseController
         $merchantList=getMerchantList();
         $this->assign('merchantList', $merchantList);
         $merchant=I('merchant',$merchantList[0]['key']);
-        setCookieKey('merchant',$merchant,$time);
+        setCache('merchant',$merchant,$time);
 
         $appList=$this->getMerchantAppList($merchant);
         $this->assign('appList', $appList);
         $app=I('app',$appList[0]['key']);
-        setCookieKey('app',$app,$time);
+        setCache('app',$app,$time);
 
         $publicNumberList=getPublicNumberList($merchant);
         $this->assign('publicNumberList', $publicNumberList);
         $publicNumber=I('publicNumber',$publicNumberList[0]['key']);
-        setCookieKey('publicNumber',$publicNumber,$time);
+        setCache('publicNumber',$publicNumber,$time);
 
         $this->display();
     }

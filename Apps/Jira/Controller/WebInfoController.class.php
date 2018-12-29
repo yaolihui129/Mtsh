@@ -12,8 +12,9 @@ class WebInfoController extends BaseController
     {
         $this->display('index');
     }
-    function isLogin()
+    function isLogin($url='/Jira/Index')
     {
+        setCache('url',$url);
         if (!getLoginUser()) {
             $this->redirect('Jira/Login/index');
         }
@@ -74,7 +75,6 @@ class WebInfoController extends BaseController
         }
         return $pro;
     }
-
     function order()
     {
         $num = 0;
@@ -389,7 +389,7 @@ class WebInfoController extends BaseController
     }
 
     //获取任务状态并更新同步
-    function synch_issuestatus($id){
+    function synchIssueStatus($id){
         $data=getIssue($id);
         if($data){
             $var['id']=$id;
@@ -398,39 +398,41 @@ class WebInfoController extends BaseController
         }
     }
 
-
-
     function synchJiraIssue($issue){
-        $issue=json_decode(trim($issue, "\xEF\xBB\xBF"), true);
         $table = 'tp_jira_issue';
+        $id=array();
+        $pkey=getCache('pkey');
         foreach ($issue as $iss){
             $data = find($table,$iss['id']);
-            $iss['pkey']=cookie('Jira_pkey').'-'.$iss['issuenum'];
+            $iss['pkey']=$pkey.'-'.$iss['issuenum'];
             if($data){
-                update($table,$iss);
+                $id[]=update($table,$iss);
             }else{
-                insert($table,$iss);
+                $id[]=insert($table,$iss);
             }
         }
+        return $id;
     }
 
 
 
 
-    //获取测试计划信息
-    function getPlanInfo($tp){
-        $table='tp_jira_issue';
-        $plan=find($table,$tp);
-        $this->assign('plan',$plan );
-
-        if($plan['assignee']==getLoginUser()){
-            $editable=1;
-        }else{
-            $editable=0;
-        }
-        $this->assign('editable', $editable);
-        return $plan;
-    }
+//    //获取测试计划信息
+//    function getPlanInfo($tp){
+//        $table='tp_jira_issue';
+//        $plan=find($table,$tp);
+//        $this->assign('plan',$plan );
+//        $this->assign('user',getLoginUser() );
+//        //todo
+//        //权限部分计划删除
+//        if($plan['assignee']==getLoginUser()){
+//            $editable=1;
+//        }else{
+//            $editable=0;
+//        }
+//        $this->assign('editable', $editable);
+//        return $plan;
+//    }
 
 
 }
