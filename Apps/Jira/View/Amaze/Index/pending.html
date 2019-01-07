@@ -117,8 +117,8 @@
 
                                 <if condition="$da.status eq 0">
                                         <notempty name="editable2">
-                                            <a href="__URL__/done/project/<{$da.id}>/pkey/<{$da.pkey}>" class="btn btn-success btn-xs">完成</a>
-                                            <a href="__URL__/chehui/project/<{$da.id}>" class="btn btn-danger btn-xs">撤回</a>
+                                            <a href="__URL__/done/id/<{$da.id}>/pkey/<{$da.pkey}>" class="btn btn-success btn-xs">完成</a>
+                                            <a href="__URL__/cheHui/id/<{$da.id}>" class="btn btn-danger btn-xs">撤回</a>
                                         </notempty>
                                         <empty name="da.draw">
                                                 <notempty name="editable2">
@@ -132,7 +132,7 @@
                                         </empty>
                                     <else />
                                         <notempty name="editable2">
-                                            <a href="__URL__/jieshu/project/<{$da.id}>" class="btn btn-info btn-xs">结束</a>
+                                            <a href="__URL__/jieshu/id/<{$da.id}>" class="btn btn-info btn-xs">结束</a>
                                         </notempty>
                                 </if>
                                 <span class="badge pull-right">
@@ -193,7 +193,7 @@
 
 
 
-<!-- 添加-模态框 -->
+
 <div class="modal fade " id="tianj" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
      aria-hidden="true">
     <div class="modal-dialog modal-md">
@@ -230,8 +230,6 @@
         </div>
     </div>
 </div>
-
-
 <script>
     function mod(id) {
         // alert(id)
@@ -248,7 +246,6 @@
         })
     }
 </script>
-<!-- 添加-模态框 -->
 <div class="modal fade " id="tianjRenyuan" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
      aria-hidden="true">
     <div class="modal-dialog modal-md">

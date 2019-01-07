@@ -4,26 +4,31 @@ class BugController extends WebInfoController
 {
     public function index()
     {
+        $project=getCache('project');
         $table= 'tp_jira_issue';
         $map = array('status'=>'0');
+        $map['project'] = $project;
+        $map['issuetype'] = '10008';
         $IssueID=filterID($table,$map);
-        $where['ID']=array('not in',$IssueID);
-
-        $where['PROJECT'] = intval($_SESSION['project']);
-        $where['issuetype'] = '10008';
-        $where['issuestatus'] = '1';
+        $where['PROJECT'] = $project;
         $datum = date("Y-m-d", time() - 24 * 3600);
         $datum = strtotime($datum);//将日期转化为时间戳
         $datum = date("Y-m-d H:i", $datum + 17.5 * 3600);
         $where['CREATED'] = array('lt', $datum);
+        $where['issuetype'] = '10008';
+        $where['issuestatus'] = array('not in', '10011,6');
+        if($IssueID){
+            $where['ID']=array('not in',$IssueID);
+        }
         //同步到本地库
-        $this->synchJiraIssue(postIssue($where));
-
-        $where['project'] = intval($_SESSION['project']);
-        $where['status'] = '1';
-        $where['created'] = array('lt', $datum);
-        $order='issuestatus desc,assignee';
-        $this->assign('data', getList($table,$where,$order));
+        $issue=postIssue($where);
+        if($issue){
+            $this->synchJiraIssue($issue);
+        }
+        $map['created'] = array('lt', $datum);
+        $map['status'] = '1';
+        $map['issuestatus'] = '1';
+        $this->assign('data', getList($table,$map,'created desc'));
 
         $this->display();
     }
@@ -31,21 +36,28 @@ class BugController extends WebInfoController
     public function fault()
     {
         $table= 'tp_jira_issue';
+        $project=getCache('project');
         $map = array('status'=>'0');
+        $map['project'] = $project;
+        $map['issuetype'] = '10008';
+        $map['priority'] = array('in', '1,2');
         $IssueID=filterID($table,$map);
-        $where['ID']=array('not in',$IssueID);
-        $where['PROJECT'] = intval($_SESSION['project']);
+        if($IssueID){
+            $where['ID']=array('not in',$IssueID);
+        }
+        $datum = strtotime('2018-10-1');//将日期转化为时间戳
+        $datum = date("Y-m-d H:i", $datum);
+        $where['CREATED'] = array('gt', $datum);
+        $where['PROJECT'] = $project;
         $where['issuetype'] = '10008';
         $where['PRIORITY'] = array('in', '1,2');
-
-        //同步到本地库
-        $this->synchJiraIssue(postIssue($where));
-
-        $where['project'] = intval($_SESSION['project']);
-        $where['priority'] = array('in', '1,2');
-        $where['status'] = '1';
-        $order='issuestatus desc,assignee';
-        $this->assign('data', getList($table,$where,$order));
+        $data=postIssue($where);
+        if($data){
+            //同步到本地库
+            $this->synchJiraIssue($data);
+        }
+        $map['status'] = '1';
+        $this->assign('data', getList($table,$map,'priority,assignee'));
 
         $this->display();
     }
@@ -53,19 +65,31 @@ class BugController extends WebInfoController
     public function noclosed()
     {
         $table= 'tp_jira_issue';
+        $project=getCache('project');
         $map = array('status'=>'0');
+        $map['project'] = $project;
+        $map['issuetype'] = '10008';
+        $map['issuestatus'] = array('not in', '10011,6');
         $IssueID=filterID($table,$map);
-        $where['ID']=array('not in',$IssueID);
-        $where['PROJECT'] = intval($_SESSION['project']);
+        if($IssueID){
+            $where['ID']=array('not in',$IssueID);
+            $map['status'] = '1';
+            $IssueID=filterID($table,$map);
+            //删除已有的条目
+            foreach ($IssueID as $vo){
+                realdel($table,$vo);
+            }
+        }
+        $where['PROJECT'] = $project;
         $where['issuetype'] = '10008';
-        $where['issuestatus'] = array('not in', '10011,6');
-        //同步到本地库
-        $this->synchJiraIssue(postIssue($where));
+        $where['issuestatus'] = array('not in', '6');
+        $data=postIssue($where);
+        if($data){
+            $this->synchJiraIssue($data);
+        }
 
-        $where['project'] = intval($_SESSION['project']);
-        $where['status'] = '1';
-        $order='created desc';
-        $this->assign('data', getList($table,$where,$order));
+        $map['status'] = '1';
+        $this->assign('data', getList($table,$map,'created desc'));
 
         $this->display();
     }
@@ -75,7 +99,9 @@ class BugController extends WebInfoController
         $table= 'tp_jira_issue';
         $map = array('status'=>'0');
         $IssueID=filterID($table,$map);
-        $where['ID']=array('not in',$IssueID);
+        if($IssueID){
+            $where['ID']=array('not in',$IssueID);
+        }
         $data = getTestRunBug(I('run_id'), I('step_id'));
         $arr = array();
         foreach ($data as $da) {
@@ -83,45 +109,63 @@ class BugController extends WebInfoController
         }
         $where['ID'] = array('in', $arr);
         $Issue=postIssue($where);
+        $this->assign('data', $Issue);
         //同步到本地库
         $this->synchJiraIssue($Issue);
 
-        $this->assign('data', $Issue);
+
         $this->display();
     }
 
     public function mine()
     {
         $url = '/Jira/Bug/mine/';
+        $this->delJiraIssueClosedBug();
         $this->isLogin($url);
         $table= 'tp_jira_issue';
+        $project=getCache('project');
         $map = array('status'=>'0');
+        $map['project'] = $project;
+        $map['issuetype'] = '10008';
+        $map['assignee'] = getLoginUser();
+        $map['issuestatus'] = array('not in', '10011,6');
         $IssueID=filterID($table,$map);
-        $where['ID']=array('not in',$IssueID);
+        if($IssueID){
+            $where['ID']=array('not in',$IssueID);
+        }
+        $where['PROJECT'] = $project;
         $where['issuetype'] = '10008';
         $where['issuestatus'] = array('not in', '10011,6');
         $where['ASSIGNEE'] = getLoginUser();
-        //同步到本地库
-        $this->synchJiraIssue(postIssue($where));
-
-        $where['assignee'] = getLoginUser();
-        $where['status'] = '1';
+        $data=postIssue($where);
+        if($data){
+            //同步到本地库
+            $this->synchJiraIssue($data);
+        }
+        $map['status'] = '1';
         $order='issuestatus desc,assignee';
-        $this->assign('data', getList($table,$where,$order));
+        $this->assign('data', getList($table,$map,$order));
 
         $this->display();
     }
 
     function setStatus(){
-        $user=getLoginUser();
-        if($user=='ylh'){
+        $issue=array(getIssue($_GET['id']));
+        $res='';
+        if($issue){
+            $res=$this->synchJiraIssue($issue);
+        }
+        if(getLoginUser()=='ylh'){
             $_GET['status']='0';
             $_GET['table']='tp_jira_issue';
             $this->update();
         }else{
-            $this->error('不允许操作');
+            if($res){
+               $this->success('成功');
+            }else{
+                $this->error('失败');
+            }
         }
-
     }
 
     function test(){

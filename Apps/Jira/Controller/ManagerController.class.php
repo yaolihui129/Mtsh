@@ -22,7 +22,7 @@ class ManagerController extends WebInfoController
         $this->assign('source', $source);
         $this->assign('type', I('type', '1'));
         $this->assign('search', I('search'));
-
+        $this->assign('user', getLoginUser());
         $url = 'Device/Manager/' . $source . '?search=' . I('search');
 
         $this->assign('url', $url);
@@ -46,7 +46,7 @@ class ManagerController extends WebInfoController
                 .'】'.$v['name'].'('.$v['username'].')';
         }
         //封装下拉列表
-        $this->assign('user', select($user, 'manager',$_SESSION['user']));
+        $this->assign('user', select($user, 'manager',getLoginUser()));
 
         $this->display();
     }
@@ -95,6 +95,7 @@ class ManagerController extends WebInfoController
         $this->assign('data', getList($table,$where,'start_time,ctime'));
         $where['deleted'] = '1';
         $this->assign('data1', getList($table,$where,'start_time,ctime'));
+        $this->assign('user', getLoginUser());
 
         $this->display();
     }
@@ -199,6 +200,7 @@ class ManagerController extends WebInfoController
         $device=I('device');
         $source=I('source','index');
         $search=I('search');
+        $this->assign('user', getLoginUser());
         //今天的预订
         $where=array('device'=>$device,'type'=>'1','start_time'=>date('Y-m-d',time()));
         $arr = findOne('tp_device_loaning_record',$where);

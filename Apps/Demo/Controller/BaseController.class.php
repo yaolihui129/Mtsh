@@ -20,9 +20,6 @@ class BaseController extends WechatController
      **   3. 修改
      **   4. 逻辑删除
      **   5. 物理删除
-     **   6. 获取列表
-     **   7. 查找数据
-     **   8. 查找符合条件的一条数据
      **   9. 计数
      */
     function order()

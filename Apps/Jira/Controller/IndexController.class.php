@@ -153,10 +153,10 @@ class IndexController extends WebInfoController
         }
     }
     //撤回
-    function chehui()
+    function cheHui()
     {
         if(getLoginUser() == 'ylh'){
-            $_GET['id'] = I('project');
+            $_GET['id'] = I('id');
             $_GET['table'] = 'tp_project_pending';
             $this->del();
         }else{
@@ -171,8 +171,9 @@ class IndexController extends WebInfoController
         $where['PROJECT'] =$project;
         $where['issuetype'] = '10102';
         $data= postIssue($where);
+        $id=I('id');
         $_GET=array();
-        $_GET['id'] = $project;
+        $_GET['id'] = $id;
         $_GET['status'] = '1';
         if($data[0]){
             $_GET['planid'] = $data[0]['id'];
@@ -184,7 +185,7 @@ class IndexController extends WebInfoController
     //结束
     function jieshu(){
         if(getLoginUser() == 'ylh'){
-            $_GET['id'] = I('project');;
+            $_GET['id'] = I('id');
             $_GET['status'] = '3';
             $_GET['table'] = 'tp_project_pending';
             $this->update();

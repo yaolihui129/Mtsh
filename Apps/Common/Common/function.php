@@ -1,5 +1,5 @@
 <?php
-
+use Think\Model;
     //手机端模板
     function ismobile() {
         // 如果有HTTP_X_WAP_PROFILE则一定是移动设备
@@ -911,17 +911,7 @@
         return $fdate;
     }
 
-    //获取登录用户
-    function getLoginUser(){
-        $user = getCache('user');
-        $user = jie_mi($user);
-        return $user;
-    }
-    function getLoginUserID(){
-        $userID = getCache('user_id');
-        $userID =jie_mi($userID);
-        return $userID;
-    }
+
 
 
     /**
@@ -967,6 +957,18 @@
         return true;
     }
 
+    //获取登录用户
+    function getLoginUser(){
+        $user = getCache('user');
+        $user = jie_mi($user);
+        return $user;
+    }
+    function getLoginUserID(){
+        $userID = getCache('user_id');
+        $userID =jie_mi($userID);
+        return $userID;
+    }
+
 
     //获取某一字典值
     function getDictValue($type,$key,$value='value',$table='tp_dict'){
@@ -1000,11 +1002,7 @@
     function getDictInfo($type,$key,$table='tp_dict',$what='value'){
         $where=array('type'=>$type,'key'=>$key);
         $data = findOne($table,$where);
-        if($what=='value'){
-            return $data['value'];
-        }else{
-            return $data;
-        }
+        return $data[$what];
     }
     //封装字典为下拉菜单
     function dictList($type,$field,$table='tp_dict',$default='0',$lim=''){

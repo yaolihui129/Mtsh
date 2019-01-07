@@ -397,7 +397,6 @@ class WebInfoController extends BaseController
             update('tp_project_pending',$var);
         }
     }
-
     function synchJiraIssue($issue){
         $table = 'tp_jira_issue';
         $id=array();
@@ -413,26 +412,17 @@ class WebInfoController extends BaseController
         }
         return $id;
     }
+    function delJiraIssueClosedBug(){
+        $table = 'tp_jira_issue';
+        $where=array('issuetype'=>'10008','issuestatus'=>'6','status'=>'1');
+        $data=getList($table,$where);
+        if($data){
+            foreach ($data as $vo){
+                realdel($table,$vo['id']);
+            }
+        }
+    }
 
-
-
-
-//    //获取测试计划信息
-//    function getPlanInfo($tp){
-//        $table='tp_jira_issue';
-//        $plan=find($table,$tp);
-//        $this->assign('plan',$plan );
-//        $this->assign('user',getLoginUser() );
-//        //todo
-//        //权限部分计划删除
-//        if($plan['assignee']==getLoginUser()){
-//            $editable=1;
-//        }else{
-//            $editable=0;
-//        }
-//        $this->assign('editable', $editable);
-//        return $plan;
-//    }
 
 
 }

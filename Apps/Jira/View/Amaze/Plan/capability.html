@@ -192,24 +192,24 @@
                                 <th width=10% align="center" bgcolor="#ccc">场景名称</th>
                                 <th width=10% align="center" bgcolor="#ccc">并发用户数</th>
                                 <th width=10% align="center" bgcolor="#ccc">加压方式</th>
-                                <th width=10% align="center" bgcolor="#ccc">持续时间</th>
+                                <th width=10% align="center" bgcolor="#ccc">持续时间（s）</th>
                                 <th width=10% align="center" bgcolor="#ccc">退出方式</th>
                                 <th width=10% align="center" bgcolor="#ccc">思考时间</th>
                                 <th width=10% align="center" bgcolor="#ccc">交易组合</th>
                                 <th width=10% align="center" bgcolor="#ccc">负载生成器数量</th>
                                 <th width=10% align="center" bgcolor="#ccc">备注</th>
                             </tr>
-                            <volist name='scene0' id='vo' key="k">
+                            <volist name='api' id='vo' key="k">
                                 <tr>
                                     <td><{$k}></td>
-                                    <td><{$vo.name}></td>
-                                    <td><{$vo.users}></td>
-                                    <td><{$vo.compres}></td>
-                                    <td><{$vo.duration}></td>
+                                    <td>基准:<{$vo.api|getName='eo_api',###,'apiuri'}></td>
+                                    <td>1</td>
+                                    <td>不加压</td>
+                                    <td>60</td>
                                     <td>自动退出</td>
-                                    <td><{$vo.think_time}></td>
-                                    <td><{$vo.portfolios}></td>
-                                    <td><{$vo.jmter_num}></td>
+                                    <td>0</td>
+                                    <td>不考虑</td>
+                                    <td>1</td>
                                     <td><{$vo.remark}></td>
                                 </tr>
                             </volist>
@@ -242,24 +242,52 @@
                                 <th width=10% align="center" bgcolor="#ccc">场景名称</th>
                                 <th width=10% align="center" bgcolor="#ccc">并发用户数</th>
                                 <th width=10% align="center" bgcolor="#ccc">加压方式</th>
-                                <th width=10% align="center" bgcolor="#ccc">持续时间</th>
+                                <th width=10% align="center" bgcolor="#ccc">持续时间（S）</th>
                                 <th width=10% align="center" bgcolor="#ccc">退出方式</th>
                                 <th width=10% align="center" bgcolor="#ccc">思考时间</th>
                                 <th width=10% align="center" bgcolor="#ccc">交易组合</th>
                                 <th width=10% align="center" bgcolor="#ccc">负载生成器数量</th>
                                 <th width=10% align="center" bgcolor="#ccc">备注</th>
                             </tr>
-                            <volist name='scene1' id='vo' key="k">
+                            <volist name='api' id='vo' key="k">
                                 <tr>
                                     <td><{$k}></td>
-                                    <td><{$vo.name}></td>
-                                    <td><{$vo.users}></td>
-                                    <td><{$vo.compres}></td>
-                                    <td><{$vo.duration}></td>
+                                    <td><{$vo.api|getName='eo_api',###,'apiuri'}></td>
+                                    <td>500</td>
+                                    <td>加压</td>
+                                    <td>900</td>
                                     <td>自动退出</td>
-                                    <td><{$vo.think_time}></td>
-                                    <td><{$vo.portfolios}></td>
-                                    <td><{$vo.jmter_num}></td>
+                                    <td>0</td>
+                                    <td>不考虑</td>
+                                    <td>1</td>
+                                    <td><{$vo.remark}></td>
+                                </tr>
+                            </volist>
+                            <volist name='api' id='vo' key="k">
+                                <tr>
+                                    <td><{$k}></td>
+                                    <td><{$vo.api|getName='eo_api',###,'apiuri'}></td>
+                                    <td>600</td>
+                                    <td>加压</td>
+                                    <td>900</td>
+                                    <td>自动退出</td>
+                                    <td>0</td>
+                                    <td>不考虑</td>
+                                    <td>1</td>
+                                    <td><{$vo.remark}></td>
+                                </tr>
+                            </volist>
+                            <volist name='api' id='vo' key="k">
+                                <tr>
+                                    <td><{$k}></td>
+                                    <td><{$vo.api|getName='eo_api',###,'apiuri'}></td>
+                                    <td>700</td>
+                                    <td>加压</td>
+                                    <td>900</td>
+                                    <td>自动退出</td>
+                                    <td>0</td>
+                                    <td>不考虑</td>
+                                    <td>1</td>
                                     <td><{$vo.remark}></td>
                                 </tr>
                             </volist>
@@ -299,17 +327,17 @@
                                 <th width=10% align="center" bgcolor="#ccc">负载生成器数量</th>
                                 <th width=10% align="center" bgcolor="#ccc">备注</th>
                             </tr>
-                            <volist name='scene2' id='vo' key="k">
+                            <volist name='api' id='vo' key="k">
                                 <tr>
                                     <td><{$k}></td>
-                                    <td><{$vo.name}></td>
-                                    <td><{$vo.users}></td>
-                                    <td><{$vo.compres}></td>
-                                    <td><{$vo.duration}></td>
+                                    <td><{$vo.api|getName='eo_api',###,'apiuri'}></td>
+                                    <td>500</td>
+                                    <td>加压</td>
+                                    <td>900</td>
                                     <td>自动退出</td>
-                                    <td><{$vo.think_time}></td>
-                                    <td><{$vo.portfolios}></td>
-                                    <td><{$vo.jmter_num}></td>
+                                    <td>0</td>
+                                    <td>不考虑</td>
+                                    <td>1</td>
                                     <td><{$vo.remark}></td>
                                 </tr>
                             </volist>
@@ -348,17 +376,17 @@
                                 <th width=10% align="center" bgcolor="#ccc">负载生成器数量</th>
                                 <th width=10% align="center" bgcolor="#ccc">备注</th>
                             </tr>
-                            <volist name='scene3' id='vo' key="k">
+                            <volist name='api' id='vo' key="k">
                                 <tr>
                                     <td><{$k}></td>
-                                    <td><{$vo.name}></td>
-                                    <td><{$vo.users}></td>
-                                    <td><{$vo.compres}></td>
-                                    <td><{$vo.duration}></td>
+                                    <td><{$vo.api|getName='eo_api',###,'apiuri'}></td>
+                                    <td>极限用户数</td>
+                                    <td>加压</td>
+                                    <td>900</td>
                                     <td>自动退出</td>
-                                    <td><{$vo.think_time}></td>
-                                    <td><{$vo.portfolios}></td>
-                                    <td><{$vo.jmter_num}></td>
+                                    <td>0</td>
+                                    <td>不考虑</td>
+                                    <td>1</td>
                                     <td><{$vo.remark}></td>
                                 </tr>
                             </volist>
@@ -397,17 +425,17 @@
                                 <th width=10% align="center" bgcolor="#ccc">负载生成器数量</th>
                                 <th width=10% align="center" bgcolor="#ccc">备注</th>
                             </tr>
-                            <volist name='scene4' id='vo' key="k">
+                            <volist name='api' id='vo' key="k">
                                 <tr>
                                     <td><{$k}></td>
-                                    <td><{$vo.name}></td>
-                                    <td><{$vo.users}></td>
-                                    <td><{$vo.compres}></td>
-                                    <td><{$vo.duration}></td>
+                                    <td><{$vo.api|getName='eo_api',###,'apiuri'}></td>
+                                    <td>500</td>
+                                    <td>加压</td>
+                                    <td>28800</td>
                                     <td>自动退出</td>
-                                    <td><{$vo.think_time}></td>
-                                    <td><{$vo.portfolios}></td>
-                                    <td><{$vo.jmter_num}></td>
+                                    <td>0</td>
+                                    <td>不考虑</td>
+                                    <td>1</td>
                                     <td><{$vo.remark}></td>
                                 </tr>
                             </volist>

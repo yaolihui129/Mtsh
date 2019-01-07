@@ -128,15 +128,16 @@
     //获取Jira用户名
     function getJiraName($name)
     {
+        $str='';
         if ($name) {
             $m = D('tp_jira_user');
             $where = array('username' => $name);
-            $data = $m->where($where)->cache('cache_' . $name)->find();
+            $data = $m->where($where)->find();
             if ($data) {
-                return $data['name'];
+                $str = $data['name'];
             } else {
                 //查不到的从远端拉取信息到tp_jira_user
-                $url = C(JIRAPI) . "/Jirapi/user?method=find&USER_KEY=" . $name;
+                $url = C('JIRAPI') . "/Jirapi/user?method=find&USER_KEY=" . $name;
                 $data = httpGet($url);
                 $data = json_decode(trim($data, "\xEF\xBB\xBF"), true);
                 $var['username'] = $name;
@@ -145,9 +146,11 @@
                     $this->error($m->getError());
                 }
                 $m->add($var);
-                return $data['display_name'];
+                $str = $data['display_name'];
             }
         }
+
+        return $str;
     }
     function getJiraNameM($name){
         $name=jie_mi($name);
@@ -217,7 +220,7 @@
             $data = $m->find($id);
             if (!$data) {
                 //请求接口拉取数据
-                $url = C(JIRAPI) . "/Jirapi/priority/" . $id;
+                $url = C('JIRAPI') . "/Jirapi/priority/" . $id;
                 $data = httpGet($url);
                 $data = json_decode(trim($data, "\xEF\xBB\xBF"), true);
                 $var['ID'] = $id;
@@ -240,7 +243,7 @@
             $data = $m->find($id);
             if (!$data) {
                 //请求接口拉取数据
-                $url = C(JIRAPI) . "/Jirapi/issuetype/" . $id;
+                $url = C('JIRAPI') . "/Jirapi/issuetype/" . $id;
                 $data = httpGet($url);
                 $data = json_decode(trim($data, "\xEF\xBB\xBF"), true);
                 $var['ID'] = $id;
@@ -263,7 +266,7 @@
             $data = $m->find($id);
             if (!$data) {
                 //请求接口拉取数据
-                $url = C(JIRAPI) . "/Jirapi/issuestatus/" . $id;
+                $url = C('JIRAPI') . "/Jirapi/issuestatus/" . $id;
                 $data = httpGet($url);
                 $data = json_decode(trim($data, "\xEF\xBB\xBF"), true);
                 $var['ID'] = $id;
@@ -282,7 +285,7 @@
     function getTestRunStep($id)
     {
         $str = '';
-        $url = C(JIRAPI) . "/Jirapi/testrunsetp/" . $id . '/run';
+        $url = C('JIRAPI') . "/Jirapi/testrunsetp/" . $id . '/run';
         $data = httpGet($url);
         $data = json_decode(trim($data, "\xEF\xBB\xBF"), true);
         if ($data) {
@@ -305,7 +308,7 @@
     //获取用例步骤
     function getTestStep($tc_id){
         $str = '';
-        $url = C(JIRAPI) . "/Jirapi/testsetp/".$tc_id ;
+        $url = C('JIRAPI') . "/Jirapi/testsetp/".$tc_id ;
         $data = httpGet($url);
         $data = json_decode(trim($data, "\xEF\xBB\xBF"), true);
         if ($data) {
@@ -329,7 +332,7 @@
         $str = '';
         $where['TC_ID'] = $tc;
         $where['TEST_CYCLE_ID'] = array('in', $cyc);
-        $url = C(JIRAPI) . "/Jirapi/testrun";
+        $url = C('JIRAPI') . "/Jirapi/testrun";
         $data = httpJsonPost($url, $where);
         $data = json_decode(trim($data, "\xEF\xBB\xBF"), true);
         if ($data) {
@@ -467,7 +470,7 @@
         $user=test_group_member($pending['pgroup']);
         $str='';
         if(!$user){
-            $user=C(QA_TESTER);
+            $user=C('QA_TESTER');
         }
         foreach ($user as $u){
             $str.='<a href="'.__APP__.'/Jira/Index/zhipai/id/'.$id.'/draw/'.$u['name']

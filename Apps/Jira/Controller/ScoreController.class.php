@@ -63,24 +63,28 @@ class ScoreController extends WebInfoController
             array('key' => '1', 'value' => '允许申诉'),
             array('key' => '0', 'value' => '不允许申诉'),
         );
-        $tester = C('QA_TESTER');
-        $_SESSION['Appraisal']['tester'] = I('tester', $tester[0]);
+        $testers = C('QA_TESTER');
+        $this->assign("testers", $testers);
+        $tester=I('tester', $testers[0]);
+        setCache('Appraisal_tester',$tester);
         $this->assign("tester", $tester);
         if (in_array(getLoginUser(), $user)) {
-            $project=array();
+            $penging=array();
             $map['status']=array('in','1,2');
             $pending=getList('tp_project_pending',$map);
             foreach ($pending as $k => $pend){
-                $project[$k]['key']=$pend['id'];
-                $project[$k]['value']='【'.$pend['pkey'].'】'.$pend['pname'].'('.$pend['id'].')';
+                $penging[$k]['key']=$pend['id'];
+                $penging[$k]['value']='【'.$pend['pkey'].'】'.$pend['pname'].'('.$pend['id'].')';
             }
-            $this->assign("project", $project);
-            $tp=I('project');
-            $this->assign("p", $tp);
+            $this->assign("penging", $penging);
+            $project=getCache('project');
+            $this->assign('project', $project);
+            $tp=I('tp');
+            $this->assign("tp", $tp);
 
             if($tp){
                 $data=getIssue($tp);
-                $_SESSION['Appraisal']['project'] = '【'.$_SESSION['pkey']. $data['issuenum'] .'】'.$data['summary'] ;
+                $summary='【'.getCache('pkey'). $data['issuenum'] .'】'.$data['summary'] ;
                 $case = getPlanCase($tp);
                 $case_id_arr=array();
                 if ($case) {
@@ -96,22 +100,24 @@ class ScoreController extends WebInfoController
                 }
                 //查询测试人员
                 $data=getCyclePlan($tp);
-                $ceshiren=array();
+                $ceShiRen=array();
                 foreach ($data as $da){
                     $case = getCycleTestRun($da['id']);
                     foreach ($case as $ca){
                         if($ca['executed_by']){
-                            if(!in_array($ca['executed_by'], $ceshiren)){
-                                $ceshiren[]=$ca['executed_by'];
+                            if(!in_array($ca['executed_by'], $ceShiRen)){
+                                $ceShiRen[]=$ca['executed_by'];
                             }
                         }
                     }
                 }
-                $this->assign("ceshiren", $ceshiren);
+                $this->assign("ceshiren", $ceShiRen);
             }else{
-                $_SESSION['Appraisal']['project'] = '【未关联】迭代或项目';
+                $summary = '【未关联】迭代或项目';
             }
-            $this->assign("score", sumScore($_SESSION['Appraisal']['tester'], C('KH_QUARTER')));
+            $this->assign("summary", $summary);
+
+            $this->assign("score", sumScore(getCache('Appraisal_tester'), C('KH_QUARTER')));
             $this->assign("quarter", C('KH_QUARTER'));
 
             //封装加分项下拉
@@ -120,7 +126,7 @@ class ScoreController extends WebInfoController
             $dissent = select($dissent, 'dissent', '0');
             $var = array(
                 'quarter' => C('KH_QUARTER'),
-                'user' => $_SESSION['Appraisal']['tester']
+                'user' => getCache('Appraisal_tester')
             );
             if ($tp) {
                 $where['project'] = '1';
@@ -167,8 +173,10 @@ class ScoreController extends WebInfoController
         $where = array('status' => '1');
         $this->assign("data", getList($table,$where));
         $this->assign("acount", countId($table,$where));
+
         $where = array('quarter' => C('KH_QUARTER'), 'status' => '2');
         $this->assign("dcount", countId($table,$where));
+
         $where = array('quarter' => C('KH_QUARTER'), 'status' => '3');
         $this->assign("rcount", countId($table,$where));
 
@@ -178,11 +186,13 @@ class ScoreController extends WebInfoController
     public function done()
     {
         $table='tp_my_score';
+        $where = array('status' => '1');
+        $this->assign("acount", countId($table,$where));
+
         $where = array('quarter' => C('KH_QUARTER'), 'status' => '2');
         $this->assign("data", getList($table,$where));
         $this->assign("dcount", countId($table,$where));
-        $where = array('status' => '1', 'deleted' => '0');
-        $this->assign("acount", countId($table,$where));
+
         $where = array('quarter' => C('KH_QUARTER'), 'status' => '3');
         $this->assign("rcount", countId($table,$where));
 
@@ -192,12 +202,15 @@ class ScoreController extends WebInfoController
     public function reject()
     {
         $table='tp_my_score';
+        $where = array('status' => '1');
+        $this->assign("acount", countId($table,$where));
+
+        $where = array('quarter' => C('KH_QUARTER'), 'status' => '2');
+        $this->assign("dcount", countId($table,$where));
+
         $where = array('quarter' => C('KH_QUARTER'), 'status' => '3');
         $this->assign("data", getList($table,$where));
         $this->assign("rcount", countId($table,$where));
-        $this->assign("dcount", countId($table,$where));
-        $where = array('status' => '1');
-        $this->assign("acount", countId($table,$where));
 
         $this->display();
     }

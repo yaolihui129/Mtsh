@@ -2,6 +2,7 @@
 namespace Admin\Controller;
 class AppController extends BaseController
 {
+    private $table = 'app';
     //初始化数据
     function init(){
         $data = array(
@@ -28,7 +29,7 @@ class AppController extends BaseController
         $this->assign('search', $search);
         $where['name|subtype|email|website|appid'] = array('like', '%' . $search . '%');
         //查询数据
-        $data=getList($info['table_app'],$where,$info['order']);
+        $data=getList($this->table,$where,$info['order']);
         $this->assign("data", $data);
 
         $this->display();

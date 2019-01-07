@@ -80,6 +80,10 @@ class PlanController extends WebInfoController
         $tp = I('tp');
         $table='tp_jira_issue';
         $this->assign('tp', $tp);
+        $issue=array(getIssue($tp));
+        if($issue){
+            $this->synchJiraIssue($issue);
+        }
         //获取计划详情
         $this->assign('plan',find($table,$tp) );
         //获取计划周期
@@ -235,6 +239,10 @@ class PlanController extends WebInfoController
         $tp = I('tp');
         $table='tp_jira_issue';
         $this->assign('tp', $tp);
+        $issue=array(getIssue($tp));
+        if($issue){
+            $this->synchJiraIssue($issue);
+        }
         //获取计划详情
         $plan=find($table,$tp);
         $this->assign('plan',$plan);
@@ -260,6 +268,10 @@ class PlanController extends WebInfoController
         $table='tp_jira_issue';
         $this->assign('tp', $tp);
         $this->assign('pkey', getCache('pkey'));
+        $issue=array(getIssue($tp));
+        if($issue){
+            $this->synchJiraIssue($issue);
+        }
         //获取计划详情
         $plan=find($table,$tp);
         $this->assign('plan',$plan );
@@ -273,6 +285,12 @@ class PlanController extends WebInfoController
             $extend = find($table,$tp);
         }
         $this->assign('extend',$extend);
+
+        $dict=getDictInfo('per_scheme',$extend['per_scheme'],'tp_dict','json');
+        $dict=json_decode($dict);
+        foreach ($dict as $d){
+            $this->assign('extend_scheme'.$d, 'extend_scheme'.$d);
+        }
 
 
         $topology='<p>压力产生器连接服务端系统，客户端发送请求到服务端，服务端响应并处理后将结果返回到客户端。
@@ -424,6 +442,7 @@ class PlanController extends WebInfoController
         $this->assign('project', $project);
         $scheme=I('scheme');
         $this->assign('scheme', $scheme);
+        $this->assign('user', getLoginUser());
 
         if($project){
             $where = array('api' => $id, 'project'=>$project);

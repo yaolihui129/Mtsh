@@ -7,7 +7,7 @@
                 <a data-toggle="collapse" data-parent="#accordion" href="#<{$st.id}>"
                    aria-expanded="true" aria-controls="<{$st.id}>">
                     <{$st.reporter|getJiraName=###}>
-                    【<{$Think.session.pkey}>-<{$st.issuenum}>】
+                    【<{$key}>-<{$st.issuenum}>】
                     <{$st.summary}>
                     <{$st.assignee|getJiraName=###}>
                     <span class="badge pull-right"> <{$st.issuestatus|getIssueStatus=###}></span>

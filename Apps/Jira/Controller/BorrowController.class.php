@@ -37,8 +37,8 @@ class BorrowController extends WebInfoController
         $id=I('id');
         $source=I('source');
         $search=I('search');
-        $_SESSION['url'] = '/' . C('PRODUCT') . '/Borrow/yuding/id/'.$id.'/source/'.$source.'/search/'.$search;
-        $this->isLogin();
+        $url = '/' . C('PRODUCT') . '/Borrow/yuding/id/'.$id.'/source/'.$source.'/search/'.$search;
+        $this->isLogin($url);
         $this->assign('arr', find('tp_device',$id));
         $where=array('device'=>$id,'type'=>'1');
         $data =getList('tp_device_loaning_record',$where,'end_time desc');
@@ -46,6 +46,7 @@ class BorrowController extends WebInfoController
 
         $this->assign('source', $source);
         $this->assign('search', $search);
+        $this->assign('user', getLoginUser());
         $this->assign('url', 'Jira/Books/'.$source);
         $this->assign('riqi', date("Y-m-d", time()));
         if ($source=='index'){
@@ -79,8 +80,8 @@ class BorrowController extends WebInfoController
                 $_POST['end_time'] = date('Y-m-d H:i:s', $time + 15*24 * 60 * 60 + 9 * 60 * 60 + 15 * 60);
             }
         }
-        $_POST['adder'] = $_SESSION['uxer'];
-        $_POST['moder'] = $_SESSION['uxer'];
+        $_POST['adder'] = getLoginUser();
+        $_POST['moder'] = getLoginUser();
         $_POST['ctime'] = time();
         if (!$m->create()) {
             $this->error($m->getError());
