@@ -1,0 +1,41 @@
+<layout name="layout"/>
+<div class="admin-content container" style="min-height: 500px">
+    <div class="well">
+        <div class="row">
+            <div class="col-md-3">
+                系统-分组: <{$api.projectid|getName='eo_project',###,'projectname'}>-
+                <{$api.groupid|getName='eo_api_group',###,'groupname'}>
+            </div>
+            <div class="col-md-5">
+                接口名称：<{$api.apiname}>
+            </div>
+            <div class="col-md-4">
+                接口路径：<{$api.apiuri}>
+            </div>
+        </div>
+    </div>
+    <table class="am-table am-table-striped am-table-hover table-main table-bordered">
+        <thead>
+        <tr>
+            <th class="table-title" bgcolor="#ccc">性能测试计划</th>
+            <th class="table-type" bgcolor="#ccc">测试者</th>
+        </tr>
+        </thead>
+        <tbody>
+        <volist name='data' id='da'>
+            <tr>
+                <td>
+                    <a href="__URL__/performance/tp/<{$da.id}>" target="_blank"><{$da.summary}></a>
+                    <span class="badge pull-right"><{$da.issuestatus|getName='issuestatus',###,'pname'}></span>
+                </td>
+                <td><{$da.assignee|getJiraName=###}></td>
+            </tr>
+        </volist>
+        <tr>
+            <td></td><td></td>
+        </tr>
+        </tbody>
+    </table>
+
+
+</div>

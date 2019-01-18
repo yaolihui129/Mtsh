@@ -1,0 +1,153 @@
+<layout name="layout"/>
+<div class="admin-content container" style="min-height: 500px">
+    <div class="panel panel-default">
+        <nav class="navbar navbar-inverse">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                            data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">性能测试报告</a>
+                </div>
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav navbar-right">
+                        <form action="__URL__/pressure " method="post" class="navbar-form navbar-left" role="search">
+                            <div class="form-group input-group">
+                                <input type="text" class="form-control" name="search" value="<{$search}>"
+                                       placeholder="名称、关键字">
+                                <span class="input-group-btn">
+                                     <button type="submit" class="btn btn-default">
+                                         <span class="glyphicon glyphicon-search"> 搜索</span>
+                                     </button>
+                                    <button type="button" data-toggle="modal" href="#tianJia" class=" btn btn-success">
+                                        <span class="glyphicon glyphicon-plus"> 添加</span>
+                                    </button>
+                                </span>
+                            </div>
+                        </form>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <ul class="nav nav-pills" role="tablist">
+            <li role="presentation" ><a href="__URL__/pressurePlan">计划</a></li>
+            <li role="presentation" ><a href="__URL__/pressureApi">接口</a></li>
+            <li role="presentation" class="active"><a href="__URL__/pressure">综合</a></li>
+        </ul>
+
+        <table class="am-table am-table-striped am-table-hover table-main table-bordered">
+            <thead>
+                <tr>
+                    <th class="table-title" bgcolor="#ccc">测试报告</th>
+                    <th class="table-type" bgcolor="#ccc">报告人</th>
+                    <th class="table-type" bgcolor="#ccc">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <volist name='data' id='da'>
+                    <tr>
+                        <td><a href="__URL__/pressureDetail/id/<{$da.id}>"><{$da.subject}></a></td>
+                        <td><{$da.tester}></td>
+                        <td>
+                            <a data-toggle="modal" href="#mod" id="<{$da.id}>" onclick="mod(this.id)">修改</a>
+                            <a href="__URL__/del/id/<{$da.id}>/table/tp_report"
+                               onclick="return confirm('你确定要废弃：<{$da.subject}>吗？')">废弃</a>
+                        </td>
+                    </tr>
+                </volist>
+                <tr>
+                    <td></td><td></td><td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="tianJia" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form action="__URL__/insert" method="post" class="form-horizontal" role="form">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">性能测试报告-创建</h4>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="type"  value="0"/>
+                    <input type="hidden" name="tester"  value="<{$user}>"/>
+                    <input type="hidden" name="method"  value="性能测试"/>
+                    <input type="hidden" name="table"  value="tp_report"/>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">名称</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="subject" value="" placeholder="报告标题">
+                        </div>
+                        <div class="col-sm-1"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="submit" class="btn btn-primary">提交</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function mod(id) {
+        $.ajax({
+            type: "GET",
+            url: "__URL__/report_info",
+            data: {id: id},
+            dataType: "json",
+            success: function (ss) {
+                $("#mod_id").val(ss.result.id);
+                $("#mod_subject").val(ss.result.subject);
+            }
+        })
+    }
+</script>
+
+<div class="modal fade" id="mod" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form action="__URL__/update" method="post" class="form-horizontal" role="form">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title" >性能测试报告-编辑</h4>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="mode_id"  value="0"/>
+                    <input type="hidden" name="table"  value="tp_report"/>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">名称</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" name="subject" id="mod_subject" value="" placeholder="报告标题">
+                        </div>
+                        <div class="col-sm-1"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="submit" class="btn btn-primary">提交</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -17,8 +17,11 @@
 </head>
 <body>
 <!--[if lte IE 9]>
-<p class="browsehappy">你正在使用<strong>过时</strong>的浏览器，Amaze UI 暂不支持。 请 <a href="http://browsehappy.com/" target="_blank">升级浏览器</a>
-    以获得更好的体验！</p>
+<p class="browsehappy">
+    你正在使用<strong>过时</strong>的浏览器，Amaze UI 暂不支持。 请
+    <a href="http://browsehappy.com/" target="_blank">升级浏览器</a>
+    以获得更好的体验！
+</p>
 <![endif]-->
 
 <header class="am-topbar admin-header navbar-static-top">
@@ -114,6 +117,11 @@
                     <span class="glyphicon glyphicon-compressed"> 接口测试</span>
                 </a>
             </li>
+            <li>
+                <a href="__APP__/<{$Think.config.PRODUCT}>/Report/pressure">
+                    <span class="glyphicon glyphicon-file"> 压测报告</span>
+                </a>
+            </li>
             <in name="Think.cookie.Jira_user|jie_mi=###" value="ylh,wcz,mhh,fj,lixiaomei">
                 <li>
                     <a href="__APP__/<{$Think.config.PRODUCT}>/Case/func">
@@ -139,8 +147,6 @@
                         <span class="am-icon-file"> &nbsp; &nbsp;测试周报</span></a>
                 </li>
             </in>
-
-
         </ul>
         <div class="am-panel am-panel-default admin-sidebar-panel">
             <div class="am-panel-bd">

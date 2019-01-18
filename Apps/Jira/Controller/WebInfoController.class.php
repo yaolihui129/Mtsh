@@ -91,8 +91,8 @@ class WebInfoController extends BaseController
     {
         $m = D(I('table'));
         if (IS_GET) {
-            $_GET['adder'] = $_SESSION['user'];
-            $_GET['moder'] = $_SESSION['user'];
+            $_GET['adder'] = getLoginUser();
+            $_GET['moder'] = getLoginUser();
             $_GET['ctime'] = time();
             if (!$m->create($_GET)) {
                 $this->error($m->getError());
@@ -107,8 +107,8 @@ class WebInfoController extends BaseController
                 $this->error("失败");
             }
         } else {
-            $_POST['adder'] = $_SESSION['user'];
-            $_POST['moder'] = $_SESSION['user'];
+            $_POST['adder'] = getLoginUser();
+            $_POST['moder'] = getLoginUser();
             $_POST['ctime'] = time();
             if (!$m->create()) {
                 $this->error($m->getError());
@@ -127,7 +127,7 @@ class WebInfoController extends BaseController
     function update()
     {
         if (IS_GET) {
-            $_GET['moder'] = $_SESSION['user'];
+            $_GET['moder'] = getLoginUser();
             if (D(I('table'))->save($_GET)) {
                 if ($_GET['url']) {
                     $this->success("成功", U($_GET['url']));
@@ -138,7 +138,7 @@ class WebInfoController extends BaseController
                 $this->error("失败！");
             }
         } else {
-            $_POST['moder'] = $_SESSION['user'];
+            $_POST['moder'] = getLoginUser();
             if (D(I('table'))->save($_POST)) {
                 if ($_POST['url']) {
                     $this->success("成功", U($_POST['url']));
@@ -153,7 +153,7 @@ class WebInfoController extends BaseController
     function del($msg='成功')
     {
         $_POST['id'] = I('id');
-        $_POST['moder'] = $_SESSION['user'];
+        $_POST['moder'] = getLoginUser();
         $_POST['deleted'] = 1;
         if (D(I('table'))->save($_POST)) {
             $this->success($msg);
@@ -161,7 +161,7 @@ class WebInfoController extends BaseController
             $this->error("失败！");
         }
     }
-    function realdel($id)
+    function realDel($id)
     {
         $count = D(I('table'))->delete($id);
         if ($count > 0) {
@@ -172,7 +172,7 @@ class WebInfoController extends BaseController
     }
     function dataUpdate($table,$savePath,$data,$img='img',$url=''){
         $_POST=$data;
-        $_POST['moder']=$_SESSION['realname'];
+        $_POST['moder']=getLoginUser();
         //处理上传图片
         $upload = new \Think\Upload();// 实例化上传类
         $upload->maxSize  =     7145728 ;// 设置附件上传大小

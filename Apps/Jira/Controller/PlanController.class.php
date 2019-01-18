@@ -275,6 +275,9 @@ class PlanController extends WebInfoController
         //获取计划详情
         $plan=find($table,$tp);
         $this->assign('plan',$plan );
+        //获取计划周期
+        $data=getCyclePlan($tp);
+        $this->assign('cycle', $data);
 
         $table='tp_project_plan_extend';
         $extend = find($table,$tp);
@@ -315,9 +318,8 @@ class PlanController extends WebInfoController
         $end='';
         $per_scheme=$this->dictList('per_scheme','per_scheme','2');
 
-        $map=array('deleted'=>'0','planid'=>$tp);
-        $api=M('tp_project_plan_api')->where($map)->select();
-        $this->assign('api', $api);
+        $map=array('planid'=>$tp);
+        $this->assign('api', getList('tp_project_plan_api',$map));
         $map=array('type'=>'1','deleted'=>'0','project'=>$tp);
         $tools=M('tp_project_tool_term')->where($map)->select();
         $this->assign('tools', $tools);

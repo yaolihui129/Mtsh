@@ -94,28 +94,7 @@ class ApiController extends WebInfoController
         $this->display();
     }
 
-    function selected(){
-        $id=I('id');
-        $table='tp_api_scene_pressure';
-        $where=array('press_type'=>I('press_type'),'project'=>I('project'));
-        $where['id']=array('not in',[$id]);
-        $data =getList($table,$where);
-        if($data){//取消选中状态
-            foreach ($data as $da){
-                $_GET['id']=$da['id'];
-                $_GET['selected']='1';
-                $_GET['table']=$table;
-                $this->update();
-            }
-        }
-        //设置选中状态
-        $_GET=array();
-        $_GET['id']=$id;
-        $_GET['selected']='1';
-        $_GET['table']=$table;
-        $this->update();
 
-    }
 
     function update_pressure()
     {

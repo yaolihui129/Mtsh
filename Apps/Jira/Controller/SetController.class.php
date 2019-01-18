@@ -44,7 +44,7 @@ class SetController extends WebInfoController
         $this->assign('search', $search);
         $where['userName|userNickName'] = array('like', '%' . $search . '%');
         $table='eo_user';
-        $this->assign('user', getList($table,$where));
+        $this->assign('user', getList($table,$where,'userID'));
 
         $this->display();
     }

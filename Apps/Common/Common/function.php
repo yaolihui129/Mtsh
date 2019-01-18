@@ -142,14 +142,26 @@ use Think\Model;
 
     /**
      **模板输出
+     * @param $assign
+     * @param $table
+     * @param $where
+     * @param string $order
+     * @param string $field
+     * @param string $page
+     * @param string $size
+     * @return bool
      */
     function baseGetList($assign,$table,$where,$order = 'id', $field = '',$page='',$size=''){
         $data=getList($table,$where,$order, $field,$page,$size);
         $this->assign($assign, $data);
         return true;
     }
+
     /**
      **对象输出
+     * @param $init_table
+     * @param $data
+     * @return mixed
      */
     function baseUpdata($init_table,$data){
         //初始化

@@ -198,6 +198,56 @@ class ReportController extends WebInfoController
     }
     //性能测试报告
     public function performance(){
+        $tp = I('tp');
+        $table='tp_jira_issue';
+        $this->assign('tp', $tp);
+        $this->assign('pkey', getCache('pkey'));
+
+        //获取计划详情
+        $plan=find($table,$tp);
+        $this->assign('plan',$plan );
+
+        $map=array('planid'=>$tp);
+        $api=getList('tp_project_plan_api',$map);
+
+        $this->assign('api', $api);
+
+        $table='tp_project_plan_extend';
+        $extend = find($table,$tp);
+
+        $dict=getDictInfo('per_scheme',$extend['per_scheme'],'tp_dict','json');
+        $dict=json_decode($dict);
+        foreach ($dict as $d){
+            $this->assign('extend_scheme'.$d, 'extend_scheme'.$d);
+        }
+
+        $apiID=array();
+        foreach ($api as $a){
+            $apiID[]= $a['api'];
+        }
+
+        $table='tp_api_scene_pressure';
+        $where=array('project'=>$tp);
+        $where['api']=array('in',$apiID);
+        $where['selected']='1';
+        $where['press_type']='0';
+//        $data=getList($table,$where);
+//        dump($where);
+        $this->assign('jiZhun', getList($table,$where));
+
+        $where['press_type']='1';
+        $this->assign('zuiYou', getList($table,$where));
+
+        $where['press_type']='2';
+        $this->assign('muBiao', getList($table,$where));
+
+        $where['press_type']='3';
+        $this->assign('jiXian', getList($table,$where));
+
+        $where['press_type']='4';
+        $this->assign('wenDing', getList($table,$where));
+
+
         $this->display();
     }
     //编辑性能测试报告
@@ -383,7 +433,6 @@ class ReportController extends WebInfoController
 
         $this->display();
     }
-
     //测试准入
     public function admittance()
     {
@@ -397,5 +446,93 @@ class ReportController extends WebInfoController
         );
         $this->assign('var', $var);
         $this->display();
+    }
+
+    //性能报告
+    public function pressure(){
+        $table='tp_report';
+        $where=array('type'=>'0');
+
+        $search = trim(I('search'));
+        $this->assign('search', $search);
+        $where['subject'] = array('like', '%' . $search . '%');
+
+        $data=getList($table,$where);
+        $this->assign('data', $data);
+
+        $this->assign('user', getJiraName(getLoginUser()));
+
+        $this->display();
+    }
+    //性能详情
+    public function pressureDetail(){
+        $id=I('id');
+        $table='tp_report';
+        $this->assign('data', find($table,$id));
+
+        $this->display();
+
+    }
+
+    public function pressureApi(){
+        $table= 'eo_api';
+        $where=array('pressure'=>1);
+
+        $search = trim(I('search'));
+        $this->assign('search', $search);
+        $where['apiName|apiURI'] = array('like', '%' . $search . '%');
+
+        $data=getList($table,$where,'projectID,groupID,apiURI');
+//        dump($data);
+        $this->assign('data', $data);
+
+        $this->display();
+    }
+
+    public function pressureApiPlan(){
+        $api=I('api');
+        $table='eo_api';
+        $this->assign('api', find($table,$api));
+        $table= 'tp_project_plan_api';
+        $where=array('api'=>$api);
+        $plan=getList($table,$where);
+        $planID=array();
+        foreach ($plan as $p){
+            $planID[]=$p['planid'];
+        }
+        $table= 'tp_jira_issue';
+        $where=array();
+        $where['id']=array('in',$planID);
+        $data=getList($table,$where);
+        $this->assign('data', $data);
+//        dump($planID);
+        $this->display();
+    }
+
+
+
+    public function pressurePlan(){
+        $project=getCache('project');
+        $where['project'] = $project;
+        $where['issuetype'] = '10102';
+        $where['plantype']='1';
+
+        $search = trim(I('search'));
+        $this->assign('search', $search);
+        $where['summary|pkey'] = array('like', '%' . $search . '%');
+
+        $table= 'tp_jira_issue';
+        $order='issuestatus desc,assignee';
+
+        $this->assign('data', getList($table,$where,$order));
+
+        $this->display();
+    }
+
+    function report_info(){
+        $table='tp_report';
+        $res=find($table,I('id'));
+        $res=resFormat($res);
+        $this->ajaxReturn($res);
     }
 }

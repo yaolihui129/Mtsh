@@ -1,0 +1,68 @@
+<layout name="layout"/>
+<div class="admin-content container" style="min-height: 500px">
+    <div class="panel panel-default">
+        <nav class="navbar navbar-inverse">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                            data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">性能测试报告</a>
+                </div>
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav navbar-right">
+                        <form action="__URL__/pressurePlan " method="post" class="navbar-form navbar-left" role="search">
+                            <div class="form-group input-group">
+                                <input type="text" class="form-control" name="search" value="<{$search}>"
+                                       placeholder="名称、关键字">
+                                <span class="input-group-btn">
+                                     <button type="submit" class="btn btn-default">
+                                         <span class="glyphicon glyphicon-search"> 搜索</span>
+                                     </button>
+                                </span>
+                            </div>
+                        </form>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <ul class="nav nav-pills" role="tablist">
+            <li role="presentation" class="active"><a href="__URL__/pressurePlan">计划</a></li>
+            <li role="presentation" ><a href="__URL__/pressureApi">接口</a></li>
+            <li role="presentation"><a href="__URL__/pressure">综合</a></li>
+        </ul>
+
+        <table class="am-table am-table-striped am-table-hover table-main table-bordered">
+            <thead>
+            <tr>
+                <th class="table-title" bgcolor="#ccc">性能测试计划</th>
+                <th class="table-type" bgcolor="#ccc">测试者</th>
+            </tr>
+            </thead>
+            <tbody>
+            <volist name='data' id='da'>
+                <tr>
+                    <td>
+                        <a href="__URL__/performance/tp/<{$da.id}>" target="_blank"><{$da.summary}></a>
+                        <span class="badge pull-right"><{$da.issuestatus|getName='issuestatus',###,'pname'}></span>
+                    </td>
+                    <td><{$da.assignee|getJiraName=###}></td>
+                </tr>
+            </volist>
+            <tr>
+                <td></td><td></td>
+            </tr>
+            </tbody>
+        </table>
+
+
+
+
+
+    </div>
+</div>

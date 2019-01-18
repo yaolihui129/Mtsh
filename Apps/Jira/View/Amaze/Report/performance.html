@@ -2,51 +2,21 @@
 <div class="admin-content container" style="min-height: 500px">
     <div class="panel panel-info">
         <div class="panel-heading">
-            测试计划：<{$Think.cookie.Jira_pkey}>-<{$plan.issuenum}>：<{$plan.summary}>
-
-            <div class="btn-group pull-right">
-                <a href="__URL__/change_type/id/<{$tp}>" class=" btn am-btn-danger btn-xs ">
-                    <span class="glyphicon glyphicon-retweet">功能测试</span>
-                </a>
-                <a href="__URL__/change_type/id/<{$tp}>/ptype/1" class=" btn am-btn-primary btn-xs ">
-                    <span class="glyphicon glyphicon-retweet">Api测试</span></a>
-                <a href="__APP__/<{$Think.config.PRODUCT}>/Plan/index/project/<{$Think.cookie.Jira_project}>/type/<{$Think.cookie.Jira_type_plan}>"
-                   class=" btn btn-warning btn-xs ">返回</a>
-            </div>
+            测试计划详情：
+            <a href="http://jira.zhidaohulian.com/browse/<{$pkey}>-<{$plan.issuenum}>" target="_blank"><{$plan.summary}></a>
         </div>
         <div class="panel-body">
-            <div class="well">
-                <div class="row">
-                    <div class="col-md-3">
-                        经办人: <{$plan.assignee|getJiraName=###}>，
-                        状态:【<{$plan.issuestatus|getIssueStatus=###}>】
-                    </div>
-                    <div class="col-md-6"></div>
-                    <div class="col-md-3">
-                        <a href="__APP__/<{$Think.config.PRODUCT}>/Plan/detail/tp/<{$tp}>" class="btn btn-warning">
-                            <span class="glyphicon glyphicon-edit"> 性能测试方案</span>
-                        </a>
-                        <a href="__APP__/<{$Think.config.PRODUCT}>/Report/edit_perfor/id/<{$tp}>"
-                           class="btn btn-info pull-right">
-                            <span class="glyphicon glyphicon-edit"> 性能测试报告</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
             <ul class="nav nav-pills" role="tablist">
                 <li role="presentation" >
-                    <a href="__APP__/<{$Think.config.PRODUCT}>/Plan/detail/tp/<{$tp}>">性能测试方案</a>
+                    <a href="__APP__/<{$Think.config.PRODUCT}>/Plan/capability/tp/<{$tp}>">性能测试方案</a>
                 </li>
                 <li role="presentation" class="active">
-                    <a href="__URL__/performance/id/<{$tp}>/status/<{$plan.issuestatus}>">性能测试报告</a>
+                    <a href="__URL__/performance/tp/<{$tp}>/status/<{$plan.issuestatus}>">性能测试报告</a>
                 </li>
             </ul>
             <div class="panel panel-info">
                 <div class="panel am-panel-bd">
-                    <h1 class="am-lg-text-center">
-                        <{$plan.summary}>项目<br \>
-                        性能测试报告
-                    </h1>
+                    <h1 class="am-lg-text-center"><{$plan.summary}><br \>性能测试报告</h1>
                         <p>
                             报告时间：YYYY-MM-DD
                             <span class="pull-right"> 测试人员：<{$plan.assignee|getJiraName=###}></span>
@@ -72,208 +42,13 @@
                     <h2>五  系统部署</h2>
 
                     <h2>六  性能测试结果与分析</h2>
-                        <h3>&nbsp;&nbsp;6.1 基准测试</h3>
+                        <if condition="$extend_scheme0">
+                            <h3>&nbsp;&nbsp;6.1 基准测试</h3>
                             <h4>&nbsp;&nbsp;6.1.1 聚合报告</h4>
-                            <table class="table table-striped table-bordered table-hover table-condensed ">
-                        <tr>
-                            <th width=5% align="center" bgcolor="#ccc">序号</th>
-                            <th width=9% align="center" bgcolor="#ccc">#Samples</th>
-                            <th width=9% align="center" bgcolor="#ccc">Average</th>
-                            <th width=9% align="center" bgcolor="#ccc">Median</th>
-                            <th width=9% align="center" bgcolor="#ccc">90%Line</th>
-                            <th width=9% align="center" bgcolor="#ccc">95%Line</th>
-                            <th width=9% align="center" bgcolor="#ccc">99%Line</th>
-                            <th width=5% align="center" bgcolor="#ccc">Min</th>
-                            <th width=9% align="center" bgcolor="#ccc">Max</th>
-                            <th width=9% align="center" bgcolor="#ccc">Error%</th>
-                            <th width=9% align="center" bgcolor="#ccc">TPS</th>
-                            <th width=9% align="center" bgcolor="#ccc">KB/sec</th>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </table>
-                            <hr>
-                        <h3>&nbsp;&nbsp;6.2 极限测试</h3>
-                            <h4>&nbsp;&nbsp;6.2.1 聚合报告</h4>
-                            <table class="table table-striped table-bordered table-hover table-condensed ">
-                        <tr>
-                            <th width=5% align="center" bgcolor="#ccc">序号</th>
-                            <th width=9% align="center" bgcolor="#ccc">#Samples</th>
-                            <th width=9% align="center" bgcolor="#ccc">Average</th>
-                            <th width=9% align="center" bgcolor="#ccc">Median</th>
-                            <th width=9% align="center" bgcolor="#ccc">90%Line</th>
-                            <th width=9% align="center" bgcolor="#ccc">95%Line</th>
-                            <th width=9% align="center" bgcolor="#ccc">99%Line</th>
-                            <th width=5% align="center" bgcolor="#ccc">Min</th>
-                            <th width=9% align="center" bgcolor="#ccc">Max</th>
-                            <th width=9% align="center" bgcolor="#ccc">Error%</th>
-                            <th width=9% align="center" bgcolor="#ccc">TPS</th>
-                            <th width=9% align="center" bgcolor="#ccc">KB/sec</th>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </table>
-                            <h4>&nbsp;&nbsp;6.2.2 负载机系统状态</h4>
-                            <h4>&nbsp;&nbsp;6.2.3 服务器系统状态</h4>
-                            <h4>&nbsp;&nbsp;6.2.4 结果分析</h4>
-                            <hr>
-                        <h3>&nbsp;&nbsp;6.3 最优测试</h3>
-                            <h4>&nbsp;&nbsp;6.3.1 聚合报告</h4>
-                            <table class="table table-striped table-bordered table-hover table-condensed ">
-                        <tr>
-                            <th width=5% align="center" bgcolor="#ccc">序号</th>
-                            <th width=9% align="center" bgcolor="#ccc">#Samples</th>
-                            <th width=9% align="center" bgcolor="#ccc">Average</th>
-                            <th width=9% align="center" bgcolor="#ccc">Median</th>
-                            <th width=9% align="center" bgcolor="#ccc">90%Line</th>
-                            <th width=9% align="center" bgcolor="#ccc">95%Line</th>
-                            <th width=9% align="center" bgcolor="#ccc">99%Line</th>
-                            <th width=5% align="center" bgcolor="#ccc">Min</th>
-                            <th width=9% align="center" bgcolor="#ccc">Max</th>
-                            <th width=9% align="center" bgcolor="#ccc">Error%</th>
-                            <th width=9% align="center" bgcolor="#ccc">TPS</th>
-                            <th width=9% align="center" bgcolor="#ccc">KB/sec</th>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </table>
-                            <h4>&nbsp;&nbsp;6.3.2 负载机系统状态</h4>
-                            <h4>&nbsp;&nbsp;6.3.3 服务器系统状态</h4>
-                            <h4>&nbsp;&nbsp;6.2.4 结果分析</h4>
-                            <hr>
-                        <h3>&nbsp;&nbsp;6.4 目标测试</h3>
-                            <h4>&nbsp;&nbsp;6.4.1 聚合报告</h4>
-                            <table class="table table-striped table-bordered table-hover table-condensed ">
-                        <tr>
-                            <th width=5% align="center" bgcolor="#ccc">序号</th>
-                            <th width=9% align="center" bgcolor="#ccc">#Samples</th>
-                            <th width=9% align="center" bgcolor="#ccc">Average</th>
-                            <th width=9% align="center" bgcolor="#ccc">Median</th>
-                            <th width=9% align="center" bgcolor="#ccc">90%Line</th>
-                            <th width=9% align="center" bgcolor="#ccc">95%Line</th>
-                            <th width=9% align="center" bgcolor="#ccc">99%Line</th>
-                            <th width=5% align="center" bgcolor="#ccc">Min</th>
-                            <th width=9% align="center" bgcolor="#ccc">Max</th>
-                            <th width=9% align="center" bgcolor="#ccc">Error%</th>
-                            <th width=9% align="center" bgcolor="#ccc">TPS</th>
-                            <th width=9% align="center" bgcolor="#ccc">KB/sec</th>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </table>
-                            <h4>&nbsp;&nbsp;6.4.2 负载机系统状态</h4>
-                            <h4>&nbsp;&nbsp;6.4.3 服务器系统状态</h4>
-                            <h4>&nbsp;&nbsp;6.4.4 结果分析</h4>
-                            <hr>
-                        <h3>&nbsp;&nbsp;6.5 稳定测试</h3>
-                            <h4>&nbsp;&nbsp;6.5.1 聚合报告</h4>
                             <table class="table table-striped table-bordered table-hover table-condensed ">
                                 <tr>
                                     <th width=5% align="center" bgcolor="#ccc">序号</th>
+                                    <th width=9% align="center" bgcolor="#ccc">Api</th>
                                     <th width=9% align="center" bgcolor="#ccc">#Samples</th>
                                     <th width=9% align="center" bgcolor="#ccc">Average</th>
                                     <th width=9% align="center" bgcolor="#ccc">Median</th>
@@ -284,10 +59,32 @@
                                     <th width=9% align="center" bgcolor="#ccc">Max</th>
                                     <th width=9% align="center" bgcolor="#ccc">Error%</th>
                                     <th width=9% align="center" bgcolor="#ccc">TPS</th>
-                                    <th width=9% align="center" bgcolor="#ccc">KB/sec</th>
+                                    <th width=9% align="center" bgcolor="#ccc">备注</th>
                                 </tr>
+                                <volist name='jiZhun' id='vo' key="k">
+                                    <tr>
+                                        <td><{$k}></td>
+                                        <td>
+                                            <a href="__APP__/<{$Think.config.PRODUCT}>/Plan/pressure_test/id/<{$vo.id}>" target="_blank">
+                                                <{$vo.api|getName='eo_api',###,'apiuri'}>
+                                            </a>
+                                        </td>
+                                        <td><{$vo.samples}></td>
+                                        <td><{$vo.average}></td>
+                                        <td><{$vo.median}></td>
+                                        <td><{$vo.line90}></td>
+                                        <td><{$vo.line95}></td>
+                                        <td><{$vo.line99}></td>
+                                        <td><{$vo.min}></td>
+                                        <td><{$vo.max}></td>
+                                        <td><{$vo.error}></td>
+                                        <td><{$vo.tps}></td>
+                                        <td><{$vo.name}></td>
+                                    </tr>
+                                </volist>
+
                                 <tr>
-                                    <td>1</td>
+                                    <td></td>
                                     <td></td>
                                     <td></td>
                                     <td></td>
@@ -300,8 +97,237 @@
                                     <td></td>
                                     <td></td>
                                 </tr>
+                            </table>
+                            <hr>
+                        </if>
+
+                        <if condition="$extend_scheme3">
+                            <h3>&nbsp;&nbsp;6.2 极限测试</h3>
+                            <h4>&nbsp;&nbsp;6.2.1 聚合报告</h4>
+                            <table class="table table-striped table-bordered table-hover table-condensed ">
                                 <tr>
-                                    <td>2</td>
+                                    <th width=5% align="center" bgcolor="#ccc">序号</th>
+                                    <th width=9% align="center" bgcolor="#ccc">Api</th>
+                                    <th width=9% align="center" bgcolor="#ccc">#Samples</th>
+                                    <th width=9% align="center" bgcolor="#ccc">Average</th>
+                                    <th width=9% align="center" bgcolor="#ccc">Median</th>
+                                    <th width=9% align="center" bgcolor="#ccc">90%Line</th>
+                                    <th width=9% align="center" bgcolor="#ccc">95%Line</th>
+                                    <th width=9% align="center" bgcolor="#ccc">99%Line</th>
+                                    <th width=5% align="center" bgcolor="#ccc">Min</th>
+                                    <th width=9% align="center" bgcolor="#ccc">Max</th>
+                                    <th width=9% align="center" bgcolor="#ccc">Error%</th>
+                                    <th width=9% align="center" bgcolor="#ccc">TPS</th>
+                                    <th width=9% align="center" bgcolor="#ccc">备注</th>
+                                </tr>
+                                <volist name='jiXian' id='vo' key="k">
+                                    <tr>
+                                        <td><{$k}></td>
+                                        <td>
+                                            <a href="__APP__/<{$Think.config.PRODUCT}>/Plan/pressure_test/id/<{$vo.id}>" target="_blank">
+                                                <{$vo.api|getName='eo_api',###,'apiuri'}>
+                                            </a>
+                                        </td>
+                                        <td><{$vo.samples}></td>
+                                        <td><{$vo.average}></td>
+                                        <td><{$vo.median}></td>
+                                        <td><{$vo.line90}></td>
+                                        <td><{$vo.line95}></td>
+                                        <td><{$vo.line99}></td>
+                                        <td><{$vo.min}></td>
+                                        <td><{$vo.max}></td>
+                                        <td><{$vo.error}></td>
+                                        <td><{$vo.tps}></td>
+                                        <td><{$vo.name}></td>
+                                    </tr>
+                                </volist>
+
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                            <h4>&nbsp;&nbsp;6.2.2 负载机系统状态</h4>
+                            <h4>&nbsp;&nbsp;6.2.3 服务器系统状态</h4>
+                            <h4>&nbsp;&nbsp;6.2.4 结果分析</h4>
+                            <hr>
+                        </if>
+
+                        <if condition="$extend_scheme1">
+                            <h3>&nbsp;&nbsp;6.3 最优测试</h3>
+                            <h4>&nbsp;&nbsp;6.3.1 聚合报告</h4>
+                            <table class="table table-striped table-bordered table-hover table-condensed ">
+                                <tr>
+                                    <th width=5% align="center" bgcolor="#ccc">序号</th>
+                                    <th width=9% align="center" bgcolor="#ccc">Api</th>
+                                    <th width=9% align="center" bgcolor="#ccc">#Samples</th>
+                                    <th width=9% align="center" bgcolor="#ccc">Average</th>
+                                    <th width=9% align="center" bgcolor="#ccc">Median</th>
+                                    <th width=9% align="center" bgcolor="#ccc">90%Line</th>
+                                    <th width=9% align="center" bgcolor="#ccc">95%Line</th>
+                                    <th width=9% align="center" bgcolor="#ccc">99%Line</th>
+                                    <th width=5% align="center" bgcolor="#ccc">Min</th>
+                                    <th width=9% align="center" bgcolor="#ccc">Max</th>
+                                    <th width=9% align="center" bgcolor="#ccc">Error%</th>
+                                    <th width=9% align="center" bgcolor="#ccc">TPS</th>
+                                    <th width=9% align="center" bgcolor="#ccc">备注</th>
+                                </tr>
+                                <volist name='zuiYou' id='vo' key="k">
+                                    <tr>
+                                        <td><{$k}></td>
+                                        <td>
+                                            <a href="__APP__/<{$Think.config.PRODUCT}>/Plan/pressure_test/id/<{$vo.id}>" target="_blank">
+                                                <{$vo.api|getName='eo_api',###,'apiuri'}>
+                                            </a>
+                                        </td>
+                                        <td><{$vo.samples}></td>
+                                        <td><{$vo.average}></td>
+                                        <td><{$vo.median}></td>
+                                        <td><{$vo.line90}></td>
+                                        <td><{$vo.line95}></td>
+                                        <td><{$vo.line99}></td>
+                                        <td><{$vo.min}></td>
+                                        <td><{$vo.max}></td>
+                                        <td><{$vo.error}></td>
+                                        <td><{$vo.tps}></td>
+                                        <td><{$vo.name}></td>
+                                    </tr>
+                                </volist>
+
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                            <h4>&nbsp;&nbsp;6.3.2 负载机系统状态</h4>
+                            <h4>&nbsp;&nbsp;6.3.3 服务器系统状态</h4>
+                            <h4>&nbsp;&nbsp;6.2.4 结果分析</h4>
+                            <hr>
+                        </if>
+                        <if condition="$extend_scheme2">
+                            <h3>&nbsp;&nbsp;6.4 目标测试</h3>
+                            <h4>&nbsp;&nbsp;6.4.1 聚合报告</h4>
+                            <table class="table table-striped table-bordered table-hover table-condensed ">
+                                <tr>
+                                    <th width=5% align="center" bgcolor="#ccc">序号</th>
+                                    <th width=9% align="center" bgcolor="#ccc">Api</th>
+                                    <th width=9% align="center" bgcolor="#ccc">#Samples</th>
+                                    <th width=9% align="center" bgcolor="#ccc">Average</th>
+                                    <th width=9% align="center" bgcolor="#ccc">Median</th>
+                                    <th width=9% align="center" bgcolor="#ccc">90%Line</th>
+                                    <th width=9% align="center" bgcolor="#ccc">95%Line</th>
+                                    <th width=9% align="center" bgcolor="#ccc">99%Line</th>
+                                    <th width=5% align="center" bgcolor="#ccc">Min</th>
+                                    <th width=9% align="center" bgcolor="#ccc">Max</th>
+                                    <th width=9% align="center" bgcolor="#ccc">Error%</th>
+                                    <th width=9% align="center" bgcolor="#ccc">TPS</th>
+                                    <th width=9% align="center" bgcolor="#ccc">备注</th>
+                                </tr>
+                                <volist name='muBiao' id='vo' key="k">
+                                    <tr>
+                                        <td><{$k}></td>
+                                        <td>
+                                            <a href="__APP__/<{$Think.config.PRODUCT}>/Plan/pressure_test/id/<{$vo.id}>" target="_blank">
+                                            <{$vo.api|getName='eo_api',###,'apiuri'}>
+                                            </a>
+                                        </td>
+                                        <td><{$vo.samples}></td>
+                                        <td><{$vo.average}></td>
+                                        <td><{$vo.median}></td>
+                                        <td><{$vo.line90}></td>
+                                        <td><{$vo.line95}></td>
+                                        <td><{$vo.line99}></td>
+                                        <td><{$vo.min}></td>
+                                        <td><{$vo.max}></td>
+                                        <td><{$vo.error}></td>
+                                        <td><{$vo.tps}></td>
+                                        <td><{$vo.name}></td>
+                                    </tr>
+                                </volist>
+
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                            <h4>&nbsp;&nbsp;6.4.2 负载机系统状态</h4>
+                            <h4>&nbsp;&nbsp;6.4.3 服务器系统状态</h4>
+                            <h4>&nbsp;&nbsp;6.4.4 结果分析</h4>
+                            <hr>
+                        </if>
+                        <if condition="$extend_scheme4">
+                            <h3>&nbsp;&nbsp;6.5 稳定测试</h3>
+                            <h4>&nbsp;&nbsp;6.5.1 聚合报告</h4>
+                            <table class="table table-striped table-bordered table-hover table-condensed ">
+                                <tr>
+                                    <th width=5% align="center" bgcolor="#ccc">序号</th>
+                                    <th width=9% align="center" bgcolor="#ccc">Api</th>
+                                    <th width=9% align="center" bgcolor="#ccc">#Samples</th>
+                                    <th width=9% align="center" bgcolor="#ccc">Average</th>
+                                    <th width=9% align="center" bgcolor="#ccc">Median</th>
+                                    <th width=9% align="center" bgcolor="#ccc">90%Line</th>
+                                    <th width=9% align="center" bgcolor="#ccc">95%Line</th>
+                                    <th width=9% align="center" bgcolor="#ccc">99%Line</th>
+                                    <th width=5% align="center" bgcolor="#ccc">Min</th>
+                                    <th width=9% align="center" bgcolor="#ccc">Max</th>
+                                    <th width=9% align="center" bgcolor="#ccc">Error%</th>
+                                    <th width=9% align="center" bgcolor="#ccc">TPS</th>
+                                    <th width=9% align="center" bgcolor="#ccc">备注</th>
+                                </tr>
+                                <volist name='wenDing' id='vo' key="k">
+                                    <tr>
+                                        <td><{$k}></td>
+                                        <td>
+                                            <a href="__APP__/<{$Think.config.PRODUCT}>/Plan/pressure_test/id/<{$vo.id}>" target="_blank">
+                                            <{$vo.api|getName='eo_api',###,'apiuri'}>
+                                            </a>
+                                        </td>
+                                        <td><{$vo.samples}></td>
+                                        <td><{$vo.average}></td>
+                                        <td><{$vo.median}></td>
+                                        <td><{$vo.line90}></td>
+                                        <td><{$vo.line95}></td>
+                                        <td><{$vo.line99}></td>
+                                        <td><{$vo.min}></td>
+                                        <td><{$vo.max}></td>
+                                        <td><{$vo.error}></td>
+                                        <td><{$vo.tps}></td>
+                                        <td><{$vo.name}></td>
+                                    </tr>
+                                </volist>
+
+                                <tr>
+                                    <td></td>
                                     <td></td>
                                     <td></td>
                                     <td></td>
@@ -319,75 +345,203 @@
                             <h4>&nbsp;&nbsp;6.5.3 服务器系统状态</h4>
                             <h4>&nbsp;&nbsp;6.5.4 结果分析</h4>
                             <hr>
+                        </if>
+
                     <h2>七  结果汇总分析</h2>
                         <table class="table table-striped table-bordered table-hover table-condensed ">
                             <tr>
-                                <th width=10% align="center" bgcolor="#ccc">序号</th>
-                                <th width=10% align="center" bgcolor="#ccc">#Samples</th>
-                                <th width=10% align="center" bgcolor="#ccc">Average</th>
-                                <th width=10% align="center" bgcolor="#ccc">Median</th>
-                                <th width=10% align="center" bgcolor="#ccc">90%Line</th>
-                                <th width=10% align="center" bgcolor="#ccc">95%Line</th>
-                                <th width=10% align="center" bgcolor="#ccc">Error%</th>
-                                <th width=10% align="center" bgcolor="#ccc">TPS</th>
-                                <th width=10% align="center" bgcolor="#ccc">KB/sec</th>
+                                <th width=5% align="center" bgcolor="#ccc">序号</th>
+                                <th width=9% align="center" bgcolor="#ccc">Api</th>
+                                <th width=9% align="center" bgcolor="#ccc">#Samples</th>
+                                <th width=9% align="center" bgcolor="#ccc">Average</th>
+                                <th width=9% align="center" bgcolor="#ccc">Median</th>
+                                <th width=9% align="center" bgcolor="#ccc">90%Line</th>
+                                <th width=9% align="center" bgcolor="#ccc">95%Line</th>
+                                <th width=9% align="center" bgcolor="#ccc">99%Line</th>
+                                <th width=5% align="center" bgcolor="#ccc">Min</th>
+                                <th width=9% align="center" bgcolor="#ccc">Max</th>
+                                <th width=9% align="center" bgcolor="#ccc">Error%</th>
+                                <th width=9% align="center" bgcolor="#ccc">TPS</th>
+                                <th width=9% align="center" bgcolor="#ccc">备注</th>
                             </tr>
-                            <tr>
-                                <td>基准</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>极限</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>最优</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>目标</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>稳定</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
+                            <if condition="$extend_scheme0">
+                                <volist name='jiZhun' id='vo' key="k">
+                                    <tr>
+                                        <td>基准</td>
+                                        <td>
+                                            <a href="__APP__/<{$Think.config.PRODUCT}>/Plan/pressure_test/id/<{$vo.id}>" target="_blank">
+                                                <{$vo.api|getName='eo_api',###,'apiuri'}>
+                                            </a>
+                                        </td>
+                                        <td><{$vo.samples}></td>
+                                        <td><{$vo.average}></td>
+                                        <td><{$vo.median}></td>
+                                        <td><{$vo.line90}></td>
+                                        <td><{$vo.line95}></td>
+                                        <td><{$vo.line99}></td>
+                                        <td><{$vo.min}></td>
+                                        <td><{$vo.max}></td>
+                                        <td><{$vo.error}></td>
+                                        <td><{$vo.tps}></td>
+                                        <td><{$vo.name}></td>
+                                    </tr>
+                                </volist>
+                            </if>
+                            <if condition="$extend_scheme3">
+                                <volist name='jiXian' id='vo' key="k">
+                                    <tr>
+                                        <td>极限</td>
+                                        <td>
+                                            <a href="__APP__/<{$Think.config.PRODUCT}>/Plan/pressure_test/id/<{$vo.id}>" target="_blank">
+                                                <{$vo.api|getName='eo_api',###,'apiuri'}>
+                                            </a>
+                                        </td>
+                                        <td><{$vo.samples}></td>
+                                        <td><{$vo.average}></td>
+                                        <td><{$vo.median}></td>
+                                        <td><{$vo.line90}></td>
+                                        <td><{$vo.line95}></td>
+                                        <td><{$vo.line99}></td>
+                                        <td><{$vo.min}></td>
+                                        <td><{$vo.max}></td>
+                                        <td><{$vo.error}></td>
+                                        <td><{$vo.tps}></td>
+                                        <td><{$vo.name}></td>
+                                    </tr>
+                                </volist>
+                                <tr>
+                                    <td>极限</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </if>
 
+                            <if condition="$extend_scheme1">
+                                <volist name='zuiYou' id='vo' key="k">
+                                    <tr>
+                                        <td>最优</td>
+                                        <td>
+                                            <a href="__APP__/<{$Think.config.PRODUCT}>/Plan/pressure_test/id/<{$vo.id}>" target="_blank">
+                                                <{$vo.api|getName='eo_api',###,'apiuri'}>
+                                            </a>
+                                        </td>
+                                        <td><{$vo.samples}></td>
+                                        <td><{$vo.average}></td>
+                                        <td><{$vo.median}></td>
+                                        <td><{$vo.line90}></td>
+                                        <td><{$vo.line95}></td>
+                                        <td><{$vo.line99}></td>
+                                        <td><{$vo.min}></td>
+                                        <td><{$vo.max}></td>
+                                        <td><{$vo.error}></td>
+                                        <td><{$vo.tps}></td>
+                                        <td><{$vo.name}></td>
+                                    </tr>
+                                </volist>
+                                <tr>
+                                    <td>最优</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </if>
+
+                            <if condition="$extend_scheme2">
+                                <volist name='muBiao' id='vo' key="k">
+                                    <tr>
+                                        <td>目标</td>
+                                        <td>
+                                            <a href="__APP__/<{$Think.config.PRODUCT}>/Plan/pressure_test/id/<{$vo.id}>" target="_blank">
+                                                <{$vo.api|getName='eo_api',###,'apiuri'}>
+                                            </a>
+                                        </td>
+                                        <td><{$vo.samples}></td>
+                                        <td><{$vo.average}></td>
+                                        <td><{$vo.median}></td>
+                                        <td><{$vo.line90}></td>
+                                        <td><{$vo.line95}></td>
+                                        <td><{$vo.line99}></td>
+                                        <td><{$vo.min}></td>
+                                        <td><{$vo.max}></td>
+                                        <td><{$vo.error}></td>
+                                        <td><{$vo.tps}></td>
+                                        <td><{$vo.name}></td>
+                                    </tr>
+                                </volist>
+                                <tr>
+                                    <td>目标</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </if>
+
+                            <if condition="$extend_scheme4">
+                                <volist name='wenDing' id='vo' key="k">
+                                    <tr>
+                                        <td>稳定</td>
+                                        <td>
+                                            <a href="__APP__/<{$Think.config.PRODUCT}>/Plan/pressure_test/id/<{$vo.id}>" target="_blank">
+                                                <{$vo.api|getName='eo_api',###,'apiuri'}>
+                                            </a>
+                                        </td>
+                                        <td><{$vo.samples}></td>
+                                        <td><{$vo.average}></td>
+                                        <td><{$vo.median}></td>
+                                        <td><{$vo.line90}></td>
+                                        <td><{$vo.line95}></td>
+                                        <td><{$vo.line99}></td>
+                                        <td><{$vo.min}></td>
+                                        <td><{$vo.max}></td>
+                                        <td><{$vo.error}></td>
+                                        <td><{$vo.tps}></td>
+                                        <td><{$vo.name}></td>
+                                    </tr>
+                                </volist>
+                                <tr>
+                                    <td>稳定</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </if>
 
                         </table>
                         <p>压测过程中出现的错误主要有：<br></p>
