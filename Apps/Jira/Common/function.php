@@ -414,8 +414,24 @@
         }
     }
 
-    /*
+    function getUserWorkHour($user,$riQi=''){
+        if(!$riQi){
+            $riQi=date("Y-m-d", time());
+        }
+        $where=array('user'=>$user,'riqi'=>$riQi);
+        return sum('tp_work_hour',$where,'hourlong');
+    }
+
+    function getTaskWorkHour($task){
+        $where=array('task'=>$task,);
+        return sum('tp_work_hour',$where,'hourlong');
+    }
+
+    /**
      * 设备&图书的预约数量
+     * @param $id
+     * @param string $start_time
+     * @return
      */
     function count_yd($id,$start_time=''){
         if($start_time){
@@ -426,9 +442,12 @@
         $count=M('tp_device_loaning_record')->where($where)->count();
         return $count;
     }
-    /*
+
+    /**
      * 设备&图书的可借用的状态
      * 借阅：0-可借，1-借出，2-待归还
+     * @param $status
+     * @return string
      */
     function book_status($status){
         if ($status==1){
@@ -442,7 +461,7 @@
         }
     }
 
-    /*
+    /**
      * 设备&图书的借出状态
      * 分类：0-借阅，1-预订，2-归还
      */
@@ -491,9 +510,11 @@
 
     /**
      * 计算个级别的BUG数量
-     * $type false 计算所有，
-     * $type true  计算遗留，
-     * */
+     * @param $tp
+     * @param int $priority
+     * @param string $type false 计算所有，true  计算遗留，
+     * @return int
+     */
     function countTpBugPriority($tp,$priority=0,$type=''){
         $where = array();
         $where['tp']=$tp;
@@ -505,5 +526,26 @@
         $bugNum=sizeof($bug);
         return $bugNum;
     }
+
+
+    function getBugReviewInfo($bugID,$field='chief'){
+        $table='tp_bug_review';
+        $res=find($table,$bugID);
+        if($res){
+            return getDictValue($field,$res[$field]);
+        }else{
+            return '未评审';
+        }
+    }
+
+    function getBugReviewInfoReasonSub($bugID){
+        $table='tp_bug_review';
+        $res=find($table,$bugID);
+        if($res){
+            return $res['reason_sub'];
+        }
+    }
+
+
 
 

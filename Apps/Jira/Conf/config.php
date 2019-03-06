@@ -13,8 +13,8 @@ return array(
     'maxPageNum'        => 10,
     'JIRAPI'            => 'http://qc.zhidaoauto.com',
     'JIRAURL'           => 'http://jira.zhidaohulian.com',
-    'QA_TESTER'         => array('ylh', 'fj', 'mhh', 'wcz', 'lixiaomei'),
-    'KH_QUARTER'        => '2018Q3-Q4',//考核周期
+    'QA_TESTER'         => array('ylh', 'fj', 'mhh','lixiaomei'),
+    'KH_QUARTER'        => '2019Q1-Q2',//考核周期
     'DB_HOST'           => '127.0.0.1',
     'DB_NAME'           => 'eolinker',
     'DB_USER'           => 'root',

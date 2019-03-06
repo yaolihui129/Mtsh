@@ -49,6 +49,11 @@ class PlanController extends WebInfoController
         $this->assign('data', getList($table,$where,$order));
         $this->assign('user', getLoginUser());
 
+        $today=date("Y-m-d", time());
+        $this->assign('today', $today);
+        $this->assign('testers', C('QA_TESTER'));
+
+
         $this->display();
     }
     //更改测试计划类型
@@ -209,9 +214,12 @@ class PlanController extends WebInfoController
         $this->assign('bugNumP0', getCache('bugNumP0'));
         $this->assign('bugNumP1', getCache('bugNumP1'));
         $this->assign('caseNum', getCache('caseNum'));
-        $this->assign('bug', getCache('testBug'));
-        $this->assign('bugNum', getCache('bugNum'));
-
+        $bugs=getCache('testBug');
+        $this->assign('bug', $bugs);
+        $where=array('tp'=>$tp);
+        $reviewBugNum=countId('tp_bug_review',$where);
+        $bugNum=sizeof($bugs);
+        $this->assign('bugNum', $bugNum-$reviewBugNum.'/'.$bugNum);
         $this->display();
     }
     public function yiliu()
@@ -431,7 +439,6 @@ class PlanController extends WebInfoController
         $this->del();
     }
 
-
     //API性能测试场景
     public function press(){
         $id = I('id');
@@ -549,5 +556,76 @@ class PlanController extends WebInfoController
         $this->update();
     }
 
+    public function workLong(){
+        $tp=I('tp');
+        $url =  '/' . C('PRODUCT') . '/Plan/workLong/tp/'.$tp;
+        $this->isLogin($url);
+        //获取计划详情
+        $table='tp_jira_issue';
+        $this->assign('plan',find($table,$tp) );
+        $table='tp_work_hour';
+        $where=array('task'=>$tp);
+        $data=getList($table,$where);
+        $this->assign('data', $data);
+        $this->assign('user', getLoginUser());
+        $this->assign('today', date("Y-m-d", time()));
 
+        $this->display();
+    }
+
+    function getBugInfo(){
+        $id=I('id');
+        $table='tp_bug_review';
+        //获取BUG—Review信息
+        $review=find($table,$id);
+        //获取BUG信息
+        $issue=getIssue($id);
+        $review['id']=$review['id']?$review['id']:$id;
+        $review['chief']=$review['chief']?$review['chief']:getJiraName($issue['assignee']);
+        $review['bug_type']=$this->dictList(
+            'bug_type',
+            'bug_type',
+            $review['bug_type']?$review['bug_type']:2
+        );
+        $review['bug_env']=$this->dictList(
+            'bug_env',
+            'bug_env',
+            $review['bug_env']?$review['bug_env']:0
+        );
+        $review['bug_reason']=$this->dictList(
+            'bug_reason',
+            'bug_reason',
+            $review['bug_priority']?$review['bug_priority']:1
+        );
+        $review['bug_priority']=$this->dictList(
+            'bug_priority',
+            'bug_priority',
+            $review['bug_priority']?$review['bug_priority']:2
+        );
+        $review['reporter']=$issue['reporter'];
+        $review['assignee']=$issue['assignee'];
+        $review['created']=$issue['created'];
+        $review['priority']=$issue['priority'];
+        $review['summary']='【CX-'.$issue['issuenum'].'】'.$issue['summary'];
+
+
+        $res=resFormat($review);
+        $this->ajaxReturn($res);
+    }
+
+    function setBugReview(){
+        $id=I('id');
+
+        $table='tp_bug_review';
+        //获取BUG—Review信息
+        $res=find($table,$id);
+        $_POST['table']=$table;
+        if($res){
+            //更新
+            $this->update($table,$_POST);
+        }else{
+            //写入
+            $this->insert($table,$_POST);
+        }
+    }
 }

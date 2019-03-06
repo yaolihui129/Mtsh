@@ -10,10 +10,6 @@ class BaseController extends WechatController
         if($isLogin==''||$user==''){
             $this->redirect(C('PRODUCT').'/Login/index');
         }
-        //判定是否是手机模式
-        if (ismobile()) {//设置默认默认主题为 Amaze
-            C('DEFAULT_V_LAYER', 'Amaze');
-        }
     }
     function _empty()
     {

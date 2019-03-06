@@ -92,7 +92,7 @@ class SetController extends WebInfoController
         $this->assign("type", $type);
         $where['type']=$type;
         //查询数据
-        $data=getList($table,$where,$info['order']);
+        $data=getList($table,$where,'sn');
         //返回数据
         $this->assign("data", $data);
         $this->assign("count", sizeof($data));

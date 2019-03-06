@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>QC质量平台</title>
+    <!-- meta使用viewport以确保页面可自由缩放 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link href="//cdn.bootcss.com/bootstrap-datepicker/1.4.0/css/bootstrap-datepicker3.min.css" rel="stylesheet">
+    <!-- 引入 jQuery Mobile 样式 -->
+    <link rel="stylesheet" href="https://cdn.staticfile.org/jquery-mobile/1.4.5/jquery.mobile.min.css">
+    <!-- 引入 jQuery 库 -->
+    <script src="https://cdn.staticfile.org/jquery/1.12.4/jquery.min.js"></script>
+    <script src="//cdn.bootcss.com/bootstrap-datepicker/1.4.0/js/bootstrap-datepicker.min.js"></script>
+    <!-- 引入 jQuery Mobile 库 -->
+    <script src="https://cdn.staticfile.org/jquery-mobile/1.4.5/jquery.mobile.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+    <script src="https://cdn.bootcss.com/echarts/4.2.1-rc1/echarts-en.min.js"></script>
+</head>
+<body>
+
+
+    <div data-role="page" id="home">
+        <!--<div data-role="header" data-position="fixed" data-fullscreen="true"><h2>QC质量平台</h2></div>-->
+        <div data-role="main" class="ui-content">
+            <form class="ui-filterable">
+                <input id="myHome" data-type="search">
+            </form>
+            <ul data-role="listview" data-inset="true" data-filter="true" data-input="#myHome"  id="homeList">
+
+            </ul>
+        </div>
+        <div data-role="footer" data-position="fixed" data-fullscreen="true" >
+            <div data-role="navbar">
+                <ul>
+                    <li><a href="#task" data-icon="bars" data-iconpos="top" >Task</a></li>
+                    <li><a href="#plan" data-icon="clock" data-iconpos="top" >Plan</a></li>
+                    <li><a href="#home" data-icon="home" data-iconpos="top" class="ui-btn-active ui-state-persist">首页</a></li>
+                    <li><a href="#bug" data-icon="tag" data-iconpos="top" >Bug</a></li>
+                    <li><a href="#case" data-icon="user" data-iconpos="top" >Case</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div data-role="page" id="task">
+        <div data-role="header" data-position="fixed" data-fullscreen="true">
+            <h1>Task</h1>
+        </div>
+        <div data-role="main" class="ui-content" >
+            <h2>Task</h2>
+            <form class="ui-filterable">
+                <input id="myTask" data-type="search">
+            </form>
+            <ul data-role="listview" data-inset="true" data-filter="true" data-input="#myTask" data-autodividers="true">
+                <li><a href="#">列表项</a></li>
+                <li><a href="#">列表项</a></li>
+                <li><a href="#">列表项</a></li>
+            </ul>
+        </div>
+        <div data-role="footer" data-position="fixed" data-fullscreen="true" >
+            <div data-role="navbar">
+                <ul>
+                    <li><a href="#task" data-icon="bars" data-iconpos="top" class="ui-btn-active ui-state-persist">Task</a></li>
+                    <li><a href="#plan" data-icon="clock" data-iconpos="top" >Plan</a></li>
+                    <li><a href="#home" data-icon="home" data-iconpos="top" >首页</a></li>
+                    <li><a href="#bug" data-icon="tag" data-iconpos="top" >Bug</a></li>
+                    <li><a href="#case" data-icon="user" data-iconpos="top" >Case</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div data-role="page" id="plan">
+        <div data-role="header" data-position="fixed" data-fullscreen="true">
+            <h1>Plan</h1>
+        </div>
+        <div data-role="main" class="ui-content">
+            <h2>Plan</h2>
+            <form class="ui-filterable">
+                <input id="myPlan" data-type="search">
+            </form>
+            <ul data-role="listview" data-inset="true" data-filter="true" data-input="#myPlan" data-autodividers="true">
+                <li><a href="#">列表项</a></li>
+                <li><a href="#">列表项</a></li>
+                <li><a href="#">列表项</a></li>
+            </ul>
+        </div>
+        <div data-role="footer" data-position="fixed" data-fullscreen="true" >
+            <div data-role="navbar">
+                <ul>
+                    <li><a href="#task" data-icon="bars" data-iconpos="top" >Task</a></li>
+                    <li><a href="#plan" data-icon="clock" data-iconpos="top" class="ui-btn-active ui-state-persist">Plan</a></li>
+                    <li><a href="#home" data-icon="home" data-iconpos="top" >首页</a></li>
+                    <li><a href="#bug" data-icon="tag" data-iconpos="top" >Bug</a></li>
+                    <li><a href="#case" data-icon="user" data-iconpos="top" >Case</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div data-role="page" id="bug">
+        <div data-role="header" data-position="fixed" data-fullscreen="true">
+            <h1>BUG</h1>
+        </div>
+        <div data-role="main" class="ui-content">
+            <h2>BUG</h2>
+            <form class="ui-filterable">
+                <input id="myBug" data-type="search">
+            </form>
+            <ul data-role="listview" data-inset="true" data-filter="true" data-input="#myBug" data-autodividers="true">
+                <li><a href="#">列表项</a></li>
+                <li><a href="#">列表项</a></li>
+                <li><a href="#">列表项</a></li>
+            </ul>
+        </div>
+        <div data-role="footer" data-position="fixed" data-fullscreen="true" >
+            <div data-role="navbar">
+                <ul>
+                    <li><a href="#task" data-icon="bars" data-iconpos="top" >Task</a></li>
+                    <li><a href="#plan" data-icon="clock" data-iconpos="top" >Plan</a></li>
+                    <li><a href="#home" data-icon="home" data-iconpos="top" >首页</a></li>
+                    <li><a href="#bug" data-icon="tag" data-iconpos="top" class="ui-btn-active ui-state-persist">Bug</a></li>
+                    <li><a href="#case" data-icon="user" data-iconpos="top" >Case</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div data-role="page" id="case">
+        <div data-role="header" data-position="fixed" data-fullscreen="true">
+            <h1>Case</h1>
+        </div>
+        <div data-role="main" class="ui-content">
+            <h2>Case</h2>
+            <form class="ui-filterable">
+                <input id="myCase" data-type="search">
+            </form>
+            <ul data-role="listview" data-inset="true" data-filter="true" data-input="#myCase" data-autodividers="true">
+                <li><a href="#">列表项</a></li>
+                <li><a href="#">列表项</a></li>
+                <li><a href="#">列表项</a></li>
+            </ul>
+        </div>
+        <div data-role="footer" data-position="fixed" data-fullscreen="true" >
+            <div data-role="navbar">
+                <ul>
+                    <li><a href="#task" data-icon="bars" data-iconpos="top" >Task</a></li>
+                    <li><a href="#plan" data-icon="clock" data-iconpos="top" >Plan</a></li>
+                    <li><a href="#home" data-icon="home" data-iconpos="top" >首页</a></li>
+                    <li><a href="#bug" data-icon="tag" data-iconpos="top" >Bug</a></li>
+                    <li><a href="#case" data-icon="user" data-iconpos="top" class="ui-btn-active ui-state-persist">Case</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div data-role="page" id="info">
+        <div data-role="main" class="ui-content">
+            <div data-role="content">
+                <div data-role="fieldcontainer">
+                    <label id="lbUserName"></label>
+                    <label id="lbAge"></label>
+                    <div id="code"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        //AJAX服务调用地址
+        // var url = window.location.href; //获取完成地址
+        // alert(url);
+        // var server_url = "http://127.0.0.1/mtsh";
+        // var server_url = "http://172.30.11.11/mtsh";
+        var server_url = "http://" + document.domain +"/mtsh";
+            /** 页面第一次初始化的时候加载列表 **/
+        $(document).on("pageinit", "#home", function () {
+            // loadHomeList();
+        });
+        $(document).on("pageinit", "#info", function () {
+            // viewPenInfo();
+        });
+        /** 每次页面显示时，重新加载列表  **/
+        $(document).on("pageshow", "#home", function () {
+            loadHomeList();
+        });
+        $(document).on("pageshow", "#info", function () {
+            viewPenInfo();
+        });
+        function loadHomeList() {
+            // var user = $.cookie('Jira_user');
+            // alert(user);
+            $.ajax({
+                type: "GET",
+                url: server_url +'/Jira/Mapi/home',
+                data: {},
+                dataType: "json",// 预期服务器返回的数据类型
+                jsonp: 'callback',  // 指定回调查询参数的名称，即前后端约定的字段，默认为“callback"
+                jsonpCallback: 'cb',  // 指定回调函数名称
+                cache: true,
+                success: function (ss) {
+                    $('#homeList li').remove();
+                    var json = eval(ss.result);
+                    for (var i = 0; i < json.length; i++) {
+                        $("#homeList").append(
+                            '<li><a href="#info" onclick=setHomeCookie('+ json[i].id + ')><h1>'
+                            + json[i].pkey +'<small class="pull-right">'+json[i].draw+ "</small></h1>"
+                            +"<p>" + json[i].pname + "</p></a></li>"
+                        );
+                    }
+                    $("#homeList").listview('refresh');
+                }
+            })
+        }
+
+        function setHomeCookie(id) {
+            // alert(id)
+            $.cookie('qcJira_pendingId', id, { expires: 7, path: '/' });
+        }
+
+        function viewPenInfo() {
+            var id = $.cookie('qcJira_pendingId');
+            $("#lbUserName").html();
+            $("#lbAge").html();
+            $.ajax({
+                type: "GET",
+                url: server_url +'/Jira/Mapi/getInfo',
+                data: {
+                    id:id
+                },
+                dataType: "json",
+                success: function (ss) {
+                    // $('#homeList li').remove();
+                    var json = eval(ss.result);
+                    $("#lbUserName").html("姓名：" + json.pkey);
+                    $("#lbAge").html("年龄：" + json.pname);
+
+                    $("#code").html("");
+
+                    //生成二维码
+                    $("#code").qrcode({
+                        render: "canvas", //table方式,canvas
+                        width: 300, //宽度
+                        height: 300, //高度
+                        text: json.pkey,//任意内容
+                        typeNumber:-1,//计算模式
+                        correctLevel:2,//二维码纠错级别
+                        background:"#ffffff",//背景颜色
+                        foreground:"#000000"  //二维码颜色
+                    });
+
+                    // $.mobile.changePage("#pageStuInfo", {
+                    //     transition:"slide"
+                    // });
+                }
+            })
+
+
+        }
+
+
+    </script>
+
+
+</body>
+</html>

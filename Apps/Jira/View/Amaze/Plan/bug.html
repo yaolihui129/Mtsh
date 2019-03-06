@@ -44,22 +44,138 @@
                     <img src="__IMG__/wao.jpg" class="img-responsive center-block" alt="error">
                     <h1 class="text-center">本次迭代没有发现BUG，是否认真测试了呢？</h1>
                     <else/>
-                        <ul class="list-group">
-                            <volist name='bug' id='st' empty="没有数据">
-                                <li class="list-group-item">
-                                    <small>
-                                        <a href="http://jira.zhidaohulian.com/browse/<{$pkey}>-<{$st.issuenum}>" target="_blank">
-                                            【<{$pkey}>-<{$st.issuenum}>】
-                                        </a>
-                                        【<{$st.issuestatus|getIssueStatus=###}>】【提交人：<{$st.reporter|getJiraName=###}>】
-                                        【指派给：<{$st.assignee|getJiraName=###}>】<{$st.summary}>
-                                    </small>
-                                    <span class="badge"><{$st.priority|getPriority=###}></span>
-                                </li>
-                            </volist>
-                        </ul>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table class="am-table am-table-striped am-table-hover table-main table-bordered">
+                                <thead>
+                                <tr>
+                                    <th class="table-title" bgcolor="#ccc">提交人->指派给</th>
+                                    <th class="table-title" bgcolor="#ccc">【状态】【编号】BUG描述</th>
+                                    <th class="table-type" bgcolor="#ccc">责任人</th>
+                                    <th class="table-type" bgcolor="#ccc">评级</th>
+                                    <th class="table-type" bgcolor="#ccc">分类</th>
+                                    <th class="table-type" bgcolor="#ccc">原因</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <volist name='bug' id='st' empty="没有数据">
+                                    <tr>
+                                        <td title="<{$st.priority|getPriority=###}>">
+                                            <{$st.reporter|getJiraName=###}>-><{$st.assignee|getJiraName=###}>
+                                        </td>
+                                        <td>
+                                            <a href="http://jira.zhidaohulian.com/browse/<{$pkey}>-<{$st.issuenum}>" target="_blank">
+                                                【<{$st.issuestatus|getIssueStatus=###}>】【<{$pkey}>-<{$st.issuenum}>】<{$st.summary}>
+                                            </a>
+                                        </td>
+                                        <td><{$st.id|getBugReviewInfo=###,'chief'}></td>
+                                        <td><{$st.id|getBugReviewInfo=###,'bug_priority'}></td>
+                                        <td><{$st.id|getBugReviewInfo=###,'bug_type'}></td>
+                                        <td title="<{$st.id|getBugReviewInfoReasonSub=###}>">
+                                            <a data-toggle="modal" href="#review" id="<{$st.id}>"
+                                               onclick="review(this.id)"><{$st.id|getBugReviewInfo=###,'bug_reason'}></a>
+                                        </td>
+                                    </tr>
+                                </volist>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                 </empty>
             </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    function review(id) {
+        // alert({$tp})
+        $.ajax({
+            type: "GET",
+            url: "__URL__/getBugInfo",
+            data: {id: id},
+            dataType: "json",
+            success: function (ss) {
+                $("#review_id").val(ss.result.id);
+                $("#review_chief").val(ss.result.chief);
+                $("#review_bug_create").val(ss.result.created);
+                $("#review_test_priority").val(ss.result.priority);
+                $("#review_reason_sub").val(ss.result.reason_sub);
+                $("#review_avoid").val(ss.result.avoid);
+                $("#review_summary").val(ss.result.summary);
+                $("#review_bug_type").empty().append(ss.result.bug_type);
+                $("#review_bug_env").empty().append(ss.result.bug_env);
+                $("#review_bug_reason").empty().append(ss.result.bug_reason);
+                $("#review_bug_priority").empty().append(ss.result.bug_priority);
+            }
+        })
+    }
+</script>
+
+
+
+<div class="modal fade" id="review" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form action="__URL__/setBugReview" method="post" enctype='multipart/form-data' class="form-horizontal" role="form"   >
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title">BUG-评审</h4>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="review_id" value="" />
+                    <input type="hidden" name="tp"  value="<{$tp}>" />
+                    <input type="hidden" name="bug_create" id="review_bug_create" value="" />
+                    <input type="hidden" name="test_priority" id="review_test_priority" value="" />
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">BUG</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control"  value="" id="review_summary" placeholder="BUG" readonly>
+                        </div>
+
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">分类</label>
+                        <div class="col-sm-4" id="review_bug_type"></div>
+                        <label class="col-sm-2 control-label">环境</label>
+                        <div class="col-sm-4" id="review_bug_env"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">责任人</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" name="chief" id="review_chief" value="" placeholder="责任人">
+                        </div>
+                        <label class="col-sm-2 control-label">级别</label>
+                        <div class="col-sm-4" id="review_bug_priority"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">原因</label>
+                        <div class="col-sm-4" id="review_bug_reason"></div>
+                        <label class="col-sm-2 control-label">说明</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" name="reason_sub" id="review_reason_sub" value="" placeholder="说明">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">规避方案</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="avoid" id="review_avoid" value="" placeholder="规避方案">
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="submit" class="btn btn-primary">提交</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

@@ -55,28 +55,31 @@
             </div>
         </div>
     </nav>
-    <table class="am-table am-table-striped am-table-hover table-main table-bordered">
-        <thead>
-        <tr>
-            <th class="table-type" bgcolor="#ccc">KEY</th>
-            <th class="table-title" bgcolor="#ccc">测试计划</th>
-            <th class="table-type" bgcolor="#ccc">报告人</th>
-            <th class="table-type" bgcolor="#ccc">经办人</th>
-        </tr>
-        </thead>
-        <tbody>
-        <volist name='data' id='da' empty="没有数据">
-            <tr>
-                <td>
-                    <a href="http://jira.zhidaohulian.com/browse/<{$da.pkey}>" target="_blank"><{$da.pkey}></a>
-                    <span class="pull-right">【<{$da.issuestatus|getName='issuestatus',###,'pname'}>】</span>
-                </td>
-                <td>
-                    <switch name="da.plantype">
-                        <case value="0">
-                            <span class="label label-success">功能</span>
-                            <a href="__URL__/details/tp/<{$da.id}>" target="_blank"><{$da.summary}></a>
-                            <span class="pull-right">
+    <div class="row">
+        <div class="col-md-10">
+            <table class="am-table am-table-striped am-table-hover table-main table-bordered">
+                <thead>
+                <tr>
+                    <th class="table-type" bgcolor="#ccc">KEY</th>
+                    <th class="table-title" bgcolor="#ccc">测试计划</th>
+                    <th class="table-type" bgcolor="#ccc">经办人</th>
+                    <th class="table-type" bgcolor="#ccc">工时</th>
+                    <th class="table-type" bgcolor="#ccc">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <volist name='data' id='da' empty="没有数据">
+                    <tr>
+                        <td>
+                            <a href="http://jira.zhidaohulian.com/browse/<{$da.pkey}>" target="_blank"><{$da.pkey}></a>
+                            <span class="pull-right">【<{$da.issuestatus|getName='issuestatus',###,'pname'}>】</span>
+                        </td>
+                        <td>
+                            <switch name="da.plantype">
+                                <case value="0">
+                                    <span class="label label-success">功能</span>
+                                    <a href="__URL__/details/tp/<{$da.id}>" target="_blank"><{$da.summary}></a>
+                                    <span class="pull-right">
                                 <a href="__URL__/change_type/id/<{$da.id}>/plantype/1" class=" btn am-btn-danger btn-xs ">
                                     <span class="glyphicon glyphicon-retweet"> 性能 </span>
                                 </a>
@@ -84,11 +87,11 @@
                                     <span class="glyphicon glyphicon-retweet"> Api </span>
                                 </a>
                             </span>
-                        </case>
-                        <case value="1">
-                            <span class="label label-danger">性能</span>
-                            <a href="__URL__/capability/tp/<{$da.id}>" target="_blank"><{$da.summary}></a>
-                            <span class="pull-right">
+                                </case>
+                                <case value="1">
+                                    <span class="label label-danger">性能</span>
+                                    <a href="__URL__/capability/tp/<{$da.id}>" target="_blank"><{$da.summary}></a>
+                                    <span class="pull-right">
                                 <a href="__URL__/change_type/id/<{$da.id}>/plantype/0" class=" btn am-btn-success btn-xs ">
                                     <span class="glyphicon glyphicon-retweet"> 功能 </span>
                                 </a>
@@ -96,11 +99,11 @@
                                     <span class="glyphicon glyphicon-retweet"> Api </span>
                                 </a>
                             </span>
-                        </case>
-                        <case value="2">
-                            <span class="label label-primary">api</span>
-                            <a href="__URL__/api/tp/<{$da.id}>" target="_blank"><{$da.summary}></a>
-                            <span class="pull-right">
+                                </case>
+                                <case value="2">
+                                    <span class="label label-primary">api</span>
+                                    <a href="__URL__/api/tp/<{$da.id}>" target="_blank"><{$da.summary}></a>
+                                    <span class="pull-right">
                                 <a href="__URL__/change_type/id/<{$da.id}>/plantype/0" class=" btn am-btn-success btn-xs ">
                                     <span class="glyphicon glyphicon-retweet"> 功能 </span>
                                 </a>
@@ -108,13 +111,32 @@
                                     <span class="glyphicon glyphicon-retweet"> 性能 </span>
                                 </a>
                             </span>
-                        </case>
-                    </switch>
-                </td>
-                <td><{$da.reporter|getJiraName=###}></td>
-                <td><{$da.assignee|getJiraName=###}></td>
-            </tr>
-        </volist>
-        </tbody>
-    </table>
+                                </case>
+                            </switch>
+                        </td>
+                        <td><{$da.assignee|getJiraName=###}></td>
+                        <td><{$da.id|getTaskWorkHour=###}></td>
+                        <td><a href="__URL__/workLong/tp/<{$da.id}>">记工时</a></td>
+                    </tr>
+                </volist>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-2">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">测试工时：<{$today}></h3>
+                </div>
+                <ul class="list-group">
+                    <volist name='testers' id='vo' empty="没有数据">
+                        <li class="list-group-item">
+                            <{$vo|getJiraName=###}>
+                            <span class="badge"><{$vo|getUserWorkHour=###}></span>
+                        </li>
+                    </volist>
+                </ul>
+            </div>
+        </div>
+    </div>
+
 </div>

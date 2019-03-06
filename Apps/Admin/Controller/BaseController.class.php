@@ -12,9 +12,6 @@ class BaseController extends Controller
         if($isLogin==''||$user==''){
             $this->redirect(C('PRODUCT').'/Login/index');
         }
-        if (ismobile()) {//设置默认默认主题为 Amaze
-            C('DEFAULT_V_LAYER', 'Amaze');
-        }
     }
     //空页面跳转
     function _empty()

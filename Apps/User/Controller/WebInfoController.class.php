@@ -5,9 +5,7 @@ class WebInfoController extends Controller
 {
     public function _initialize()
     {
-        if (ismobile()) {//设置默认默认主题为 Amaze
-            C('DEFAULT_V_LAYER', 'Amaze');
-        }
+
     }
 
     function _empty()
